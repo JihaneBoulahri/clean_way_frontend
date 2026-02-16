@@ -58,37 +58,37 @@ class ApiService {
   }
 
   // ───────────────────────────── CAMION ─────────────────────────────
-  static Future<List<camion>> fetchCamions() async {
+  static Future<List<Camion>> fetchCamions() async {
     final response = await http.get(Uri.parse('$baseUrl/camions'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => camion.fromJson(json)).toList();
+      return data.map((json) => Camion.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load camions');
     }
   }
 
-  static Future<camion> createCamion(camion camion) async {
+  static Future<Camion> createCamion(Camion camion) async {
     final response = await http.post(
       Uri.parse('$baseUrl/camions'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(camion.toJson()),
     );
     if (response.statusCode == 201) {
-      return camion.fromJson(json.decode(response.body));
+      return Camion.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to create camion');
     }
   }
 
-  static Future<camion> updateCamion(camion camion) async {
+  static Future<Camion> updateCamion(Camion camion) async {
     final response = await http.put(
       Uri.parse('$baseUrl/camions/${camion.id}'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(camion.toJson()),
     );
     if (response.statusCode == 200) {
-      return camion.fromJson(json.decode(response.body));
+      return Camion.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to update camion');
     }

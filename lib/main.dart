@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../pages/splash_page.dart';
+import 'package:get/get.dart';
+//import 'pages/splash_page.dart';
+import 'pages/auth/registre_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +12,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Clean Way',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
+
+   
+     
+      getPages: [
+        GetPage(
+          name: '/register',
+          page: () => RegisterPage(),
+        ),
+      ],
     );
   }
 }

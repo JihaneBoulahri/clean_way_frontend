@@ -3,11 +3,11 @@ import '../models/camion_model.dart';
 import 'api_service.dart';
 
 class CamionProvider with ChangeNotifier {
-  List<camion> _camions = [];
+  List<Camion> _camions = [];
   bool _isLoading = false;
   String? _error;
 
-  List<camion> get camions => _camions;
+  List<Camion> get camions => _camions;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -27,7 +27,7 @@ class CamionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addCamion(camion camion) async {
+  Future<void> addCamion(Camion camion) async {
     try {
       final newCamion = await ApiService.createCamion(camion);
       _camions.add(newCamion);
@@ -37,7 +37,7 @@ class CamionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateCamion(camion camion) async {
+  Future<void> updateCamion(Camion camion) async {
     try {
       final updated = await ApiService.updateCamion(camion);
       final index = _camions.indexWhere((c) => c.id == updated.id);
