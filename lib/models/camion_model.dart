@@ -1,11 +1,11 @@
-class camion{
+class Camion{
    final int id; 
   final String immatriculation;
   final String typeCamion;
   final double capaciteCamion;
   final DateTime? dateMiseEnService; 
   final int? idZone; 
-  camion({
+  Camion({
     required this.id,
     required this.immatriculation,
     required this.typeCamion,
@@ -14,8 +14,8 @@ class camion{
     this.idZone,
   });
 
- factory camion.fromJson(Map<String, dynamic> json) {
-    return camion(
+ factory Camion.fromJson(Map<String, dynamic> json) {
+    return Camion(
       id: json['id_camion'] as int,
       immatriculation: json['immatriculation'] as String,
       typeCamion: json['type_camion'] as String,

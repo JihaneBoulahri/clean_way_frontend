@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../pages/splash_page.dart';
+import 'package:get/get.dart';
+import 'routes/app_pages.dart';
+import 'routes/app_routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +12,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Clean Way',
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'Clean Way',
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
+      initialRoute: AppRoutes.login,
+      getPages: AppPages.routes,
     );
   }
 }
