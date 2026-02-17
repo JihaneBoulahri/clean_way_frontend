@@ -12,7 +12,8 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final AuthController controller = Get.put(AuthController());
 
-  final nameController = TextEditingController();
+  final nomController = TextEditingController();
+  final prenomController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -22,7 +23,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    nameController.dispose();
+    nomController.dispose();
+    prenomController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -58,6 +60,39 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Obx(() {
+                    if (controller.errorMessage.value.isEmpty) return const SizedBox.shrink();
+                    return Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Erreur',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade800,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            controller.errorMessage.value,
+                            style: TextStyle(
+                              color: Colors.grey.shade700,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                   Container(
                     padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
@@ -98,8 +133,14 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 18),
 
                         TextField(
-                          controller: nameController,
-                          decoration: _inputDecoration(hint: 'Name', icon: Icons.person),
+                          controller: nomController,
+                          decoration: _inputDecoration(hint: 'Nom', icon: Icons.badge_outlined),
+                        ),
+                        const SizedBox(height: 12),
+
+                        TextField(
+                          controller: prenomController,
+                          decoration: _inputDecoration(hint: 'Prénom', icon: Icons.person_outline),
                         ),
                         const SizedBox(height: 12),
 
@@ -155,7 +196,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                     onPressed: () {
                                       controller.register(
-                                        name: nameController.text,
+                                        nom: nomController.text,
+                                        prenom: prenomController.text,
                                         email: emailController.text,
                                         password: passwordController.text,
                                         confirmPassword: confirmPasswordController.text,
@@ -188,6 +230,16 @@ class _RegisterPageState extends State<RegisterPage> {
                           )
                         ],
                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () {
+                      Get.toNamed('/driver-dashboard');
+                    },
+                    child: Text(
+                      'Voir le Dashboard Chauffeur',
+                      style: TextStyle(color: primaryGreen, fontWeight: FontWeight.w600, fontSize: 13),
                     ),
                   ),
                 ],

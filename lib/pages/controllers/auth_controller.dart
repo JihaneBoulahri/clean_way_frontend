@@ -4,14 +4,16 @@ import '../../services/auth_service.dart';
 
 class AuthController extends GetxController {
   final isLoading = false.obs;
+  final errorMessage = ''.obs;
 
   Future<void> register({
-    required String name,
+    required String nom,
+    required String prenom,
     required String email,
     required String password,
     required String confirmPassword,
   }) async {
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (nom.isEmpty || prenom.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       Get.snackbar('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
@@ -20,10 +22,12 @@ class AuthController extends GetxController {
       return;
     }
 
+    errorMessage.value = '';
     try {
       isLoading.value = true;
       final res = await AuthService.register({
-        'name': name,
+        'nom': nom,
+        'prenom': prenom,
         'email': email,
         'password': password,
         'confirmPassword': confirmPassword,
@@ -35,10 +39,21 @@ class AuthController extends GetxController {
         final msg = res['error'] ?? res['message'];
         Get.snackbar('Erreur', msg.toString());
       } else {
+        errorMessage.value = '';
         Get.snackbar('Succès', 'Inscription réussie');
       }
     } catch (e) {
-      Get.snackbar('Erreur', e.toString());
+      final msg = e.toString();
+      if (msg.contains('Connection refused') ||
+          msg.contains('SocketException') ||
+          msg.contains('ClientException')) {
+        errorMessage.value =
+            'Serveur inaccessible. Vérifiez que le backend est démarré sur http://127.0.0.1:8000';
+        Get.snackbar('Erreur', errorMessage.value);
+      } else {
+        errorMessage.value = msg;
+        Get.snackbar('Erreur', msg);
+      }
     } finally {
       isLoading.value = false;
     }
