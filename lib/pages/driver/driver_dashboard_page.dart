@@ -6,6 +6,8 @@ import '../../models/tournee_model.dart';
 import '../../models/benne_model.dart';
 import '../../models/releve_model.dart';
 import '../../models/capteur_model.dart';
+import 'dashboard_navbar.dart';
+import 'dashboard_sidebar.dart';
 
 class DriverDashboardPage extends StatefulWidget {
   const DriverDashboardPage({super.key});
@@ -17,6 +19,14 @@ class DriverDashboardPage extends StatefulWidget {
 class _DriverDashboardPageState extends State<DriverDashboardPage> {
   static const Color primaryGreen = Color(0xFF22C55E);
   static const Color background = Color(0xFFF9F2F7);
+
+  bool _isSidebarVisible = false;
+
+  // Exemple de données utilisateur – remplacez par vos vraies données.
+  final String _firstName = 'Amina';
+  final String _lastName = 'Driver';
+  final String _email = 'amina.driver@example.com';
+  final String _phone = '+212 6 00 00 00 00';
 
   List<Tournee> _tournees = [];
   List<Benne> _bennes = [];
@@ -55,11 +65,25 @@ class _DriverDashboardPageState extends State<DriverDashboardPage> {
         _releves = [];
         _capteurs = [];
         _loading = false;
-        _error = e.toString().contains('Connection refused')
-            ? 'Serveur indisponible'
-            : e.toString();
+        final errorMsg = e.toString();
+        if (errorMsg.contains('Connection refused') ||
+            errorMsg.contains('SocketException') ||
+            errorMsg.contains('ClientException') ||
+            errorMsg.contains('Failed host lookup') ||
+            errorMsg.contains('TimeoutException') ||
+            errorMsg.contains('Serveur inaccessible')) {
+          _error = 'Serveur inaccessible. Vérifiez que le backend est démarré sur http://127.0.0.1:8000';
+        } else {
+          _error = errorMsg;
+        }
       });
     }
+  }
+
+  void _toggleSidebar() {
+    setState(() {
+      _isSidebarVisible = !_isSidebarVisible;
+    });
   }
 
   List<Tournee> get _todayTournees {
@@ -105,53 +129,92 @@ class _DriverDashboardPageState extends State<DriverDashboardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      appBar: AppBar(
-        backgroundColor: primaryGreen,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('Dashboard Chauffeur'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loading ? null : _loadData,
-          ),
-        ],
+      bottomNavigationBar: const DashboardBottomBar(
+        primaryColor: primaryGreen,
+        appName: 'Clean Way',
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+          : Stack(
+              children: [
+                // Contenu principal avec navbar + dashboard
+                Column(
                   children: [
-                    _buildHeader(),
-                    if (_error != null) _buildErrorBanner(),
-                    const SizedBox(height: 20),
-                    _buildSectionTitle('Ma distribution du jour', Icons.today),
-                    _buildDailyDistributionCard(),
-                    const SizedBox(height: 16),
-                    _buildSectionTitle('Le parcours', Icons.route),
-                    _buildRouteCard(),
-                    const SizedBox(height: 16),
-                    _buildSectionTitle('Les conteneurs', Icons.delete_outline),
-                    _buildContainersCard(),
-                    const SizedBox(height: 16),
-                    _buildSectionTitle('Statut', Icons.info_outline),
-                    _buildStatusCard(),
-                    const SizedBox(height: 16),
-                    _buildSectionTitle('Total', Icons.donut_large),
-                    _buildTotalCard(),
-                    const SizedBox(height: 16),
-                    _buildSectionTitle('Niveau de remplissage par jour', Icons.show_chart),
-                    _buildFillLevelCard(),
-                    // Bennes fill level section removed
-                    const SizedBox(height: 24),
+                    DashboardNavbar(
+                      primaryColor: primaryGreen,
+                      firstName: _firstName,
+                      lastName: _lastName,
+                      email: _email,
+                      phone: _phone,
+                      onRefresh: _loading ? null : _loadData,
+                      onToggleSidebar: _toggleSidebar,
+                    ),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: _loadData,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildHeader(),
+                              if (_error != null) _buildErrorBanner(),
+                              const SizedBox(height: 20),
+                              _buildSectionTitle('Ma distribution du jour', Icons.today),
+                              _buildDailyDistributionCard(),
+                              const SizedBox(height: 16),
+                              _buildSectionTitle('Le parcours', Icons.route),
+                              _buildRouteCard(),
+                              const SizedBox(height: 16),
+                              _buildSectionTitle('Les conteneurs', Icons.delete_outline),
+                              _buildContainersCard(),
+                              const SizedBox(height: 16),
+                              _buildSectionTitle('Statut', Icons.info_outline),
+                              _buildStatusCard(),
+                              const SizedBox(height: 16),
+                              _buildSectionTitle('Total', Icons.donut_large),
+                              _buildTotalCard(),
+                              const SizedBox(height: 16),
+                              _buildSectionTitle(
+                                'Niveau de remplissage par jour',
+                                Icons.show_chart,
+                              ),
+                              _buildFillLevelCard(),
+                              const SizedBox(height: 24),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
+                // Sidebar qui glisse par-dessus, comme un drawer
+                if (_isSidebarVisible)
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: _toggleSidebar,
+                      child: Container(
+                        color: Colors.black.withOpacity(0.3),
+                        alignment: Alignment.centerLeft,
+                        child: SizedBox(
+                          width: 260,
+                          child: Material(
+                            elevation: 8,
+                            child: DashboardSidebar(
+                              primaryColor: primaryGreen,
+                              onItemSelected: (String route) {
+                                // Ferme le menu, puis gère la navigation si besoin.
+                                _toggleSidebar();
+                                // TODO: navigation selon "route".
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
     );
   }
