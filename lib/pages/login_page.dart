@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/login_controller.dart';
+import '../routes/app_routes.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
@@ -106,12 +107,25 @@ class LoginPage extends GetView<LoginController> {
                           ),
                         )),
                   SizedBox(height: screenHeight * 0.02),
-                  // Forgot password
+                  // sign up text
                   TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      "Don't have account?  Sign Up",
-                      style: TextStyle(color: const Color.fromARGB(255, 47, 211, 137)),
+                    onPressed: () {
+                      Get.toNamed(AppRoutes.signup);
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Don't have an account? ",
+                        style: TextStyle(color: Colors.grey[700]),
+                        children: [
+                          TextSpan(
+                            text: 'Sign Up',
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 47, 211, 137),
+                              fontWeight: FontWeight.bold,
+                              ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

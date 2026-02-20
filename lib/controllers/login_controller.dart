@@ -52,7 +52,7 @@ class LoginController extends GetxController {
 
       if (result['success']) {
         Get.snackbar("Success", "Login successful");
-
+        Get.offAllNamed("/dashboard");
         // Optional: store token
         // final token = result['data']['token'];
         // await SharedPreferences.getInstance().then((prefs) {
