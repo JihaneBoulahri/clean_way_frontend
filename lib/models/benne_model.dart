@@ -2,34 +2,35 @@ class Benne {
   final int id;
   final String typeBenne;
   final double capacite;
-  final double niveauRemplissage;
-  final String position;
+  final String latitude;
+  final String longitude;
+
 
   Benne({
     required this.id,
     required this.typeBenne,
     required this.capacite,
-    required this.niveauRemplissage,
-    required this.position,
+    required this.latitude,
+    required this.longitude,
   });
 
   factory Benne.fromJson(Map<String, dynamic> json) {
     return Benne(
-      id: json['id_point'] as int,
+      id: json['id_benne'] as int,
       typeBenne: json['type_benne'] as String,
       capacite: (json['capacite'] as num).toDouble(),
-      niveauRemplissage: (json['niveau_remplissage'] as num).toDouble(),
-      position: json['position'] as String,
+      latitude: json['latitude'] as String,
+      longitude: json['longitude'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id_point': id,
+      'id_benne': id,
       'type_benne': typeBenne,
       'capacite': capacite,
-      'niveau_remplissage': niveauRemplissage,
-      'position': position,
+      'latitude': latitude,
+      'longitude': longitude,
     };
   }
 }

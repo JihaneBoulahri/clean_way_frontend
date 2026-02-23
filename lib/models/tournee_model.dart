@@ -4,7 +4,8 @@ class Tournee {
   final String heureDebut; 
   final String heureFin;
   final String statut;
-  final int? idCamion; 
+  final int? idCamion;
+  final int? id_zone; 
 
   Tournee({
     required this.id,
@@ -13,6 +14,7 @@ class Tournee {
     required this.heureFin,
     required this.statut,
     this.idCamion,
+    this.id_zone,
   });
 
   factory Tournee.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class Tournee {
       heureFin: json['heure_fin'] as String,
       statut: json['statut'] as String,
       idCamion: json['id_camion'] as int?,
+      id_zone: json['id_zone'] as int?,
     );
   }
 
@@ -34,6 +37,7 @@ class Tournee {
       'heure_fin': heureFin,
       'statut': statut,
       'id_camion': idCamion,
+      'id_zone': id_zone,
     };
   }
 }

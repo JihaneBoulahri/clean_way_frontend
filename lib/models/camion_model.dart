@@ -4,14 +4,14 @@ class Camion{
   final String typeCamion;
   final double capaciteCamion;
   final DateTime? dateMiseEnService; 
-  final int? idZone; 
+  final String status;
   Camion({
     required this.id,
     required this.immatriculation,
     required this.typeCamion,
     required this.capaciteCamion,
     this.dateMiseEnService,
-    this.idZone,
+    required this.status
   });
 
  factory Camion.fromJson(Map<String, dynamic> json) {
@@ -23,7 +23,7 @@ class Camion{
       dateMiseEnService: json['date_mise_en_service'] != null
           ? DateTime.parse(json['date_mise_en_service'] as String)
           : null,
-      idZone: json['id_zone'] as int?,
+      status: json['status'] as String,
     );
   }
    Map<String, dynamic> toJson() {
@@ -33,7 +33,8 @@ class Camion{
       'type_camion': typeCamion,
       'capacite_camion': capaciteCamion,
       'date_mise_en_service': dateMiseEnService?.toIso8601String(),
-      'id_zone': idZone,
+      'status': status, 
+      
     };
    }
 }

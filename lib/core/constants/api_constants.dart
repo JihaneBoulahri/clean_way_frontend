@@ -54,15 +54,6 @@ class ChauffeurEndpoints {
   static String detail(int id) => "${ApiConstants.baseUrl}/chauffeurs/$id";
 }
 
-/* ===========================
-            RELEVES
-=========================== */
-
-class ReleveEndpoints {
-  static const String base = "${ApiConstants.baseUrl}/releves";
-
-  static String detail(int id) => "${ApiConstants.baseUrl}/releves/$id";
-}
 
 /* =========================== */
 /*            STATS            */
