@@ -1,8 +1,8 @@
 import 'package:clean_way_frontend/pages/driver/dashboard_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-//import 'pages/splash_page.dart';
-import 'pages/auth/registre_page.dart';
+import 'routes/app_pages.dart';
+import 'routes/app_routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,24 +14,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Clean Way',
       debugShowCheckedModeBanner: false,
+      title: 'Clean Way',
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-     
-      getPages: [
-        GetPage(
-          name: '/',
-          page: () => RegisterPage(),
-        ),
-        GetPage(
-          name: '/dashboard',
-          page: () =>DashboardSidebar(primaryColor: Colors.red, onItemSelected: (route) {
-            print('Selected route: $route');
-          }),
-        ),
-      ]
+      initialRoute: AppRoutes.login,
+      getPages: AppPages.routes,
     );
   }
 }

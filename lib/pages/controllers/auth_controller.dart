@@ -29,6 +29,7 @@ class AuthController extends GetxController {
         'nom': nom,
         'prenom': prenom,
         'email': email,
+        'role': 'admin',
         'password': password,
         'confirmPassword': confirmPassword,
       });
@@ -41,6 +42,7 @@ class AuthController extends GetxController {
       } else {
         errorMessage.value = '';
         Get.snackbar('Succès', 'Inscription réussie');
+        Get.offAllNamed("/dashboard");
       }
     } catch (e) {
       final msg = e.toString();

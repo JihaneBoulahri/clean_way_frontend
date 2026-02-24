@@ -1,4 +1,5 @@
 class Camion{
+class Camion{
    final int id; 
   final String immatriculation;
   final String typeCamion;
@@ -14,6 +15,8 @@ class Camion{
     required this.status
   });
 
+ factory Camion.fromJson(Map<String, dynamic> json) {
+    return Camion(
  factory Camion.fromJson(Map<String, dynamic> json) {
     return Camion(
       id: json['id_camion'] as int,
