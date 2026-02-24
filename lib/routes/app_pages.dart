@@ -3,7 +3,7 @@ import '../pages/splash_page.dart';
 import '../pages/login_page.dart';
 import '../pages/signup_page.dart';
 import '../bindings/login_binding.dart';
-import '../pages/dashboard_page.dart';
+import '../pages/dashboard/dashboard_page.dart';
 import '../controllers/dashboard_controller.dart';
 import 'app_routes.dart';
 
