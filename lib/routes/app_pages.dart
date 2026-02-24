@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import '../pages/splash_page.dart';
 import '../pages/login_page.dart';
-import '../pages/signup_page.dart';
+import '../pages/auth/registre_page.dart';
 import '../bindings/login_binding.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../controllers/dashboard_controller.dart';
@@ -20,7 +20,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.signup, 
-      page: () => SignupPage()
+      page: () => RegisterPage()
     ),
     GetPage(
       name: AppRoutes.dashboard,
