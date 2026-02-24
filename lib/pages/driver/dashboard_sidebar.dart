@@ -22,14 +22,43 @@ class DashboardSidebar extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.local_shipping, color: primaryColor),
+                  Icon(Icons.recycling, color: primaryColor),
                   const SizedBox(width: 8),
-                  Text(
-                    'Chauffeur',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
-                      color: Colors.grey[900],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Clean Way',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: Colors.grey[900],
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Dashboard',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: primaryColor.withOpacity(0.1),
+                    child: Text(
+                      'JB',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -47,28 +76,28 @@ class DashboardSidebar extends StatelessWidget {
                     onTap: () => onItemSelected('dashboard'),
                   ),
                   _SidebarItem(
-                    icon: Icons.today_outlined,
-                    label: 'Tournées du jour',
+                    icon: Icons.local_shipping_outlined,
+                    label: 'Camions',
                     primaryColor: primaryColor,
-                    onTap: () => onItemSelected('today'),
+                    onTap: () => onItemSelected('trucks'),
                   ),
                   _SidebarItem(
-                    icon: Icons.route,
-                    label: 'Parcours',
+                    icon: Icons.map_outlined,
+                    label: 'Zones',
                     primaryColor: primaryColor,
-                    onTap: () => onItemSelected('route'),
+                    onTap: () => onItemSelected('zones'),
                   ),
                   _SidebarItem(
                     icon: Icons.delete_outline,
-                    label: 'Conteneurs',
+                    label: 'Bennes',
                     primaryColor: primaryColor,
-                    onTap: () => onItemSelected('containers'),
+                    onTap: () => onItemSelected('bennes'),
                   ),
                   _SidebarItem(
-                    icon: Icons.person_outline,
-                    label: 'Profil',
+                    icon: Icons.today_outlined,
+                    label: 'Tournées',
                     primaryColor: primaryColor,
-                    onTap: () => onItemSelected('profile'),
+                    onTap: () => onItemSelected('tours'),
                   ),
                   _SidebarItem(
                     icon: Icons.settings_outlined,
@@ -76,7 +105,48 @@ class DashboardSidebar extends StatelessWidget {
                     primaryColor: primaryColor,
                     onTap: () => onItemSelected('settings'),
                   ),
+                  _SidebarItem(
+                    icon: Icons.help_outline,
+                    label: 'Help & Support',
+                    primaryColor: primaryColor,
+                    onTap: () => onItemSelected('help'),
+                  ),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: InkWell(
+                onTap: () => onItemSelected('logout'),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red.shade100),
+                    color: Colors.red.shade50,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.logout,
+                        size: 18,
+                        color: Colors.red.shade700,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: Colors.red.shade700,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],

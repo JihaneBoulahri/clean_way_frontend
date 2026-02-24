@@ -1,8 +1,8 @@
+import 'package:clean_way_frontend/pages/driver/dashboard_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 //import 'pages/splash_page.dart';
 import 'pages/auth/registre_page.dart';
-import 'pages/driver/driver_dashboard_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,10 +26,12 @@ class MyApp extends StatelessWidget {
           page: () => RegisterPage(),
         ),
         GetPage(
-          name: '/driver-dashboard',
-          page: () => const DriverDashboardPage(),
+          name: '/dashboard',
+          page: () =>DashboardSidebar(primaryColor: Colors.red, onItemSelected: (route) {
+            print('Selected route: $route');
+          }),
         ),
-      ],
+      ]
     );
   }
 }
