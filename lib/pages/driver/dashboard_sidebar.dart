@@ -26,47 +26,31 @@ class DashboardSidebar extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  // Avatar on the left
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: primaryColor.withOpacity(0.1),
-                    child: Text(
-                      () {
-                        final parts = userName.trim().split(RegExp(r'\s+'));
-                        if (parts.isEmpty) return '';
-                        final f = parts[0].isNotEmpty ? parts[0][0] : '';
-                        final l = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
-                        return (f + l).toUpperCase();
-                      }(),
+                // Logo + nom de l'application à gauche
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.recycling, color: primaryColor, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Clean Way',
                       style: TextStyle(
-                        color: primaryColor,
                         fontWeight: FontWeight.w700,
-                        fontSize: 12,
+                        fontSize: 16,
+                        color: Colors.grey[900],
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  // Logo + app name + user name/role
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ],
+                ),
+                const Spacer(),
+                // Informations utilisateur (initiales + nom + rôle) à droite
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Row(
-                          children: [
-                            Icon(Icons.recycling, color: primaryColor, size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Clean Way',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                                color: Colors.grey[900],
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
                         Text(
                           userName,
                           style: TextStyle(
@@ -86,9 +70,29 @@ class DashboardSidebar extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(width: 8),
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: primaryColor.withOpacity(0.1),
+                      child: Text(
+                        () {
+                          final parts = userName.trim().split(RegExp(r'\s+'));
+                          if (parts.isEmpty) return '';
+                          final f = parts[0].isNotEmpty ? parts[0][0] : '';
+                          final l = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
+                          return (f + l).toUpperCase();
+                        }(),
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
             ),
             const Divider(height: 1),
             Expanded(

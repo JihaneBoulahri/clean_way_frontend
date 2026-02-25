@@ -62,7 +62,9 @@ class BennesPage extends GetView<BennesController> {
               lastName: 'Ben',
               email: 'jihane@example.com',
               phone: '+212000000000',
-              pageName: 'Chauffeur',
+              // Nom de la page affiché dans la navbar
+              pageName: 'Bennes',
+              // Rôle de l'utilisateur affiché dans la fiche profil
               userRole: 'Chauffeur',
               onToggleSidebar: () => _openSidebar(context, primaryColor),
               onRefresh: controller.fetchBennes,
