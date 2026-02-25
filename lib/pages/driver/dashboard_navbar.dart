@@ -6,6 +6,8 @@ class DashboardNavbar extends StatelessWidget {
   final String lastName;
   final String email;
   final String phone;
+  final String pageName;
+  final String userRole;
   final Future<void> Function()? onRefresh;
   final VoidCallback onToggleSidebar;
 
@@ -17,6 +19,8 @@ class DashboardNavbar extends StatelessWidget {
     required this.email,
     required this.phone,
     required this.onToggleSidebar,
+    this.pageName = 'Chauffeur',
+    this.userRole = 'Chauffeur',
     this.onRefresh,
   });
 
@@ -64,7 +68,7 @@ class DashboardNavbar extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Chauffeur',
+                        userRole,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -123,14 +127,14 @@ class DashboardNavbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: primaryColor,
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -138,50 +142,116 @@ class DashboardNavbar extends StatelessWidget {
         bottom: false,
         child: Row(
           children: [
-            Flexible(
-              child: Text(
-                'Dashboard Chauffeur',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 18,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
-            if (onRefresh != null) ...[
-              IconButton(
-                onPressed: () => onRefresh!(),
-                icon: const Icon(Icons.refresh, color: Colors.white),
-                tooltip: 'Rafraîchir',
-                padding: const EdgeInsets.all(8),
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 4),
-            ],
-            GestureDetector(
-              onTap: () => _showUserInfo(context),
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: Colors.white,
-                child: Text(
-                  _initials,
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 4),
+            // menu button
             IconButton(
               onPressed: onToggleSidebar,
-              icon: const Icon(Icons.more_vert, color: Colors.white),
+              icon: Icon(Icons.menu, color: primaryColor),
               tooltip: 'Menu',
-              padding: const EdgeInsets.all(8),
-              constraints: const BoxConstraints(),
+            ),
+
+            // center logo/title (only on dashboard pages)
+            Expanded(
+              child: Builder(builder: (context) {
+                final isDashboard = pageName.toLowerCase().contains('dashboard');
+                if (isDashboard) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Container(
+                        height: 32,
+                        width: 32,
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.recycling, color: primaryColor, size: 18),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Clean Way',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            pageName,
+                            style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+
+                // Non-dashboard pages: show only a small badge with the page name
+                return Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      pageName,
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+            // notifications + avatar
+            Row(
+              children: [
+                // bell with optional badge
+                Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.notifications_none, color: Colors.grey[800]),
+                      tooltip: 'Notifications',
+                    ),
+                    // small red dot
+                    Positioned(
+                      right: 10,
+                      top: 10,
+                      child: Container(
+                        height: 8,
+                        width: 8,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _showUserInfo(context),
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: primaryColor.withOpacity(0.12),
+                    child: Text(
+                      _initials,
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
             ),
           ],
         ),

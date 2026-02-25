@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../routes/app_routes.dart';
 import '../controllers/auth_controller.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -235,7 +236,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 8),
                   TextButton(
                     onPressed: () {
-                      Get.toNamed('/driver-dashboard');
+                      Get.toNamed(AppRoutes.benne);
                     },
                     child: Text(
                       'Voir le Dashboard Chauffeur',

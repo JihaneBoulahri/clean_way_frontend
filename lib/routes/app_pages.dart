@@ -4,6 +4,7 @@ import '../pages/login_page.dart';
 import '../pages/auth/registre_page.dart';
 import '../bindings/login_binding.dart';
 import '../pages/dashboard/dashboard_page.dart';
+import '../pages/bennes/bennes_page.dart';
 import '../controllers/dashboard_controller.dart';
 import 'app_routes.dart';
 
@@ -27,6 +28,13 @@ class AppPages {
       page: () => const DashboardPage(),
       binding: BindingsBuilder(() {
         Get.lazyPut(() => DashboardController());
+      }),
+    ),
+    GetPage(
+      name: '/bennes',
+      page: () => const BennesPage(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => BennesController());
       }),
     ),
   ];

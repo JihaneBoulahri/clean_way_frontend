@@ -1,23 +1,22 @@
-class Camion{
-class Camion{
-   final int id; 
+
+class Camion {
+  final int id;
   final String immatriculation;
   final String typeCamion;
   final double capaciteCamion;
-  final DateTime? dateMiseEnService; 
+  final DateTime? dateMiseEnService;
   final String status;
+
   Camion({
     required this.id,
     required this.immatriculation,
     required this.typeCamion,
     required this.capaciteCamion,
     this.dateMiseEnService,
-    required this.status
+    required this.status,
   });
 
- factory Camion.fromJson(Map<String, dynamic> json) {
-    return Camion(
- factory Camion.fromJson(Map<String, dynamic> json) {
+  factory Camion.fromJson(Map<String, dynamic> json) {
     return Camion(
       id: json['id_camion'] as int,
       immatriculation: json['immatriculation'] as String,
@@ -29,15 +28,15 @@ class Camion{
       status: json['status'] as String,
     );
   }
-   Map<String, dynamic> toJson() {
+
+  Map<String, dynamic> toJson() {
     return {
       'id_camion': id,
       'immatriculation': immatriculation,
       'type_camion': typeCamion,
       'capacite_camion': capaciteCamion,
       'date_mise_en_service': dateMiseEnService?.toIso8601String(),
-      'status': status, 
-      
+      'status': status,
     };
-   }
+  }
 }

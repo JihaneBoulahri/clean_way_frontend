@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 class DashboardSidebar extends StatelessWidget {
   final Color primaryColor;
   final void Function(String route) onItemSelected;
+  final String userName;
+  final String userRole;
 
   const DashboardSidebar({
     super.key,
     required this.primaryColor,
     required this.onItemSelected,
+    this.userName = 'John Doe',
+    this.userRole = 'Chauffeur',
   });
 
   @override
@@ -22,23 +26,58 @@ class DashboardSidebar extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
-                  Icon(Icons.recycling, color: primaryColor),
-                  const SizedBox(width: 8),
+                  // Avatar on the left
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: primaryColor.withOpacity(0.1),
+                    child: Text(
+                      () {
+                        final parts = userName.trim().split(RegExp(r'\s+'));
+                        if (parts.isEmpty) return '';
+                        final f = parts[0].isNotEmpty ? parts[0][0] : '';
+                        final l = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
+                        return (f + l).toUpperCase();
+                      }(),
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Logo + app name + user name/role
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          children: [
+                            Icon(Icons.recycling, color: primaryColor, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Clean Way',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                                color: Colors.grey[900],
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
                         Text(
-                          'Clean Way',
+                          userName,
                           style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: Colors.grey[900],
+                            fontSize: 13,
+                            color: Colors.grey[800],
+                            fontWeight: FontWeight.w600,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          'Dashboard',
+                          userRole,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
@@ -46,19 +85,6 @@ class DashboardSidebar extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: primaryColor.withOpacity(0.1),
-                    child: Text(
-                      'JB',
-                      style: TextStyle(
-                        color: primaryColor,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
                     ),
                   ),
                 ],
