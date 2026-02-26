@@ -24,75 +24,78 @@ class DashboardSidebar extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                // Logo + nom de l'application à gauche
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.recycling, color: primaryColor, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Clean Way',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        color: Colors.grey[900],
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                // Informations utilisateur (initiales + nom + rôle) à droite
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          userName,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[800],
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          userRole,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 8),
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: primaryColor.withOpacity(0.1),
-                      child: Text(
-                        () {
-                          final parts = userName.trim().split(RegExp(r'\s+'));
-                          if (parts.isEmpty) return '';
-                          final f = parts[0].isNotEmpty ? parts[0][0] : '';
-                          final l = parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
-                          return (f + l).toUpperCase();
-                        }(),
+                  // Ligne 1 : logo + nom de l'application
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.recycling, color: primaryColor, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Clean Way',
                         style: TextStyle(
-                          color: primaryColor,
                           fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                          fontSize: 16,
+                          color: Colors.grey[900],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Ligne 2 : profil utilisateur (avatar + nom + rôle)
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: primaryColor.withOpacity(0.1),
+                        child: Text(
+                          () {
+                            final parts = userName.trim().split(RegExp(r'\s+'));
+                            if (parts.isEmpty) return '';
+                            final f = parts[0].isNotEmpty ? parts[0][0] : '';
+                            final l =
+                                parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
+                            return (f + l).toUpperCase();
+                          }(),
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userName,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[800],
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              userRole,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const Divider(height: 1),
             Expanded(
@@ -182,7 +185,7 @@ class DashboardSidebar extends StatelessWidget {
           ],
         ),
       ),
-    );
+    );  
   }
 }
 

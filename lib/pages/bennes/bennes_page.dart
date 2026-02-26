@@ -174,7 +174,7 @@ void _openSidebar(BuildContext context, Color primaryColor) {
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (ctx) {
-      final width = MediaQuery.of(ctx).size.width * 0.6; // 60% width
+      final width = MediaQuery.of(ctx).size.width * 0.65; // 65% width
       return SafeArea(
         child: Align(
           alignment: Alignment.centerLeft,
