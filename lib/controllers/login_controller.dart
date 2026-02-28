@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../services/auth_service.dart';
-import 'package:get_storage/get_storage.dart';import '../routes/app_routes.dart';
+import 'package:get_storage/get_storage.dart';
+import '../routes/app_routes.dart';
 
 class LoginController extends GetxController {
   // Fields
@@ -31,43 +32,47 @@ class LoginController extends GetxController {
 
   // Login function
   Future<void> login() async {
-    final emailError = validateEmail(email.value);
-    final passError = validatePassword(password.value);
+  final emailError = validateEmail(email.value);
+  final passError = validatePassword(password.value);
 
-    if (emailError != null) {
-      Get.snackbar("Error", emailError);
-      return;
-    }
-
-    if (passError != null) {
-      Get.snackbar("Error", passError);
-      return;
-    }
-
-    try {
-      isLoading.value = true;
-
-      final result = await AuthService.login(
-        email.value,
-        password.value,
-      );
-
-      if (result['success']) {
-        final box = GetStorage();
-
-        await box.write('token', result['token']);
-        await box.write('user', result['user']);
-  
-        Get.snackbar("Success", "Login successful");
-
-        Get.offAllNamed(AppRoutes.dashboard);
-      } else {
-        Get.snackbar("Error", result['message']);
-      }
-    } catch (e) {
-      Get.snackbar("Error", "Something went wrong");
-    } finally {
-      isLoading.value = false;
-    }
+  if (emailError != null) {
+    Get.snackbar("Error", emailError);
+    return;
   }
+
+  if (passError != null) {
+    Get.snackbar("Error", passError);
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+
+    final result = await AuthService.login(email.value, password.value);
+    print("Login response: $result");
+
+    if (result['success'] == true) {
+      final box = GetStorage();
+
+      // Direct access with !
+      final token = result['data']['token'];
+      final user = result['data']['user'];
+
+      await box.write('token', token);
+      await box.write('user', user);
+
+      print('Token stored: ${box.read('token')}'); // now should print token
+
+      Get.snackbar("Success", "Login successful");
+      Get.offAllNamed(AppRoutes.dashboard);
+    } else {
+      Get.snackbar("Error", result['message'] ?? "Login failed");
+    }
+  } catch (e) {
+    print("Login error: $e");
+    Get.snackbar("Error", "Something went wrong");
+  } finally {
+    isLoading.value = false;
+  }
+}
 }
