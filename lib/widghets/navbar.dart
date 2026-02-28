@@ -1,34 +1,19 @@
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
 
-class DashboardNavbar extends StatelessWidget {
+class Navbar extends StatelessWidget {
   final Color primaryColor;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String phone;
+  final User user;
   final String pageName;
-  final String userRole;
-  final Future<void> Function()? onRefresh;
-  final VoidCallback onToggleSidebar;
+  final VoidCallback? onMenuPressed;
 
-  const DashboardNavbar({
+  const Navbar({
     super.key,
     required this.primaryColor,
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.phone,
-    required this.onToggleSidebar,
-    this.pageName = 'Chauffeur',
-    this.userRole = 'Chauffeur',
-    this.onRefresh,
+    required this.user,
+    required this.pageName,
+    this.onMenuPressed,
   });
-
-  String get _initials {
-    final f = firstName.isNotEmpty ? firstName[0] : '';
-    final l = lastName.isNotEmpty ? lastName[0] : '';
-    return (f + l).toUpperCase();
-  }
 
   void _showUserInfo(BuildContext context) {
     showModalBottomSheet(
@@ -49,7 +34,7 @@ class DashboardNavbar extends StatelessWidget {
                     radius: 22,
                     backgroundColor: primaryColor.withOpacity(0.1),
                     child: Text(
-                      _initials,
+                      user.initials,
                       style: TextStyle(
                         color: primaryColor,
                         fontWeight: FontWeight.w700,
@@ -61,14 +46,14 @@ class DashboardNavbar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '$firstName $lastName',
+                        user.fullName,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        userRole,
+                        user.role,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -81,9 +66,7 @@ class DashboardNavbar extends StatelessWidget {
               const SizedBox(height: 16),
               Divider(color: Colors.grey.shade200),
               const SizedBox(height: 8),
-              _infoRow(Icons.email_outlined, 'Email', email),
-              const SizedBox(height: 8),
-              _infoRow(Icons.phone_outlined, 'Téléphone', phone),
+              _infoRow(Icons.email_outlined, 'Email', user.email),
               const SizedBox(height: 16),
             ],
           ),
@@ -142,14 +125,14 @@ class DashboardNavbar extends StatelessWidget {
         bottom: false,
         child: Row(
           children: [
-            // menu button
+            // Menu button
             IconButton(
-              onPressed: onToggleSidebar,
+              onPressed: onMenuPressed,
               icon: Icon(Icons.menu, color: primaryColor),
               tooltip: 'Menu',
             ),
 
-            // center logo/title (only on dashboard pages)
+            // Centre : logo / titre adapté à la page
             Expanded(
               child: Builder(builder: (context) {
                 final isDashboard = pageName.toLowerCase().contains('dashboard');
@@ -190,7 +173,7 @@ class DashboardNavbar extends StatelessWidget {
                   );
                 }
 
-                // Non-dashboard pages: show only a small badge with the page name
+                // Pages non-dashboard : simple badge
                 return Align(
                   alignment: Alignment.center,
                   child: Container(
@@ -201,17 +184,20 @@ class DashboardNavbar extends StatelessWidget {
                     ),
                     child: Text(
                       pageName,
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w700, fontSize: 13),
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                 );
               }),
             ),
 
-            // notifications + avatar
+            // Notifications + avatar
             Row(
               children: [
-                // bell with optional badge
                 Stack(
                   children: [
                     IconButton(
@@ -219,14 +205,14 @@ class DashboardNavbar extends StatelessWidget {
                       icon: Icon(Icons.notifications_none, color: Colors.grey[800]),
                       tooltip: 'Notifications',
                     ),
-                    // small red dot
+                    // Petit point rouge de notification
                     Positioned(
                       right: 10,
                       top: 10,
                       child: Container(
                         height: 8,
                         width: 8,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.red,
                           shape: BoxShape.circle,
                         ),
@@ -234,7 +220,6 @@ class DashboardNavbar extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const SizedBox(width: 8),
                 GestureDetector(
                   onTap: () => _showUserInfo(context),
@@ -242,7 +227,7 @@ class DashboardNavbar extends StatelessWidget {
                     radius: 18,
                     backgroundColor: primaryColor.withOpacity(0.12),
                     child: Text(
-                      _initials,
+                      user.initials,
                       style: TextStyle(
                         color: primaryColor,
                         fontWeight: FontWeight.w700,
@@ -260,11 +245,12 @@ class DashboardNavbar extends StatelessWidget {
   }
 }
 
-class DashboardBottomBar extends StatelessWidget {
+// BottomBar (optionnelle, utilisable en bas sur mobile par exemple)
+class BottomBar extends StatelessWidget {
   final Color primaryColor;
   final String appName;
 
-  const DashboardBottomBar({
+  const BottomBar({
     super.key,
     required this.primaryColor,
     required this.appName,

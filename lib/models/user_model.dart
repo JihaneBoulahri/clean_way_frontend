@@ -28,6 +28,10 @@ class User {
           : null,
     );
   }
+    // Getter pratiques
+      String get fullName => '$prenom $nom';
+      String get initials => (prenom.isNotEmpty ? prenom[0] : '') +
+          (nom.isNotEmpty ? nom[0] : '');
 
   Map<String, dynamic> toJson() {
     return {

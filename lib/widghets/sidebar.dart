@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
 
-class DashboardSidebar extends StatelessWidget {
+class Sidebar extends StatelessWidget {
   final Color primaryColor;
   final void Function(String route) onItemSelected;
-  final String userName;
-  final String userRole;
+  final User user;
 
-  const DashboardSidebar({
+  const Sidebar({
     super.key,
     required this.primaryColor,
     required this.onItemSelected,
-    this.userName = 'John Doe',
-    this.userRole = 'Chauffeur',
+    required this.user,
   });
 
   @override
@@ -27,7 +26,7 @@ class DashboardSidebar extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Ligne 1 : logo + nom de l'application
+                  // Logo + nom de l'application
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -45,21 +44,14 @@ class DashboardSidebar extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // Ligne 2 : profil utilisateur (avatar + nom + rôle)
+                  // Profil utilisateur
                   Row(
                     children: [
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: primaryColor.withOpacity(0.1),
                         child: Text(
-                          () {
-                            final parts = userName.trim().split(RegExp(r'\s+'));
-                            if (parts.isEmpty) return '';
-                            final f = parts[0].isNotEmpty ? parts[0][0] : '';
-                            final l =
-                                parts.length > 1 && parts[1].isNotEmpty ? parts[1][0] : '';
-                            return (f + l).toUpperCase();
-                          }(),
+                          user.initials,
                           style: TextStyle(
                             color: primaryColor,
                             fontWeight: FontWeight.w700,
@@ -73,7 +65,7 @@ class DashboardSidebar extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              userName,
+                              user.fullName,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey[800],
@@ -82,7 +74,7 @@ class DashboardSidebar extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              userRole,
+                              user.role,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -147,14 +139,14 @@ class DashboardSidebar extends StatelessWidget {
                 ],
               ),
             ),
+            // Bouton de déconnexion
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: InkWell(
                 onTap: () => onItemSelected('logout'),
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.red.shade100),
@@ -185,7 +177,7 @@ class DashboardSidebar extends StatelessWidget {
           ],
         ),
       ),
-    );  
+    );
   }
 }
 
