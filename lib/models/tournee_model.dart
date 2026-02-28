@@ -2,8 +2,8 @@ class Tournee {
   final int id; 
   final DateTime dateTournee;
   final String heureDebut; 
-  final String heureFin;
-  final String statut;
+  final String? heureFin;
+  final String status;
   final int? idCamion;
   final int? id_zone; 
 
@@ -12,7 +12,7 @@ class Tournee {
     required this.dateTournee,
     required this.heureDebut,
     required this.heureFin,
-    required this.statut,
+    required this.status,
     this.idCamion,
     this.id_zone,
   });
@@ -22,8 +22,8 @@ class Tournee {
       id: json['id_tournee'] as int,
       dateTournee: DateTime.parse(json['date_tournee'] as String),
       heureDebut: json['heure_debut'] as String,
-      heureFin: json['heure_fin'] as String,
-      statut: json['statut'] as String,
+      heureFin: json['heure_fin'] as String?,
+      status: json['status'] as String,
       idCamion: json['id_camion'] as int?,
       id_zone: json['id_zone'] as int?,
     );
@@ -35,7 +35,7 @@ class Tournee {
       'date_tournee': dateTournee.toIso8601String(),
       'heure_debut': heureDebut,
       'heure_fin': heureFin,
-      'statut': statut,
+      'status': status,
       'id_camion': idCamion,
       'id_zone': id_zone,
     };

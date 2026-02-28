@@ -104,7 +104,30 @@ class DashboardPage extends GetView<DashboardController> {
                     'Voir bennes',
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
                   ),
-                )
+                ),
+
+                const SizedBox(height: 30),
+
+                TextButton(
+                  onPressed: (){
+                    Get.toNamed(AppRoutes.zones);
+                  }, 
+                  child: Text(
+                    'Voir zones',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ),
+                const SizedBox(height: 30),
+
+                TextButton(
+                  onPressed: (){
+                    Get.toNamed(AppRoutes.tournees);
+                  }, 
+                  child: Text(
+                    'Voir tournees',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ),
               ],
             ),
           );

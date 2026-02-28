@@ -2,7 +2,7 @@ class Capteur {
   final int id; 
   final String typeCapteur;
   final DateTime? dateInstallation;
-  final String statut;
+  final String status;
   final int? idPoint; 
   final double niveauRemplissage;
 
@@ -11,7 +11,7 @@ class Capteur {
     required this.typeCapteur,
     required this.niveauRemplissage,
     this.dateInstallation,
-    required this.statut,
+    required this.status,
     this.idPoint,
   });
 
@@ -23,7 +23,7 @@ class Capteur {
       dateInstallation: json['date_installation'] != null
           ? DateTime.parse(json['date_installation'] as String)
           : null,
-      statut: json['statut'] as String,
+      status: json['status'] as String,
       idPoint: json['id_benne'] as int?,
     );
   }
@@ -34,7 +34,7 @@ class Capteur {
       'type_capteur': typeCapteur,
       'niveau_remplissage': niveauRemplissage,
       'date_installation': dateInstallation?.toIso8601String(),
-      'statut': statut,
+      'status': status,
       'id_benne': idPoint,
     };
   }
