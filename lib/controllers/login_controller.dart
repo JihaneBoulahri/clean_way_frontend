@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import '../services/auth_service.dart';
+import 'package:get_storage/get_storage.dart';import '../routes/app_routes.dart';
 
 class LoginController extends GetxController {
   // Fields
@@ -30,7 +31,6 @@ class LoginController extends GetxController {
 
   // Login function
   Future<void> login() async {
-    // 1️⃣ Validate fields
     final emailError = validateEmail(email.value);
     final passError = validatePassword(password.value);
 
@@ -44,28 +44,28 @@ class LoginController extends GetxController {
       return;
     }
 
-    // 2️⃣ Call API
     try {
       isLoading.value = true;
 
-      final result = await AuthService.login(email.value, password.value);
+      final result = await AuthService.login(
+        email.value,
+        password.value,
+      );
 
       if (result['success']) {
-        Get.snackbar("Success", "Login successful");
-        Get.offAllNamed("/dashboard");
-        // Optional: store token
-        // final token = result['data']['token'];
-        // await SharedPreferences.getInstance().then((prefs) {
-        //   prefs.setString("token", token);
-        // });
+        final box = GetStorage();
 
-        // Navigate to home page
-        // Get.toNamed("/home");
+        await box.write('token', result['token']);
+        await box.write('user', result['user']);
+  
+        Get.snackbar("Success", "Login successful");
+
+        Get.offAllNamed(AppRoutes.dashboard);
       } else {
         Get.snackbar("Error", result['message']);
       }
     } catch (e) {
-      Get.snackbar("Error", "Something went wrong: $e");
+      Get.snackbar("Error", "Something went wrong");
     } finally {
       isLoading.value = false;
     }

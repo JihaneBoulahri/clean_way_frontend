@@ -233,16 +233,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () {
-                      Get.toNamed(AppRoutes.benne);
-                    },
-                    child: Text(
-                      'Voir le Dashboard Chauffeur',
-                      style: TextStyle(color: primaryGreen, fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
-                  ),
                 ],
               ),
             ),
