@@ -1,11 +1,14 @@
+import 'camion_model.dart';
+import 'zone_model.dart';
+
 class Tournee {
-  final int id; 
+  final int id;
   final DateTime dateTournee;
-  final String heureDebut; 
+  final String heureDebut;
   final String? heureFin;
   final String status;
-  final int? idCamion;
-  final int? id_zone; 
+  final Camion? camion;
+  final Zone? zone;
 
   Tournee({
     required this.id,
@@ -13,8 +16,8 @@ class Tournee {
     required this.heureDebut,
     required this.heureFin,
     required this.status,
-    this.idCamion,
-    this.id_zone,
+    this.camion,
+    this.zone,
   });
 
   factory Tournee.fromJson(Map<String, dynamic> json) {
@@ -24,20 +27,24 @@ class Tournee {
       heureDebut: json['heure_debut'] as String,
       heureFin: json['heure_fin'] as String?,
       status: json['status'] as String,
-      idCamion: json['id_camion'] as int?,
-      id_zone: json['id_zone'] as int?,
+      camion: json['camion'] != null
+          ? Camion.fromJson(json['camion'] as Map<String, dynamic>)
+          : null,
+      zone: json['zone'] != null
+          ? Zone.fromJson(json['zone'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id_tournee': id,
-      'date_tournee': dateTournee.toIso8601String(),
+      'date_tournee': dateTournee.toIso8601String().split('T').first,
       'heure_debut': heureDebut,
       'heure_fin': heureFin,
       'status': status,
-      'id_camion': idCamion,
-      'id_zone': id_zone,
+      'id_camion': camion?.id,
+      'id_zone': zone?.id,
     };
   }
 }

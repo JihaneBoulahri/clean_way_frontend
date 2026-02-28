@@ -25,14 +25,30 @@ class TourneeCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             //affiche la date de la tournée
-            Text('Date: ${tournee.dateTournee}'),
-            Text('heure de début: ${tournee.heureDebut}'),
-            Text('heure de fin: ${tournee.heureFin}'),
-            Text('status: ${tournee.status}'),
+            Text('Date: ${tournee.dateTournee.toString().split(' ').first}'),
+            Text('Heure de début: ${tournee.heureDebut}'),
+            Text('Heure de fin: ${tournee.heureFin ?? "—"}'),
+            Text('Statut: ${tournee.status}'),
 
-            // Affiche les zones associées à la tournée
-            Text('Zones associées au camion: ${tournee.idCamion}'),
-            Text('Zones associées à la tournée: ${tournee.id_zone}'),
+            if (tournee.camion != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Camion: ${tournee.camion!.immatriculation}',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text('  Type: ${tournee.camion!.typeCamion}'),
+              Text('  Capacité: ${tournee.camion!.capaciteCamion} kg'),
+              Text('  Statut: ${tournee.camion!.status}'),
+            ],
+            if (tournee.zone != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Zone: ${tournee.zone!.nomZone}',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text('  Type: ${tournee.zone!.typeZone}'),
+              Text('  Coordonnées: ${tournee.zone!.latitude}, ${tournee.zone!.longitude}'),
+            ],
 
             const SizedBox(height: 12),
 
