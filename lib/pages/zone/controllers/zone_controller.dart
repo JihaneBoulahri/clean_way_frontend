@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import '../../../services/zone_service.dart';
 
 class ZoneController extends GetxController {
+  final ZoneService _service = ZoneService();
   var zones = <Zone>[].obs;
-  var isLoading = false.obs; 
+  var isLoading = false.obs;
+  var error = RxnString();
 
   @override
   void onInit() {
@@ -15,9 +17,11 @@ class ZoneController extends GetxController {
   void fetchZones() async {
     try {
       isLoading(true);
-      final data = await ZoneService.getAll();
+      final data = await _service.getAll();
       zones.value = data.map((json) => Zone.fromJson(json)).toList();
     } catch (e) {
+      error.value = e.toString();
+      print('Error loading zones: $e');
       Get.snackbar('Error', 'Failed to load zones');
     } finally {
       isLoading(false);
@@ -25,7 +29,7 @@ class ZoneController extends GetxController {
   }
   void addZone(Zone zone) async {
     try {
-      final data = await ZoneService.create(zone.toJson());
+      final data = await _service.create(zone.toJson());
       zones.add(Zone.fromJson(data));
       Get.snackbar('Success', 'Zone added successfully');
     } catch (e) {
@@ -34,7 +38,7 @@ class ZoneController extends GetxController {
   }
   void updateZone(int id, Zone zone) async {
     try {
-      final data = await ZoneService.update(id, zone.toJson());
+      final data = await _service.update(id, zone.toJson());
       int index = zones.indexWhere((z) => z.id == id);
       if (index != -1) {
         zones[index] = Zone.fromJson(data);
@@ -46,7 +50,7 @@ class ZoneController extends GetxController {
   }
   void deleteZone(int id) async {
     try {
-      await ZoneService.delete(id);
+      await _service.delete(id);
       zones.removeWhere((z) => z.id == id);
       Get.snackbar('Success', 'Zone deleted successfully');
     } catch (e) {
@@ -55,7 +59,7 @@ class ZoneController extends GetxController {
   }
   void getZoneById(int id) async {
     try {
-      final data = await ZoneService.getById(id);
+      final data = await _service.getById(id);
       Zone zone = Zone.fromJson(data);
     } catch (e) {
       Get.snackbar('Error', 'Failed to load zone details');

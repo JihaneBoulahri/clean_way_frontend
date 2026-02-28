@@ -28,7 +28,7 @@ class TourneeCard extends StatelessWidget {
             Text('Date: ${tournee.dateTournee}'),
             Text('heure de début: ${tournee.heureDebut}'),
             Text('heure de fin: ${tournee.heureFin}'),
-            Text('status: ${tournee.statut}'),
+            Text('status: ${tournee.status}'),
 
             // Affiche les zones associées à la tournée
             Text('Zones associées au camion: ${tournee.idCamion}'),

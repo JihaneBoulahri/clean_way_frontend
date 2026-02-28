@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../services/tournee_service.dart';
 
 class TourneeController extends GetxController {
+  final TourneeService _service = TourneeService();
   var tournees = <Tournee>[].obs;
   var isLoading = false.obs; 
 
@@ -15,9 +16,10 @@ class TourneeController extends GetxController {
   void fetchTournees() async {
     try {
       isLoading(true);
-      final data = await TourneeService.getAll();
+      final data = await _service.getAll();
       tournees.value = data.map((json) => Tournee.fromJson(json)).toList();
     } catch (e) {
+      print('Error loading tournees: $e');
       Get.snackbar('Error', 'Failed to load tournees');
     } finally {
       isLoading(false);
@@ -25,7 +27,7 @@ class TourneeController extends GetxController {
   }
   void addTournee(Tournee tournee) async {
     try {
-      final data = await TourneeService.create(tournee.toJson());
+      final data = await _service.create(tournee.toJson());
       tournees.add(Tournee.fromJson(data));
       Get.snackbar('Success', 'Tournee added successfully');
     } catch (e) {
@@ -34,7 +36,7 @@ class TourneeController extends GetxController {
   }
   void updateTournee(int id, Tournee tournee) async {
     try {
-      final data = await TourneeService.update(id, tournee.toJson());
+      final data = await _service.update(id, tournee.toJson());
       int index = tournees.indexWhere((t) => t.id == id);
       if (index != -1) {
         tournees[index] = Tournee.fromJson(data);
@@ -46,7 +48,7 @@ class TourneeController extends GetxController {
   }
   void deleteTournee(int id) async {
     try {
-      await TourneeService.delete(id);
+      await _service.delete(id);
       tournees.removeWhere((t) => t.id == id);
       Get.snackbar('Success', 'Tournee deleted successfully');
     } catch (e) {
@@ -55,7 +57,7 @@ class TourneeController extends GetxController {
   }
   void getTourneeById(int id) async {
     try {
-      final data = await TourneeService.getById(id);
+      final data = await _service.getById(id);
       Tournee tournee = Tournee.fromJson(data);
     } catch (e) {
       Get.snackbar('Error', 'Failed to load tournee details');
@@ -64,7 +66,7 @@ class TourneeController extends GetxController {
   void searchTournees(String query) async {
     try {
       isLoading(true);
-      final data = await TourneeService.search(query);
+      final data = await _service.search(query);
       tournees.value = data.map((json) => Tournee.fromJson(json)).toList();
     } catch (e) {
       Get.snackbar('Error', 'Failed to search tournees');

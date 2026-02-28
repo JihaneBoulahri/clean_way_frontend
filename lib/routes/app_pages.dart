@@ -10,6 +10,10 @@ import '../controllers/dashboard_controller.dart';
 import 'app_routes.dart';
 import '../pages/camion/views/camion_page.dart';
 import '../pages/camion/controllers/camion_controller.dart';
+import '../pages/zone/views/zone_page.dart';
+import '../pages/zone/controllers/zone_controller.dart';
+import '../pages/tournee/views/tournee_page.dart';
+import '../pages/tournee/controllers/tournee_controller.dart';
 
 class AppPages {
   static final routes = [
@@ -45,6 +49,20 @@ class AppPages {
       page: () => const BennesPage(),
       binding: BindingsBuilder((){
         Get.lazyPut(() => BennesController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.zones, 
+      page: () => const ZonePage(),
+      binding: BindingsBuilder((){
+        Get.lazyPut(() => ZoneController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.tournees, 
+      page: () => const TourneePage(),
+      binding: BindingsBuilder((){
+        Get.lazyPut(() => TourneeController());
       }),
     )
   ];
