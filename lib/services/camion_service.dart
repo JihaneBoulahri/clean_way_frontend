@@ -1,42 +1,87 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
 import '../core/constants/api_constants.dart';
+import '../routes/app_routes.dart';
 
 class CamionService {
-  //get all camions
-  static Future<List<dynamic>> getAll() async {
-    final res = await http.get(Uri.parse(CamionEndpoints.base));
-    return jsonDecode(res.body);
+  final _box = GetStorage();
+
+  /// Base headers with token
+  Map<String, String> get _headers {
+    final token = _box.read('token');
+    print('Token: $token');
+    return {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
   }
 
-  //create camion
-  static Future create(Map data) async {
+  /// Handle common response logic
+  dynamic _handleResponse(http.Response res) {
+    
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      final decoded = jsonDecode(res.body);
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['data'] is List) return decoded['data'];
+      return decoded;
+    }
+
+    // Show error but don't auto-redirect; let controller handle it
+    throw Exception("Server error (${res.statusCode}): ${res.body.isNotEmpty ? res.body.substring(0, 200) : 'No response'}");
+  }
+
+  /// Get all camions
+  Future<List<dynamic>> getAll() async {
+    final res = await http.get(
+      Uri.parse(CamionEndpoints.base),
+      headers: _headers,
+    );
+
+    return _handleResponse(res);
+  }
+
+  /// Get camion by id
+  Future<dynamic> getById(int id) async {
+    final res = await http.get(
+      Uri.parse(CamionEndpoints.detail(id)),
+      headers: _headers,
+    );
+
+    return _handleResponse(res);
+  }
+
+  /// Create camion
+  Future<dynamic> create(Map<String, dynamic> data) async {
     final res = await http.post(
       Uri.parse(CamionEndpoints.base),
-      headers: {"Content-Type": "application/json"},
+      headers: _headers,
       body: jsonEncode(data),
     );
-    return jsonDecode(res.body);
+
+    return _handleResponse(res);
   }
 
-  //update camion
-  static Future update(int id, Map data) async {
+  /// Update camion
+  Future<dynamic> update(int id, Map<String, dynamic> data) async {
     final res = await http.put(
       Uri.parse(CamionEndpoints.detail(id)),
-      headers: {"Content-Type": "application/json"},
+      headers: _headers,
       body: jsonEncode(data),
     );
-    return jsonDecode(res.body);
+
+    return _handleResponse(res);
   }
 
-  //delete camion
-  static Future delete(int id) async {
-    await http.delete(Uri.parse(CamionEndpoints.detail(id)));
-  }
+  /// Delete camion
+  Future<void> delete(int id) async {
+    final res = await http.delete(
+      Uri.parse(CamionEndpoints.detail(id)),
+      headers: _headers,
+    );
 
-  //get camion by id 
-  static Future getById(int id) async {
-    final res = await http.get(Uri.parse(CamionEndpoints.detail(id)));
-    return jsonDecode(res.body);
+    _handleResponse(res);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:clean_way_frontend/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/dashboard_controller.dart';
@@ -80,6 +81,18 @@ class DashboardPage extends GetView<DashboardController> {
                 const SizedBox(height: 15),
 
                 const RecentActivity(),
+
+                const SizedBox(height: 30),
+
+                TextButton(
+                  onPressed: (){
+                    Get.toNamed(AppRoutes.camions);
+                  }, 
+                  child: Text(
+                    'Voir camions',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                )
               ],
             ),
           );

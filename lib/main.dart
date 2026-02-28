@@ -1,10 +1,12 @@
-import 'package:clean_way_frontend/pages/driver/dashboard_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'routes/app_pages.dart';
 import 'routes/app_routes.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
