@@ -3,6 +3,7 @@ import '../../../services/zone_service.dart';
 import '../../../models/zone_model.dart';
 import '../controllers/zone_controller.dart';
 
+
 class ZoneCard extends StatelessWidget {
   final Zone zone;
   final VoidCallback onDelete;
