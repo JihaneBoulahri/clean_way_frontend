@@ -11,7 +11,6 @@ class CamionService {
   /// Base headers with token
   Map<String, String> get _headers {
     final token = _box.read('token');
-    print('Token: $token');
     return {
       'Authorization': 'Bearer $token',
       'Accept': 'application/json',
