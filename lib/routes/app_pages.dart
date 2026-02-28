@@ -14,6 +14,8 @@ import '../pages/zone/views/zone_page.dart';
 import '../pages/zone/controllers/zone_controller.dart';
 import '../pages/tournee/views/tournee_page.dart';
 import '../pages/tournee/controllers/tournee_controller.dart';
+import '../pages/chauffeur/views/chauffeur_page.dart';
+import '../pages/chauffeur/controllers/chauffeur_controller.dart';
 
 class AppPages {
   static final routes = [
@@ -64,6 +66,14 @@ class AppPages {
       binding: BindingsBuilder((){
         Get.lazyPut(() => TourneeController());
       }),
-    )
+    ),
+    GetPage(
+      name: AppRoutes.chauffeurs, 
+      page: () => const ChauffeurPage(),
+      binding: BindingsBuilder((){
+        Get.lazyPut(() => ChauffeurController());
+      }),
+    ),
+    
   ];
 }
