@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../services/benne_service.dart'; 
 
 class BennesController extends GetxController {
+  final BenneService _service = BenneService();
   var bennes = <Benne>[].obs;
   var isLoading = false.obs; 
 
@@ -15,7 +16,7 @@ class BennesController extends GetxController {
   void fetchBennes() async {
     try {
       isLoading(true);
-      final data = await BenneService.getAllBennes();
+      final data = await _service.getAllBennes();
       bennes.value = data.map((json) => Benne.fromJson(json)).toList();
     } catch (e) {
       Get.snackbar('Error', 'Failed to load bennes');
@@ -25,7 +26,7 @@ class BennesController extends GetxController {
   }
   void addBenne(Benne benne) async {
     try {
-      final data = await BenneService.createBenne(benne.toJson());
+      final data = await _service.createBenne(benne.toJson());
       bennes.add(Benne.fromJson(data));
       Get.snackbar('Success', 'Benne added successfully');
     } catch (e) {
@@ -34,7 +35,7 @@ class BennesController extends GetxController {
   }
   void updateBenne(int id, Benne benne) async {
     try {
-      final data = await BenneService.updateBenne(id, benne.toJson());
+      final data = await _service.updateBenne(id, benne.toJson());
       int index = bennes.indexWhere((b) => b.id == id);
       if (index != -1) {
         bennes[index] = Benne.fromJson(data);
@@ -46,7 +47,7 @@ class BennesController extends GetxController {
   }
   void deleteBenne(int id) async {
     try {
-      await BenneService.deleteBenne(id);
+      await _service.deleteBenne(id);
       bennes.removeWhere((b) => b.id == id);
       Get.snackbar('Success', 'Benne deleted successfully');
     } catch (e) {
@@ -55,7 +56,7 @@ class BennesController extends GetxController {
   }
   void getBenneById(int id) async {
     try {
-      final data = await BenneService.getBenneById(id);
+      final data = await _service.getBenneById(id);
       Benne benne = Benne.fromJson(data);
     } catch (e) {
       Get.snackbar('Error', 'Failed to get benne details');
@@ -64,7 +65,7 @@ class BennesController extends GetxController {
   void getBennesWithSensors() async {
     try {
       isLoading(true);
-      final data = await BenneService.getBennesWithSensors();
+      final data = await _service.getBennesWithSensors();
       bennes.value = data.map((json) => Benne.fromJson(json)).toList();
     } catch (e) {
       Get.snackbar('Error', 'Failed to load bennes with sensors');

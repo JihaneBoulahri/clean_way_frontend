@@ -5,4 +5,5 @@ class AppRoutes {
   static const signup = '/signup';
   static const dashboard = '/dashboard';
   static const camions = '/camions';
+  static const bennes = '/bennes';
 }

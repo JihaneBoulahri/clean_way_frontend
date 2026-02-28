@@ -1,103 +1,102 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../core/constants/api_constants.dart';
+import 'package:get_storage/get_storage.dart';
 
 class BenneService {
+
+  final _box = GetStorage();
+
+  /// Base headers with token
+  Map<String, String> get _headers {
+    final token = _box.read('token');
+    return {
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  /// Handle common response logic
+  dynamic _handleResponse(http.Response res) {
+    
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      final decoded = jsonDecode(res.body);
+      if (decoded is List) return decoded;
+      if (decoded is Map && decoded['data'] is List) return decoded['data'];
+      return decoded;
+    }
+
+    // Show error but don't auto-redirect; let controller handle it
+    throw Exception("Server error (${res.statusCode}): ${res.body.isNotEmpty ? res.body.substring(0, 200) : 'No response'}");
+  }
+
   //get all bennes
-  static Future<List<dynamic>> getAllBennes() async {
+  Future<List<dynamic>> getAllBennes() async {
     final response = await http.get(
       Uri.parse(BenneEndpoints.base),
-      headers: {
-        "Accept": "application/json",
-      },
+      headers: _headers,
     );
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception("Failed to load bennes");
-    }
+    return _handleResponse(response);
   }
 
   //create benne
-  static Future createBenne(Map data) async {
+  Future createBenne(Map data) async {
     final response = await http.post(
       Uri.parse(BenneEndpoints.base),
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
+      headers: _headers,
       body: jsonEncode(data),
     );
 
-    return jsonDecode(response.body);
+    return _handleResponse(response);
   }
 
   //update benne
-  static Future updateBenne(int id, Map data) async {
+  Future updateBenne(int id, Map data) async {
     final response = await http.put(
       Uri.parse(BenneEndpoints.detail(id)),
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
+      headers: _headers,
       body: jsonEncode(data),
     );
 
-    return jsonDecode(response.body);
+    return _handleResponse(response);
   }
 
   //delete benne
-  static Future deleteBenne(int id) async {
-    await http.delete(
+  Future deleteBenne(int id) async {
+    final response = await http.delete(
       Uri.parse(BenneEndpoints.detail(id)),
+      headers: _headers,
     );
+    return _handleResponse(response);
   }
 
   //get benne by id
-  static Future getBenneById(int id) async {
+  Future getBenneById(int id) async {
     final response = await http.get(
       Uri.parse(BenneEndpoints.detail(id)),
-      headers: {
-        "Accept": "application/json",
-      },
+      headers: _headers,
     );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception("Failed to load benne");
-    }
+    return _handleResponse(response);
   }
 
   //get bennes with sensors
-  static Future<List<dynamic>> getBennesWithSensors() async {
+  Future<List<dynamic>> getBennesWithSensors() async {
     final response = await http.get(
       Uri.parse(BenneEndpoints.withSensors),
-      headers: {
-        "Accept": "application/json",
-      },
+      headers: _headers,
     );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception("Failed to load bennes with sensors");
-    }
+    return _handleResponse(response);
   }
 
   //vider benne
-  static Future viderBenne(int id) async {
+  Future viderBenne(int id) async {
     final response = await http.post(
       Uri.parse(BenneEndpoints.vider(id)),
-      headers: {
-        "Accept": "application/json",
-      },
+      headers: _headers,
     );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception("Failed to vider benne");
-    }
+    return _handleResponse(response);
   }
 }
