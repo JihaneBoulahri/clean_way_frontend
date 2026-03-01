@@ -1,3 +1,5 @@
+import 'package:clean_way_frontend/models/chauffeur_model.dart';
+
 class AppRoutes {
   static const splash = '/';
   static const login = '/login';
@@ -8,4 +10,5 @@ class AppRoutes {
   static const bennes = '/bennes';
   static const zones = '/zones';
   static const tournees = '/tournees';
+  static const chauffeurs = '/chauffeurs';
 }

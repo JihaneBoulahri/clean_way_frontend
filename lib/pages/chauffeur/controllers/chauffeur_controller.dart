@@ -19,9 +19,10 @@ class ChauffeurController extends GetxController {
     try {
       isLoading(true);
       error.value = null;
-      final data = await ChauffeurService.getAll();
+      final data = await _service.getAll();
       chauffeurs.value = data.map((json) => Chauffeur.fromJson(json)).toList();
     } catch (e) {
+      print('Error loading chauffeurs: $e');
       error.value = e.toString();
       Get.snackbar('Error', 'Failed to load chauffeurs: ${e.toString()}');
     } finally {
@@ -30,7 +31,7 @@ class ChauffeurController extends GetxController {
   }
   void addChauffeur(Chauffeur chauffeur) async {
     try {
-      final data = await ChauffeurService.create(chauffeur.toJson());
+      final data = await _service.create(chauffeur.toJson());
       chauffeurs.add(Chauffeur.fromJson(data));
       Get.snackbar('Success', 'Chauffeur added successfully');
     } catch (e) {
@@ -39,7 +40,7 @@ class ChauffeurController extends GetxController {
   }
   void updateChauffeur(int id, Chauffeur chauffeur) async {
     try {
-      final data = await ChauffeurService.update(id, chauffeur.toJson());
+      final data = await _service.update(id, chauffeur.toJson());
       int index = chauffeurs.indexWhere((c) => c.id == id);
       if (index != -1) {
         chauffeurs[index] = Chauffeur.fromJson(data);
@@ -51,7 +52,7 @@ class ChauffeurController extends GetxController {
   }
   void deleteChauffeur(int id) async {
     try {
-      await ChauffeurService.delete(id);
+      await _service.delete(id);
       chauffeurs.removeWhere((c) => c.id == id);
       Get.snackbar('Success', 'Chauffeur deleted successfully');
     } catch (e) {
@@ -60,7 +61,7 @@ class ChauffeurController extends GetxController {
   }
   void getChauffeurById(int id) async {
     try {
-      final data = await ChauffeurService.getById(id);
+      final data = await _service.getById(id);
     } catch (e) {
       Get.snackbar('Error', 'Failed to get chauffeur details');
     }

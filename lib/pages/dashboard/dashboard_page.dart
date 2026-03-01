@@ -128,6 +128,15 @@ class DashboardPage extends GetView<DashboardController> {
                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
                   ),
                 ),
+                TextButton(
+                  onPressed: (){
+                    Get.toNamed(AppRoutes.chauffeurs);
+                  }, 
+                  child: Text(
+                    'Voir chauffeurs',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ),
               ],
             ),
           );

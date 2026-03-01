@@ -1,6 +1,6 @@
 class Chauffeur {
   final int id; 
-  final int userId;
+  final int? userId;
   final String numTelephone;
   final String cni;
   final String permis;
@@ -18,7 +18,7 @@ class Chauffeur {
   factory Chauffeur.fromJson(Map<String, dynamic> json) {
     return Chauffeur(
       id: json['id_chauffeur'] as int,
-      userId: json['user_id'] as int,
+      userId: json['user_id'] as int?,
       numTelephone: json['num_telephone'] as String,
       cni: json['cni'] as String,
       permis: json['permis'] as String,
