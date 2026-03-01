@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../services/camion_service.dart';
 import '../../../models/camion_model.dart';
-import '../controllers/camion_controller.dart';
 
 class CamionCard extends StatelessWidget {
   final Camion camion;
@@ -35,40 +33,26 @@ class CamionCard extends StatelessWidget {
               Text(
                 'Mise en service: ${_formatDate(camion.dateMiseEnService!)}',
               ),
-            Text('Status: ${camion.status}'),
+            Text('Statut: ${camion.status}'),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                InkWell(
-                  onTap: onEdit,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.edit, size: 20, color: Colors.blue.shade700),
-                        const SizedBox(width: 4),
-                        Text('Modifier', style: TextStyle(color: Colors.blue.shade700)),
-                      ],
-                    ),
+                TextButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit, size: 20),
+                  label: const Text('Modifier'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue.shade700,
                   ),
                 ),
-                const SizedBox(width: 12),
-                InkWell(
-                  onTap: onDelete,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.delete, size: 20, color: Colors.red.shade700),
-                        const SizedBox(width: 4),
-                        Text('Supprimer', style: TextStyle(color: Colors.red.shade700)),
-                      ],
-                    ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete, size: 20),
+                  label: const Text('Supprimer'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red.shade700,
                   ),
                 ),
               ],
@@ -79,7 +63,6 @@ class CamionCard extends StatelessWidget {
     );
   }
 
-  // Méthode utilitaire pour formater la date (à adapter selon vos besoins)
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }

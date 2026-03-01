@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../services/tournee_service.dart';
 import '../../../models/tournee_model.dart';
-import '../controllers/tournee_controller.dart';
 
 class TourneeCard extends StatelessWidget {
   final Tournee tournee;
@@ -24,18 +22,15 @@ class TourneeCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Affiche le nom de la tournée comme titre
             Text(
               'Tournée ${tournee.id}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            //affiche la date de la tournée
             Text('Date: ${tournee.dateTournee.toString().split(' ').first}'),
             Text('Heure de début: ${tournee.heureDebut}'),
             Text('Heure de fin: ${tournee.heureFin ?? "—"}'),
             Text('Statut: ${tournee.status}'),
-
             if (tournee.camion != null) ...[
               const SizedBox(height: 8),
               Text(
@@ -43,7 +38,7 @@ class TourneeCard extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               Text('  Type: ${tournee.camion!.typeCamion}'),
-              Text('  Capacité: ${tournee.camion!.capaciteCamion} kg'),
+              Text('  Capacité: ${tournee.camion!.capaciteCamion} m³'),
               Text('  Statut: ${tournee.camion!.status}'),
             ],
             if (tournee.zone != null) ...[
@@ -55,41 +50,25 @@ class TourneeCard extends StatelessWidget {
               Text('  Type: ${tournee.zone!.typeZone}'),
               Text('  Coordonnées: ${tournee.zone!.latitude}, ${tournee.zone!.longitude}'),
             ],
-
             const SizedBox(height: 12),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                InkWell(
-                  onTap: onEdit,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.edit, size: 20, color: Colors.blue.shade700),
-                        const SizedBox(width: 4),
-                        Text('Modifier', style: TextStyle(color: Colors.blue.shade700)),
-                      ],
-                    ),
+                TextButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit, size: 20),
+                  label: const Text('Modifier'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue.shade700,
                   ),
                 ),
-                const SizedBox(width: 12),
-                InkWell(
-                  onTap: onDelete,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.delete, size: 20, color: Colors.red.shade700),
-                        const SizedBox(width: 4),
-                        Text('Supprimer', style: TextStyle(color: Colors.red.shade700)),
-                      ],
-                    ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete, size: 20),
+                  label: const Text('Supprimer'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red.shade700,
                   ),
                 ),
               ],

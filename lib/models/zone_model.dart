@@ -14,12 +14,24 @@ class Zone {
   });
 
   factory Zone.fromJson(Map<String, dynamic> json) {
+    int parseInt(dynamic v) {
+      if (v == null) return 0;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return int.tryParse(v.toString()) ?? 0;
+    }
+
+    String parseString(dynamic v) {
+      if (v == null) return '';
+      return v.toString();
+    }
+
     return Zone(
-      id: json['id_zone'] as int,
-      nomZone: json['nom_zone'] as String,
-      typeZone: json['type_zone'] as String,
-      latitude: json['latitude'] as String,
-      longitude: json['longitude'] as String,
+      id: parseInt(json['id_zone']),
+      nomZone: parseString(json['nom_zone']),
+      typeZone: parseString(json['type_zone']),
+      latitude: parseString(json['latitude']),
+      longitude: parseString(json['longitude']),
     );
   }
 

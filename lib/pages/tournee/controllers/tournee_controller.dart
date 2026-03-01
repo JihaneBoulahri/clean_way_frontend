@@ -1,6 +1,7 @@
 import 'package:clean_way_frontend/models/tournee_model.dart';
 import 'package:get/get.dart';
 import '../../../services/tournee_service.dart';
+import '../../../routes/app_routes.dart';
 
 class TourneeController extends GetxController {
   final TourneeService _service = TourneeService();
@@ -15,12 +16,24 @@ class TourneeController extends GetxController {
     } else {
       searchTournees(query.trim());
     }
-  } 
+  }
 
   @override
   void onInit() {
     super.onInit();
     fetchTournees();
+  }
+
+  void _handleError(dynamic e, {bool showSnackbar = true}) {
+    final errorMsg = e.toString();
+    if (errorMsg.contains('401') || errorMsg.contains('Unauthorized')) {
+      Get.offAllNamed(AppRoutes.login);
+    } else if (errorMsg.contains('404') || errorMsg.contains('Not Found')) {
+      fetchTournees();
+      if (showSnackbar) Get.snackbar('Info', 'L\'élément a été supprimé ailleurs');
+    } else {
+      if (showSnackbar) Get.snackbar('Erreur', errorMsg);
+    }
   }
 
   void fetchTournees() async {
@@ -29,60 +42,54 @@ class TourneeController extends GetxController {
       final data = await _service.getAll();
       tournees.value = data.map((json) => Tournee.fromJson(json)).toList();
     } catch (e) {
-      print('Error loading tournees: $e');
-      Get.snackbar('Error', 'Failed to load tournees');
+      _handleError(e, showSnackbar: false);
     } finally {
       isLoading(false);
     }
   }
-  void addTournee(Tournee tournee) async {
+
+  Future<void> addTournee(Tournee tournee) async {
     try {
       final data = await _service.create(tournee.toJson());
       tournees.add(Tournee.fromJson(data));
-      Get.snackbar('Success', 'Tournee added successfully');
+      Get.snackbar('Succès', 'Tournée ajoutée avec succès');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add tournee');
+      _handleError(e);
     }
   }
-  void updateTournee(int id, Tournee tournee) async {
+
+  Future<void> updateTournee(Tournee tournee) async {
     try {
-      final data = await _service.update(id, tournee.toJson());
-      int index = tournees.indexWhere((t) => t.id == id);
+      final data = await _service.update(tournee.id, tournee.toJson());
+      int index = tournees.indexWhere((t) => t.id == tournee.id);
       if (index != -1) {
         tournees[index] = Tournee.fromJson(data);
-        Get.snackbar('Success', 'Tournee updated successfully');
+        Get.snackbar('Succès', 'Tournée modifiée avec succès');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update tournee');
+      _handleError(e);
     }
   }
-  void deleteTournee(int id) async {
+
+  Future<void> deleteTournee(int id) async {
     try {
       await _service.delete(id);
       tournees.removeWhere((t) => t.id == id);
-      Get.snackbar('Success', 'Tournee deleted successfully');
+      Get.snackbar('Succès', 'Tournée supprimée avec succès');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete tournee');
+      _handleError(e);
     }
   }
-  void getTourneeById(int id) async {
-    try {
-      final data = await _service.getById(id);
-      Tournee tournee = Tournee.fromJson(data);
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to load tournee details');
-    }
-  }
+
   void searchTournees(String query) async {
     try {
       isLoading(true);
       final data = await _service.search(query);
       tournees.value = data.map((json) => Tournee.fromJson(json)).toList();
     } catch (e) {
-      Get.snackbar('Error', 'Failed to search tournees');
+      _handleError(e);
     } finally {
       isLoading(false);
     }
   }
-  
 }

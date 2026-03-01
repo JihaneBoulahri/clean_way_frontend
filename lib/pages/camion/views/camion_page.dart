@@ -71,6 +71,8 @@ class CamionPage extends GetView<CamionController> {
                 padding: const EdgeInsets.only(bottom: 80),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
+                  // Sécurité : vérifier que l'index est valide (évite les RangeError)
+                  if (i >= list.length) return const SizedBox.shrink();
                   final camion = list[i];
                   return CamionCard(
                     camion: camion,

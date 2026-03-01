@@ -14,6 +14,7 @@ class BenneFormDialog extends StatefulWidget {
 
 class _BenneFormDialogState extends State<BenneFormDialog> {
   final _formKey = GlobalKey<FormState>();
+  bool _saving = false;
   late final TextEditingController _typeController;
   late final TextEditingController _capaciteController;
   late final TextEditingController _latController;
@@ -38,35 +39,44 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final cap = double.tryParse(_capaciteController.text);
     if (cap == null || cap <= 0) {
       Get.snackbar('Erreur', 'Capacité invalide');
       return;
     }
+    // Contrainte de capacité maximale (exemple)
+    if (cap > 133) {
+      Get.snackbar('Erreur', 'Capacité doit être ≤ 133');
+      return;
+    }
+    setState(() => _saving = true);
     final controller = Get.find<BennesController>();
-    if (widget.benne == null) {
-      controller.addBenne(Benne(
-        id: 0,
-        typeBenne: _typeController.text.trim(),
-        capacite: cap,
-        latitude: _latController.text.trim(),
-        longitude: _longController.text.trim(),
-      ));
-    } else {
-      controller.updateBenne(
-        widget.benne!.id,
-        Benne(
+    try {
+      if (widget.benne == null) {
+        await controller.addBenne(Benne(
+          id: 0,
+          typeBenne: _typeController.text.trim(),
+          capacite: cap,
+          latitude: _latController.text.trim(),
+          longitude: _longController.text.trim(),
+        ));
+      } else {
+        // Utilisation de la nouvelle signature (objet Benne complet)
+        await controller.updateBenne(Benne(
           id: widget.benne!.id,
           typeBenne: _typeController.text.trim(),
           capacite: cap,
           latitude: _latController.text.trim(),
           longitude: _longController.text.trim(),
-        ),
-      );
+        ));
+      }
+      // Fermeture robuste du dialogue
+      if (mounted) Navigator.of(context).pop();
+    } finally {
+      setState(() => _saving = false);
     }
-    Get.back();
   }
 
   @override
@@ -96,21 +106,43 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
               TextFormField(
                 controller: _latController,
                 decoration: const InputDecoration(labelText: 'Latitude'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Requis';
+                  if (double.tryParse(v.trim()) == null) return 'Doit être un nombre';
+                  return null;
+                },
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _longController,
                 decoration: const InputDecoration(labelText: 'Longitude'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Requis';
+                  if (double.tryParse(v.trim()) == null) return 'Doit être un nombre';
+                  return null;
+                },
               ),
             ],
           ),
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
-        FilledButton(onPressed: _save, child: Text(isEdit ? 'Modifier' : 'Ajouter')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(isEdit ? 'Modifier' : 'Ajouter'),
+        ),
       ],
     );
   }

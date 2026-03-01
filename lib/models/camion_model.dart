@@ -17,15 +17,37 @@ class Camion {
   });
 
   factory Camion.fromJson(Map<String, dynamic> json) {
+    int _parseInt(dynamic v) {
+      if (v == null) return 0;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return int.tryParse(v.toString()) ?? 0;
+    }
+
+    double _parseDouble(dynamic v) {
+      if (v == null) return 0.0;
+      if (v is double) return v;
+      if (v is num) return v.toDouble();
+      return double.tryParse(v.toString()) ?? 0.0;
+    }
+
+    String _parseString(dynamic v) {
+      if (v == null) return '';
+      return v.toString();
+    }
+
+    DateTime? _parseDate(dynamic v) {
+      if (v == null) return null;
+      return DateTime.tryParse(v.toString());
+    }
+
     return Camion(
-      id: json['id_camion'] as int,
-      immatriculation: json['immatriculation'] as String,
-      typeCamion: json['type_camion'] as String,
-      capaciteCamion: (json['capacite_camion'] as num).toDouble(),
-      dateMiseEnService: json['date_mise_en_service'] != null
-          ? DateTime.parse(json['date_mise_en_service'] as String)
-          : null,
-      status: json['status'] as String,
+      id: _parseInt(json['id_camion']),
+      immatriculation: _parseString(json['immatriculation']),
+      typeCamion: _parseString(json['type_camion']),
+      capaciteCamion: _parseDouble(json['capacite_camion']),
+      dateMiseEnService: _parseDate(json['date_mise_en_service']),
+      status: _parseString(json['status']),
     );
   }
 

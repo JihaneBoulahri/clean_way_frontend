@@ -1,39 +1,66 @@
+import 'package:clean_way_frontend/models/camion_model.dart';
+import 'package:clean_way_frontend/models/user_model.dart';
+
 class Chauffeur {
-  final int id; 
-  final int? userId;
+  final int id;
+  final User? user;          // nouveau champ utilisateur
   final String numTelephone;
   final String cni;
   final String permis;
-  final int? idCamion; 
+  final Camion? camion;      // lien vers camion
 
   Chauffeur({
     required this.id,
-    required this.userId,
+    this.user,
     required this.numTelephone,
     required this.cni,
     required this.permis,
-    this.idCamion,
+    this.camion,
   });
 
   factory Chauffeur.fromJson(Map<String, dynamic> json) {
+    int parseInt(dynamic v) {
+      if (v == null) return 0;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return int.tryParse(v.toString()) ?? 0;
+    }
+
+    String parseString(dynamic v) {
+      if (v == null) return '';
+      return v.toString();
+    }
+
+    Camion? parseCamion(dynamic v) {
+      if (v == null) return null;
+      if (v is Map<String, dynamic>) return Camion.fromJson(v);
+      return null;
+    }
+
+    User? parseUser(dynamic v) {
+      if (v == null) return null;
+      if (v is Map<String, dynamic>) return User.fromJson(v);
+      return null;
+    }
+
     return Chauffeur(
-      id: json['id_chauffeur'] as int,
-      userId: json['user_id'] as int?,
-      numTelephone: json['num_telephone'] as String,
-      cni: json['cni'] as String,
-      permis: json['permis'] as String,
-      idCamion: json['id_camion'] as int?,
+      id: parseInt(json['id_chauffeur']),
+      user: parseUser(json['user']),
+      numTelephone: parseString(json['num_telephone']),
+      cni: parseString(json['cni']),
+      permis: parseString(json['permis']),
+      camion: parseCamion(json['camion']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id_chauffeur': id,
-      'user_id': userId,
+      'user_id': user?.id,
       'num_telephone': numTelephone,
       'cni': cni,
       'permis': permis,
-      'id_camion': idCamion,
+      'id_camion': camion?.id,
     };
   }
 }

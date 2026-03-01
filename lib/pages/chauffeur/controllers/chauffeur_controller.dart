@@ -1,18 +1,52 @@
 import 'package:get/get.dart';
 import '../../../services/chauffeur_service.dart';
 import '../../../models/chauffeur_model.dart';
+import '../../../models/user_model.dart';
+import '../../../routes/app_routes.dart';
 
 class ChauffeurController extends GetxController {
-
   final ChauffeurService _service = ChauffeurService();
   var chauffeurs = <Chauffeur>[].obs;
   var isLoading = false.obs;
   var error = RxnString();
+  var searchQuery = ''.obs;
+
+  List<Chauffeur> get filteredChauffeurs {
+    if (searchQuery.value.trim().isEmpty) return chauffeurs;
+    final q = searchQuery.value.trim().toLowerCase();
+    return chauffeurs.where((c) {
+      final phone = c.numTelephone.toLowerCase();
+      final cni = c.cni.toLowerCase();
+      final permis = c.permis.toLowerCase();
+      final camionId = c.camion?.id.toString() ?? '';
+      final userId = c.user?.id.toString() ?? '';
+      final userName = c.user?.fullName.toLowerCase() ?? '';
+      return phone.contains(q) ||
+          cni.contains(q) ||
+          permis.contains(q) ||
+          camionId.contains(q) ||
+          userId.contains(q) ||
+          userName.contains(q);
+    }).toList();
+  }
 
   @override
   void onInit() {
     super.onInit();
     fetchChauffeurs();
+  }
+
+  void _handleError(dynamic e, {bool showSnackbar = true}) {
+    final errorMsg = e.toString();
+    if (errorMsg.contains('401') || errorMsg.contains('Unauthorized')) {
+      Get.offAllNamed(AppRoutes.login);
+    } else if (errorMsg.contains('404') || errorMsg.contains('Not Found')) {
+      // L'élément n'existe plus, on rafraîchit la liste
+      fetchChauffeurs();
+      if (showSnackbar) Get.snackbar('Info', 'L\'élément a été supprimé ailleurs');
+    } else {
+      if (showSnackbar) Get.snackbar('Erreur', errorMsg);
+    }
   }
 
   Future<void> fetchChauffeurs() async {
@@ -22,48 +56,43 @@ class ChauffeurController extends GetxController {
       final data = await _service.getAll();
       chauffeurs.value = data.map((json) => Chauffeur.fromJson(json)).toList();
     } catch (e) {
-      print('Error loading chauffeurs: $e');
       error.value = e.toString();
-      Get.snackbar('Error', 'Failed to load chauffeurs: ${e.toString()}');
+      _handleError(e, showSnackbar: false);
     } finally {
       isLoading(false);
     }
   }
-  void addChauffeur(Chauffeur chauffeur) async {
+
+  Future<void> addChauffeur(Chauffeur chauffeur) async {
     try {
       final data = await _service.create(chauffeur.toJson());
       chauffeurs.add(Chauffeur.fromJson(data));
-      Get.snackbar('Success', 'Chauffeur added successfully');
+      Get.snackbar('Succès', 'Chauffeur ajouté avec succès');
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      _handleError(e);
     }
   }
-  void updateChauffeur(int id, Chauffeur chauffeur) async {
+
+  Future<void> updateChauffeur(Chauffeur chauffeur) async {
     try {
-      final data = await _service.update(id, chauffeur.toJson());
-      int index = chauffeurs.indexWhere((c) => c.id == id);
+      final data = await _service.update(chauffeur.id, chauffeur.toJson());
+      final index = chauffeurs.indexWhere((c) => c.id == chauffeur.id);
       if (index != -1) {
         chauffeurs[index] = Chauffeur.fromJson(data);
-        Get.snackbar('Success', 'Chauffeur updated successfully');
+        Get.snackbar('Succès', 'Chauffeur modifié avec succès');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update chauffeur: ${e.toString()} amina');
+      _handleError(e);
     }
   }
-  void deleteChauffeur(int id) async {
+
+  Future<void> deleteChauffeur(int id) async {
     try {
       await _service.delete(id);
       chauffeurs.removeWhere((c) => c.id == id);
-      Get.snackbar('Success', 'Chauffeur deleted successfully');
+      Get.snackbar('Succès', 'Chauffeur supprimé avec succès');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete chauffeur');
-    }
-  }
-  void getChauffeurById(int id) async {
-    try {
-      final data = await _service.getById(id);
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to get chauffeur details');
+      _handleError(e);
     }
   }
 }

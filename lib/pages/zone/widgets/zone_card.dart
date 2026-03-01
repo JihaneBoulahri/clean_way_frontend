@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../services/zone_service.dart';
 import '../../../models/zone_model.dart';
-import '../controllers/zone_controller.dart';
-
 
 class ZoneCard extends StatelessWidget {
   final Zone zone;
@@ -25,52 +22,32 @@ class ZoneCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Affiche le nom de la zone comme titre
             Text(
               'Zone ${zone.nomZone}',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            //affiche le type de la zone
             Text('Type: ${zone.typeZone}'),
-
-            // Affiche les coordonnées de la zone
             Text('Coordonnées: (${zone.latitude}, ${zone.longitude})'),
-
             const SizedBox(height: 12),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                InkWell(
-                  onTap: onEdit,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.edit, size: 20, color: Colors.blue.shade700),
-                        const SizedBox(width: 4),
-                        Text('Modifier', style: TextStyle(color: Colors.blue.shade700)),
-                      ],
-                    ),
+                TextButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit, size: 20),
+                  label: const Text('Modifier'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue.shade700,
                   ),
                 ),
-                const SizedBox(width: 12),
-                InkWell(
-                  onTap: onDelete,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.delete, size: 20, color: Colors.red.shade700),
-                        const SizedBox(width: 4),
-                        Text('Supprimer', style: TextStyle(color: Colors.red.shade700)),
-                      ],
-                    ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete, size: 20),
+                  label: const Text('Supprimer'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red.shade700,
                   ),
                 ),
               ],

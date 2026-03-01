@@ -42,6 +42,8 @@ class ZonePage extends GetView<ZoneController> {
                 padding: const EdgeInsets.only(bottom: 80),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
+                  // Sécurité contre les accès hors limites
+                  if (i >= list.length) return const SizedBox.shrink();
                   final zone = list[i];
                   return ZoneCard(
                     zone: zone,

@@ -21,17 +21,34 @@ class Tournee {
   });
 
   factory Tournee.fromJson(Map<String, dynamic> json) {
+    int parseInt(dynamic v) {
+      if (v == null) return 0;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return int.tryParse(v.toString()) ?? 0;
+    }
+
+    String parseString(dynamic v) {
+      if (v == null) return '';
+      return v.toString();
+    }
+
+    DateTime? parseDate(dynamic v) {
+      if (v == null) return null;
+      return DateTime.tryParse(v.toString());
+    }
+
     return Tournee(
-      id: json['id_tournee'] as int,
-      dateTournee: DateTime.parse(json['date_tournee'] as String),
-      heureDebut: json['heure_debut'] as String,
-      heureFin: json['heure_fin'] as String?,
-      status: json['status'] as String,
+      id: parseInt(json['id_tournee']),
+      dateTournee: parseDate(json['date_tournee']) ?? DateTime.now(),
+      heureDebut: parseString(json['heure_debut']),
+      heureFin: json['heure_fin'] != null ? parseString(json['heure_fin']) : null,
+      status: parseString(json['status']),
       camion: json['camion'] != null
-          ? Camion.fromJson(json['camion'] as Map<String, dynamic>)
+          ? Camion.fromJson((json['camion'] is Map) ? json['camion'] as Map<String, dynamic> : Map<String, dynamic>.from(json['camion']))
           : null,
       zone: json['zone'] != null
-          ? Zone.fromJson(json['zone'] as Map<String, dynamic>)
+          ? Zone.fromJson((json['zone'] is Map) ? json['zone'] as Map<String, dynamic> : Map<String, dynamic>.from(json['zone']))
           : null,
     );
   }

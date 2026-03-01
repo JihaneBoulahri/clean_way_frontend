@@ -42,13 +42,13 @@ class BennesPage extends GetView<BennesController> {
                 padding: const EdgeInsets.only(bottom: 80),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
+                  // Sécurité contre les accès hors limites
+                  if (i >= list.length) return const SizedBox.shrink();
                   final benne = list[i];
                   return BenneCard(
                     benne: benne,
                     onDelete: () => controller.deleteBenne(benne.id),
-                    onEdit: () => Get.dialog(
-                      BenneFormDialog(benne: benne),
-                    ),
+                    onEdit: () => Get.dialog(BenneFormDialog(benne: benne)),
                   );
                 },
               );

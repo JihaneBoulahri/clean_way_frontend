@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import '../../../services/camion_service.dart';
 import '../../../models/camion_model.dart';
+import '../../../routes/app_routes.dart';
+
 class CamionController extends GetxController {
   final CamionService _service = CamionService();
   var camions = <Camion>[].obs;
@@ -25,6 +27,14 @@ class CamionController extends GetxController {
     fetchCamions();
   }
 
+  void _handleError(dynamic e) {
+    if (e.toString().contains('401') || e.toString().contains('Unauthorized')) {
+      Get.offAllNamed(AppRoutes.login);
+    } else {
+      Get.snackbar('Erreur', e.toString());
+    }
+  }
+
   Future<void> fetchCamions() async {
     try {
       isLoading(true);
@@ -33,47 +43,43 @@ class CamionController extends GetxController {
       camions.value = data.map((json) => Camion.fromJson(json)).toList();
     } catch (e) {
       error.value = e.toString();
-      Get.snackbar('Error', 'Failed to load camions: ${e.toString()}');
+      _handleError(e);
     } finally {
       isLoading(false);
     }
   }
-  void addCamion(Camion camion) async {
+
+  Future<void> addCamion(Camion camion) async {
     try {
       final data = await _service.create(camion.toJson());
       camions.add(Camion.fromJson(data));
-      Get.snackbar('Success', 'Camion added successfully');
+      Get.snackbar('Succès', 'Camion ajouté avec succès');
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      print('Erreur lors de l\'ajout: $e'); // Pour déboguer
+      _handleError(e);
     }
   }
-  void updateCamion(int id, Camion camion) async {
+
+  Future<void> updateCamion(Camion camion) async {
     try {
-      final data = await _service.update(id, camion.toJson());
-      int index = camions.indexWhere((c) => c.id == id);
+      final data = await _service.update(camion.id, camion.toJson());
+      int index = camions.indexWhere((c) => c.id == camion.id);
       if (index != -1) {
         camions[index] = Camion.fromJson(data);
-        Get.snackbar('Success', 'Camion updated successfully');
+        Get.snackbar('Succès', 'Camion modifié avec succès');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update camion: ${e.toString()} amina');
+      _handleError(e);
     }
   }
-  void deleteCamion(int id) async {
+
+  Future<void> deleteCamion(int id) async {
     try {
       await _service.delete(id);
       camions.removeWhere((c) => c.id == id);
-      Get.snackbar('Success', 'Camion deleted successfully');
+      Get.snackbar('Succès', 'Camion supprimé avec succès');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete camion');
-    }
-  }
-  void getCamionById(int id) async {
-    try {
-      final data = await _service.getById(id);
-      Camion camion = Camion.fromJson(data);
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to load camion details');
+      _handleError(e);
     }
   }
 }

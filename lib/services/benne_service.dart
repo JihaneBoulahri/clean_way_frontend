@@ -23,7 +23,11 @@ class BenneService {
     if (res.statusCode == 200 || res.statusCode == 201) {
       final decoded = jsonDecode(res.body);
       if (decoded is List) return decoded;
-      if (decoded is Map && decoded['data'] is List) return decoded['data'];
+      if (decoded is Map) {
+        if (decoded['data'] is List) return decoded['data'];
+        if (decoded['data'] is Map) return decoded['data'];
+        if (decoded.containsKey('data')) return decoded['data'];
+      }
       return decoded;
     }
 
