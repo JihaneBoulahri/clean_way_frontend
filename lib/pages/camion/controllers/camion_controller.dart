@@ -2,11 +2,22 @@ import 'package:get/get.dart';
 import '../../../services/camion_service.dart';
 import '../../../models/camion_model.dart';
 class CamionController extends GetxController {
-
   final CamionService _service = CamionService();
   var camions = <Camion>[].obs;
   var isLoading = false.obs;
   var error = RxnString();
+  var searchQuery = ''.obs;
+
+  List<Camion> get filteredCamions {
+    if (searchQuery.value.trim().isEmpty) return camions;
+    final q = searchQuery.value.trim().toLowerCase();
+    return camions.where((c) {
+      return c.immatriculation.toLowerCase().contains(q) ||
+          c.typeCamion.toLowerCase().contains(q) ||
+          c.status.toLowerCase().contains(q) ||
+          c.capaciteCamion.toString().contains(q);
+    }).toList();
+  }
 
   @override
   void onInit() {
