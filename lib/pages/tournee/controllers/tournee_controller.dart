@@ -5,7 +5,17 @@ import '../../../services/tournee_service.dart';
 class TourneeController extends GetxController {
   final TourneeService _service = TourneeService();
   var tournees = <Tournee>[].obs;
-  var isLoading = false.obs; 
+  var isLoading = false.obs;
+  var searchQuery = ''.obs;
+
+  void searchOrFetch(String query) {
+    searchQuery.value = query;
+    if (query.trim().isEmpty) {
+      fetchTournees();
+    } else {
+      searchTournees(query.trim());
+    }
+  } 
 
   @override
   void onInit() {

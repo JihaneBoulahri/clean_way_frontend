@@ -6,8 +6,14 @@ import '../controllers/camion_controller.dart';
 class CamionCard extends StatelessWidget {
   final Camion camion;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
-  const CamionCard({super.key, required this.camion, required this.onDelete});
+  const CamionCard({
+    super.key,
+    required this.camion,
+    required this.onDelete,
+    required this.onEdit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,33 +37,41 @@ class CamionCard extends StatelessWidget {
               ),
             Text('Status: ${camion.status}'),
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: InkWell(
-                onTap: onDelete,
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.delete,
-                        size: 20,
-                        color: Colors.red.shade700,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Supprimer',
-                        style: TextStyle(color: Colors.red.shade700),
-                      ),
-                    ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                InkWell(
+                  onTap: onEdit,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.edit, size: 20, color: Colors.blue.shade700),
+                        const SizedBox(width: 4),
+                        Text('Modifier', style: TextStyle(color: Colors.blue.shade700)),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 12),
+                InkWell(
+                  onTap: onDelete,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.delete, size: 20, color: Colors.red.shade700),
+                        const SizedBox(width: 4),
+                        Text('Supprimer', style: TextStyle(color: Colors.red.shade700)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

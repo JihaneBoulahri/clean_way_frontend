@@ -7,6 +7,18 @@ class ZoneController extends GetxController {
   var zones = <Zone>[].obs;
   var isLoading = false.obs;
   var error = RxnString();
+  var searchQuery = ''.obs;
+
+  List<Zone> get filteredZones {
+    if (searchQuery.value.trim().isEmpty) return zones;
+    final q = searchQuery.value.trim().toLowerCase();
+    return zones.where((z) {
+      return z.nomZone.toLowerCase().contains(q) ||
+          z.typeZone.toLowerCase().contains(q) ||
+          z.latitude.toLowerCase().contains(q) ||
+          z.longitude.toLowerCase().contains(q);
+    }).toList();
+  }
 
   @override
   void onInit() {

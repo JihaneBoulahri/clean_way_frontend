@@ -5,7 +5,19 @@ import '../../../services/benne_service.dart';
 class BennesController extends GetxController {
   final BenneService _service = BenneService();
   var bennes = <Benne>[].obs;
-  var isLoading = false.obs; 
+  var isLoading = false.obs;
+  var searchQuery = ''.obs;
+
+  List<Benne> get filteredBennes {
+    if (searchQuery.value.trim().isEmpty) return bennes;
+    final q = searchQuery.value.trim().toLowerCase();
+    return bennes.where((b) {
+      return b.typeBenne.toLowerCase().contains(q) ||
+          b.capacite.toString().contains(q) ||
+          b.latitude.toLowerCase().contains(q) ||
+          b.longitude.toLowerCase().contains(q);
+    }).toList();
+  } 
 
   @override
   void onInit() {
