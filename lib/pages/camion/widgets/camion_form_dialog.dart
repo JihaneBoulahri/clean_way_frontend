@@ -14,6 +14,7 @@ class CamionFormDialog extends StatefulWidget {
 
 class _CamionFormDialogState extends State<CamionFormDialog> {
   final _formKey = GlobalKey<FormState>();
+  bool _saving = false;
   late final TextEditingController _immatController;
   late final TextEditingController _typeController;
   late final TextEditingController _capaciteController;
@@ -45,7 +46,7 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final cap = double.tryParse(_capaciteController.text);
     if (cap == null || cap <= 0) {
@@ -56,30 +57,35 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     if (_dateController.text.trim().isNotEmpty) {
       date = DateTime.tryParse(_dateController.text.trim());
     }
+    setState(() => _saving = true);
     final controller = Get.find<CamionController>();
-    if (widget.camion == null) {
-      controller.addCamion(Camion(
-        id: 0,
-        immatriculation: _immatController.text.trim(),
-        typeCamion: _typeController.text.trim(),
-        capaciteCamion: cap,
-        dateMiseEnService: date,
-        status: _statusController.text.trim(),
-      ));
-    } else {
-      controller.updateCamion(
-        widget.camion!.id,
-        Camion(
-          id: widget.camion!.id,
+    try {
+      if (widget.camion == null) {
+        await controller.addCamion(Camion(
+          id: 0,
           immatriculation: _immatController.text.trim(),
           typeCamion: _typeController.text.trim(),
           capaciteCamion: cap,
           dateMiseEnService: date,
           status: _statusController.text.trim(),
-        ),
-      );
+        ));
+      } else {
+        await controller.updateCamion(
+          widget.camion!.id,
+          Camion(
+            id: widget.camion!.id,
+            immatriculation: _immatController.text.trim(),
+            typeCamion: _typeController.text.trim(),
+            capaciteCamion: cap,
+            dateMiseEnService: date,
+            status: _statusController.text.trim(),
+          ),
+        );
+      }
+      Get.back();
+    } finally {
+      setState(() => _saving = false);
     }
-    Get.back();
   }
 
   @override
@@ -129,7 +135,16 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
-        FilledButton(onPressed: _save, child: Text(isEdit ? 'Modifier' : 'Ajouter')),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(isEdit ? 'Modifier' : 'Ajouter'),
+        ),
       ],
     );
   }

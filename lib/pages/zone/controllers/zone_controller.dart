@@ -39,16 +39,16 @@ class ZoneController extends GetxController {
       isLoading(false);
     }
   }
-  void addZone(Zone zone) async {
+  Future<void> addZone(Zone zone) async {
     try {
       final data = await _service.create(zone.toJson());
       zones.add(Zone.fromJson(data));
       Get.snackbar('Success', 'Zone added successfully');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add zone');
+      Get.snackbar('Error', 'Failed to add zone: ${e.toString()}');
     }
   }
-  void updateZone(int id, Zone zone) async {
+  Future<void> updateZone(int id, Zone zone) async {
     try {
       final data = await _service.update(id, zone.toJson());
       int index = zones.indexWhere((z) => z.id == id);
@@ -57,16 +57,16 @@ class ZoneController extends GetxController {
         Get.snackbar('Success', 'Zone updated successfully');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update zone');
+      Get.snackbar('Error', 'Failed to update zone: ${e.toString()}');
     }
   }
-  void deleteZone(int id) async {
+  Future<void> deleteZone(int id) async {
     try {
       await _service.delete(id);
       zones.removeWhere((z) => z.id == id);
       Get.snackbar('Success', 'Zone deleted successfully');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete zone');
+      Get.snackbar('Error', 'Failed to delete zone: ${e.toString()}');
     }
   }
   void getZoneById(int id) async {

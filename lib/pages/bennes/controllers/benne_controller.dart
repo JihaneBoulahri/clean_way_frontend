@@ -36,16 +36,16 @@ class BennesController extends GetxController {
       isLoading(false);
     }
   }
-  void addBenne(Benne benne) async {
+  Future<void> addBenne(Benne benne) async {
     try {
       final data = await _service.createBenne(benne.toJson());
       bennes.add(Benne.fromJson(data));
       Get.snackbar('Success', 'Benne added successfully');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add benne');
+      Get.snackbar('Error', 'Failed to add benne: ${e.toString()}');
     }
   }
-  void updateBenne(int id, Benne benne) async {
+  Future<void> updateBenne(int id, Benne benne) async {
     try {
       final data = await _service.updateBenne(id, benne.toJson());
       int index = bennes.indexWhere((b) => b.id == id);
@@ -54,16 +54,16 @@ class BennesController extends GetxController {
         Get.snackbar('Success', 'Benne updated successfully');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update benne');
+      Get.snackbar('Error', 'Failed to update benne: ${e.toString()}');
     }
   }
-  void deleteBenne(int id) async {
+  Future<void> deleteBenne(int id) async {
     try {
       await _service.deleteBenne(id);
       bennes.removeWhere((b) => b.id == id);
       Get.snackbar('Success', 'Benne deleted successfully');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete benne');
+      Get.snackbar('Error', 'Failed to delete benne: ${e.toString()}');
     }
   }
   void getBenneById(int id) async {

@@ -14,6 +14,7 @@ class ZoneFormDialog extends StatefulWidget {
 
 class _ZoneFormDialogState extends State<ZoneFormDialog> {
   final _formKey = GlobalKey<FormState>();
+  bool _saving = false;
   late final TextEditingController _nomController;
   late final TextEditingController _typeController;
   late final TextEditingController _latController;
@@ -37,30 +38,35 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    setState(() => _saving = true);
     final controller = Get.find<ZoneController>();
-    if (widget.zone == null) {
-      controller.addZone(Zone(
-        id: 0,
-        nomZone: _nomController.text.trim(),
-        typeZone: _typeController.text.trim(),
-        latitude: _latController.text.trim(),
-        longitude: _longController.text.trim(),
-      ));
-    } else {
-      controller.updateZone(
-        widget.zone!.id,
-        Zone(
-          id: widget.zone!.id,
+    try {
+      if (widget.zone == null) {
+        await controller.addZone(Zone(
+          id: 0,
           nomZone: _nomController.text.trim(),
           typeZone: _typeController.text.trim(),
           latitude: _latController.text.trim(),
           longitude: _longController.text.trim(),
-        ),
-      );
+        ));
+      } else {
+        await controller.updateZone(
+          widget.zone!.id,
+          Zone(
+            id: widget.zone!.id,
+            nomZone: _nomController.text.trim(),
+            typeZone: _typeController.text.trim(),
+            latitude: _latController.text.trim(),
+            longitude: _longController.text.trim(),
+          ),
+        );
+      }
+      Get.back();
+    } finally {
+      setState(() => _saving = false);
     }
-    Get.back();
   }
 
   @override
@@ -89,13 +95,23 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
               TextFormField(
                 controller: _latController,
                 decoration: const InputDecoration(labelText: 'Latitude'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Requis';
+                  if (double.tryParse(v.trim()) == null) return 'Doit être un nombre';
+                  return null;
+                },
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _longController,
                 decoration: const InputDecoration(labelText: 'Longitude'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Requis';
+                  if (double.tryParse(v.trim()) == null) return 'Doit être un nombre';
+                  return null;
+                },
               ),
             ],
           ),
@@ -103,7 +119,16 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
-        FilledButton(onPressed: _save, child: Text(isEdit ? 'Modifier' : 'Ajouter')),
+        FilledButton(
+          onPressed: _saving ? null : _save,
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(isEdit ? 'Modifier' : 'Ajouter'),
+        ),
       ],
     );
   }

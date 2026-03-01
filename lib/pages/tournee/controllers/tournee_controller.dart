@@ -35,16 +35,16 @@ class TourneeController extends GetxController {
       isLoading(false);
     }
   }
-  void addTournee(Tournee tournee) async {
+  Future<void> addTournee(Tournee tournee) async {
     try {
       final data = await _service.create(tournee.toJson());
       tournees.add(Tournee.fromJson(data));
       Get.snackbar('Success', 'Tournee added successfully');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add tournee');
+      Get.snackbar('Error', 'Failed to add tournee: ${e.toString()}');
     }
   }
-  void updateTournee(int id, Tournee tournee) async {
+  Future<void> updateTournee(int id, Tournee tournee) async {
     try {
       final data = await _service.update(id, tournee.toJson());
       int index = tournees.indexWhere((t) => t.id == id);
@@ -53,16 +53,16 @@ class TourneeController extends GetxController {
         Get.snackbar('Success', 'Tournee updated successfully');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update tournee');
+      Get.snackbar('Error', 'Failed to update tournee: ${e.toString()}');
     }
   }
-  void deleteTournee(int id) async {
+  Future<void> deleteTournee(int id) async {
     try {
       await _service.delete(id);
       tournees.removeWhere((t) => t.id == id);
       Get.snackbar('Success', 'Tournee deleted successfully');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete tournee');
+      Get.snackbar('Error', 'Failed to delete tournee: ${e.toString()}');
     }
   }
   void getTourneeById(int id) async {
