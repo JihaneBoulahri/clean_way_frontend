@@ -1,6 +1,7 @@
 import 'package:clean_way_frontend/models/zone_model.dart';
 import 'package:get/get.dart';
 import '../../../services/zone_service.dart';
+import '../../../routes/app_routes.dart';
 
 class ZoneController extends GetxController {
   final ZoneService _service = ZoneService();
@@ -26,6 +27,14 @@ class ZoneController extends GetxController {
     fetchZones();
   }
 
+  void _handleError(dynamic e) {
+    if (e.toString().contains('401') || e.toString().contains('Unauthorized')) {
+      Get.offAllNamed(AppRoutes.login);
+    } else {
+      Get.snackbar('Erreur', e.toString());
+    }
+  }
+
   void fetchZones() async {
     try {
       isLoading(true);
@@ -33,48 +42,45 @@ class ZoneController extends GetxController {
       zones.value = data.map((json) => Zone.fromJson(json)).toList();
     } catch (e) {
       error.value = e.toString();
-      print('Error loading zones: $e');
-      Get.snackbar('Error', 'Failed to load zones');
+      _handleError(e);
     } finally {
       isLoading(false);
     }
   }
+
   Future<void> addZone(Zone zone) async {
     try {
       final data = await _service.create(zone.toJson());
       zones.add(Zone.fromJson(data));
-      Get.snackbar('Success', 'Zone added successfully');
+      Get.snackbar('Succès', 'Zone ajoutée avec succès');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add zone: ${e.toString()}');
+      _handleError(e);
     }
   }
-  Future<void> updateZone(int id, Zone zone) async {
+
+  // Modification : on passe directement l'objet Zone (qui contient son id)
+  Future<void> updateZone(Zone zone) async {
     try {
-      final data = await _service.update(id, zone.toJson());
-      int index = zones.indexWhere((z) => z.id == id);
+      final data = await _service.update(zone.id, zone.toJson());
+      int index = zones.indexWhere((z) => z.id == zone.id);
       if (index != -1) {
         zones[index] = Zone.fromJson(data);
-        Get.snackbar('Success', 'Zone updated successfully');
+        Get.snackbar('Succès', 'Zone modifiée avec succès');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update zone: ${e.toString()}');
+      _handleError(e);
     }
   }
+
   Future<void> deleteZone(int id) async {
     try {
       await _service.delete(id);
       zones.removeWhere((z) => z.id == id);
-      Get.snackbar('Success', 'Zone deleted successfully');
+      Get.snackbar('Succès', 'Zone supprimée avec succès');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete zone: ${e.toString()}');
+      _handleError(e);
     }
   }
-  void getZoneById(int id) async {
-    try {
-      final data = await _service.getById(id);
-      Zone zone = Zone.fromJson(data);
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to load zone details');
-    }
-  }
+
+  // Méthode inutilisée supprimée (getZoneById)
 }

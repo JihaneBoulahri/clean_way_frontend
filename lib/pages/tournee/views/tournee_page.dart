@@ -30,11 +30,14 @@ class TourneePage extends GetView<TourneeController> {
               if (controller.tournees.isEmpty) {
                 return const Center(child: Text('Aucune tournée'));
               }
+              final list = controller.tournees;
               return ListView.builder(
                 padding: const EdgeInsets.only(bottom: 80),
-                itemCount: controller.tournees.length,
+                itemCount: list.length,
                 itemBuilder: (_, i) {
-                  final tournee = controller.tournees[i];
+                  // Vérification stricte pour éviter tout accès hors limites
+                  if (i < 0 || i >= list.length) return const SizedBox.shrink();
+                  final tournee = list[i];
                   return TourneeCard(
                     tournee: tournee,
                     onDelete: () => controller.deleteTournee(tournee.id),
@@ -47,7 +50,7 @@ class TourneePage extends GetView<TourneeController> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const TourneeFormDialog()),
+        onPressed: () => Get.dialog(TourneeFormDialog()),
         icon: const Icon(Icons.add),
         label: const Text('Ajouter'),
         backgroundColor: const Color(0xFF0F172A),

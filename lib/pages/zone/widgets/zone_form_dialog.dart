@@ -40,10 +40,20 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Validation supplémentaire des coordonnées (optionnelle mais recommandée)
+    final lat = double.tryParse(_latController.text.trim());
+    final lng = double.tryParse(_longController.text.trim());
+    if (lat == null || lng == null) {
+      Get.snackbar('Erreur', 'Coordonnées invalides');
+      return;
+    }
+
     setState(() => _saving = true);
     final controller = Get.find<ZoneController>();
     try {
       if (widget.zone == null) {
+        // Ajout
         await controller.addZone(Zone(
           id: 0,
           nomZone: _nomController.text.trim(),
@@ -52,18 +62,16 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
           longitude: _longController.text.trim(),
         ));
       } else {
-        await controller.updateZone(
-          widget.zone!.id,
-          Zone(
-            id: widget.zone!.id,
-            nomZone: _nomController.text.trim(),
-            typeZone: _typeController.text.trim(),
-            latitude: _latController.text.trim(),
-            longitude: _longController.text.trim(),
-          ),
-        );
+        // Modification : utilisation de la nouvelle signature
+        await controller.updateZone(Zone(
+          id: widget.zone!.id,
+          nomZone: _nomController.text.trim(),
+          typeZone: _typeController.text.trim(),
+          latitude: _latController.text.trim(),
+          longitude: _longController.text.trim(),
+        ));
       }
-      Get.back();
+      if (mounted) Navigator.of(context).pop();
     } finally {
       setState(() => _saving = false);
     }
@@ -118,7 +126,10 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
         FilledButton(
           onPressed: _saving ? null : _save,
           child: _saving

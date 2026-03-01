@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../models/chauffeur_model.dart';
-import '../../../models/camion_model.dart';
-import '../../../models/user_model.dart';
 
 class ChauffeurCard extends StatelessWidget {
   final Chauffeur chauffeur;
@@ -39,55 +37,21 @@ class ChauffeurCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                InkWell(
-                  onTap: onEdit,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.edit,
-                          size: 20,
-                          color: Colors.blue.shade700,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Modifier',
-                          style: TextStyle(color: Colors.blue.shade700),
-                        ),
-                      ],
-                    ),
+                TextButton.icon(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit, size: 20),
+                  label: const Text('Modifier'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.blue.shade700,
                   ),
                 ),
-                const SizedBox(width: 12),
-                InkWell(
-                  onTap: onDelete,
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.delete,
-                          size: 20,
-                          color: Colors.red.shade700,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Supprimer',
-                          style: TextStyle(color: Colors.red.shade700),
-                        ),
-                      ],
-                    ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete, size: 20),
+                  label: const Text('Supprimer'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red.shade700,
                   ),
                 ),
               ],

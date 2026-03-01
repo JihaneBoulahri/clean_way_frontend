@@ -46,7 +46,7 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
       Get.snackbar('Erreur', 'Capacité invalide');
       return;
     }
-    // enforce max capacity (avoid slider range error)
+    // Contrainte de capacité maximale (exemple)
     if (cap > 133) {
       Get.snackbar('Erreur', 'Capacité doit être ≤ 133');
       return;
@@ -63,18 +63,17 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
           longitude: _longController.text.trim(),
         ));
       } else {
-        await controller.updateBenne(
-          widget.benne!.id,
-          Benne(
-            id: widget.benne!.id,
-            typeBenne: _typeController.text.trim(),
-            capacite: cap,
-            latitude: _latController.text.trim(),
-            longitude: _longController.text.trim(),
-          ),
-        );
+        // Utilisation de la nouvelle signature (objet Benne complet)
+        await controller.updateBenne(Benne(
+          id: widget.benne!.id,
+          typeBenne: _typeController.text.trim(),
+          capacite: cap,
+          latitude: _latController.text.trim(),
+          longitude: _longController.text.trim(),
+        ));
       }
-      Get.back();
+      // Fermeture robuste du dialogue
+      if (mounted) Navigator.of(context).pop();
     } finally {
       setState(() => _saving = false);
     }
@@ -130,7 +129,10 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
         FilledButton(
           onPressed: _saving ? null : _save,
           child: _saving

@@ -39,7 +39,7 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                           color: Colors.red, size: 48),
                       const SizedBox(height: 16),
                       const Text(
-                        'Error',
+                        'Erreur',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -47,7 +47,7 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Failed to load chauffeurs',
+                        'Échec du chargement des chauffeurs',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
                       ),
@@ -55,13 +55,13 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                       ElevatedButton.icon(
                         onPressed: () => controller.fetchChauffeurs(),
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Retry'),
+                        label: const Text('Réessayer'),
                       ),
                       const SizedBox(height: 8),
                       TextButton.icon(
                         onPressed: () => Get.offAllNamed(AppRoutes.login),
                         icon: const Icon(Icons.login),
-                        label: const Text('Back to Login'),
+                        label: const Text('Retour connexion'),
                       ),
                     ],
                   ),
@@ -69,18 +69,20 @@ class ChauffeurPage extends GetView<ChauffeurController> {
               }
 
               if (controller.chauffeurs.isEmpty) {
-                return const Center(child: Text('No Data'));
+                return const Center(child: Text('Aucun chauffeur'));
               }
 
               final list = controller.filteredChauffeurs;
               if (list.isEmpty) {
-                return const Center(child: Text('No results'));
+                return const Center(child: Text('Aucun résultat'));
               }
 
               return ListView.builder(
                 padding: const EdgeInsets.only(bottom: 80),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
+                  // Sécurité contre les accès hors limites
+                  if (i >= list.length) return const SizedBox.shrink();
                   final chauffeur = list[i];
                   return ChauffeurCard(
                     chauffeur: chauffeur,
@@ -95,7 +97,7 @@ class ChauffeurPage extends GetView<ChauffeurController> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const ChauffeurFormDialog()),
+        onPressed: () => Get.dialog(ChauffeurFormDialog()), // plus de const
         icon: const Icon(Icons.add),
         label: const Text('Ajouter'),
         backgroundColor: const Color(0xFF0F172A),

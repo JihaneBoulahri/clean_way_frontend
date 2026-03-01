@@ -57,14 +57,24 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
     final userId = _userIdController.text.trim().isEmpty
         ? null
         : int.tryParse(_userIdController.text.trim());
+
+    if (_camionIdController.text.trim().isNotEmpty && camionId == null) {
+      Get.snackbar('Erreur', 'L\'ID camion doit être un nombre entier');
+      return;
+    }
+    if (_userIdController.text.trim().isNotEmpty && userId == null) {
+      Get.snackbar('Erreur', 'L\'ID utilisateur doit être un nombre entier');
+      return;
+    }
+
     final controller = Get.find<ChauffeurController>();
-    // build objects only if an id was entered
     final camionObj = camionId != null
         ? Camion(id: camionId, immatriculation: '', typeCamion: '', capaciteCamion: 0, status: '')
         : null;
     final userObj = userId != null
         ? User(id: userId, nom: '', prenom: '', email: '', role: '')
         : null;
+
     setState(() => _saving = true);
     try {
       if (widget.chauffeur == null) {
@@ -80,7 +90,6 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
         );
       } else {
         await controller.updateChauffeur(
-          widget.chauffeur!.id,
           Chauffeur(
             id: widget.chauffeur!.id,
             user: userObj ?? widget.chauffeur!.user,
@@ -91,7 +100,7 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
           ),
         );
       }
-      Get.back();
+      if (mounted) Navigator.of(context).pop();
     } finally {
       setState(() => _saving = false);
     }
@@ -110,31 +119,26 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
             children: [
               TextFormField(
                 controller: _phoneController,
-                decoration:
-                    const InputDecoration(labelText: 'Numéro de téléphone'),
+                decoration: const InputDecoration(labelText: 'Numéro de téléphone'),
                 keyboardType: TextInputType.phone,
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _cniController,
                 decoration: const InputDecoration(labelText: 'CNI'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _permisController,
                 decoration: const InputDecoration(labelText: 'Permis'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _userIdController,
-                decoration:
-                    const InputDecoration(labelText: 'ID utilisateur (optionnel)'),
+                decoration: const InputDecoration(labelText: 'ID utilisateur (optionnel)'),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
@@ -145,8 +149,7 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _camionIdController,
-                decoration:
-                    const InputDecoration(labelText: 'ID camion (optionnel)'),
+                decoration: const InputDecoration(labelText: 'ID camion (optionnel)'),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
@@ -159,7 +162,10 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
         FilledButton(
           onPressed: _saving ? null : _save,
           child: _saving
@@ -174,4 +180,3 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
     );
   }
 }
-

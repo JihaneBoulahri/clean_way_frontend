@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../../services/chauffeur_service.dart';
 import '../../../models/chauffeur_model.dart';
 import '../../../models/user_model.dart';
+import '../../../routes/app_routes.dart';
 
 class ChauffeurController extends GetxController {
   final ChauffeurService _service = ChauffeurService();
@@ -35,6 +36,19 @@ class ChauffeurController extends GetxController {
     fetchChauffeurs();
   }
 
+  void _handleError(dynamic e, {bool showSnackbar = true}) {
+    final errorMsg = e.toString();
+    if (errorMsg.contains('401') || errorMsg.contains('Unauthorized')) {
+      Get.offAllNamed(AppRoutes.login);
+    } else if (errorMsg.contains('404') || errorMsg.contains('Not Found')) {
+      // L'élément n'existe plus, on rafraîchit la liste
+      fetchChauffeurs();
+      if (showSnackbar) Get.snackbar('Info', 'L\'élément a été supprimé ailleurs');
+    } else {
+      if (showSnackbar) Get.snackbar('Erreur', errorMsg);
+    }
+  }
+
   Future<void> fetchChauffeurs() async {
     try {
       isLoading(true);
@@ -42,10 +56,8 @@ class ChauffeurController extends GetxController {
       final data = await _service.getAll();
       chauffeurs.value = data.map((json) => Chauffeur.fromJson(json)).toList();
     } catch (e) {
-      // ignore: avoid_print
-      print('Error loading chauffeurs: $e');
       error.value = e.toString();
-      Get.snackbar('Error', 'Failed to load chauffeurs: ${e.toString()}');
+      _handleError(e, showSnackbar: false);
     } finally {
       isLoading(false);
     }
@@ -55,25 +67,22 @@ class ChauffeurController extends GetxController {
     try {
       final data = await _service.create(chauffeur.toJson());
       chauffeurs.add(Chauffeur.fromJson(data));
-      Get.snackbar('Success', 'Chauffeur added successfully');
+      Get.snackbar('Succès', 'Chauffeur ajouté avec succès');
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      _handleError(e);
     }
   }
 
-  Future<void> updateChauffeur(int id, Chauffeur chauffeur) async {
+  Future<void> updateChauffeur(Chauffeur chauffeur) async {
     try {
-      final data = await _service.update(id, chauffeur.toJson());
-      final index = chauffeurs.indexWhere((c) => c.id == id);
+      final data = await _service.update(chauffeur.id, chauffeur.toJson());
+      final index = chauffeurs.indexWhere((c) => c.id == chauffeur.id);
       if (index != -1) {
         chauffeurs[index] = Chauffeur.fromJson(data);
-        Get.snackbar('Success', 'Chauffeur updated successfully');
+        Get.snackbar('Succès', 'Chauffeur modifié avec succès');
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to update chauffeur: ${e.toString()}',
-      );
+      _handleError(e);
     }
   }
 
@@ -81,17 +90,9 @@ class ChauffeurController extends GetxController {
     try {
       await _service.delete(id);
       chauffeurs.removeWhere((c) => c.id == id);
-      Get.snackbar('Success', 'Chauffeur deleted successfully');
+      Get.snackbar('Succès', 'Chauffeur supprimé avec succès');
     } catch (e) {
-      Get.snackbar('Error', 'Failed to delete chauffeur: ${e.toString()}');
-    }
-  }
-
-  void getChauffeurById(int id) async {
-    try {
-      await _service.getById(id);
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to get chauffeur details');
+      _handleError(e);
     }
   }
 }

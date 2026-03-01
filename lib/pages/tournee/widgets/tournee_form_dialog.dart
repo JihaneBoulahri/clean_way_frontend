@@ -53,9 +53,8 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
     super.dispose();
   }
 
-  static final _timeRegex = RegExp(r'^([01]?\d|2[0-3]):[0-5]\d(:[0-5]\d)?\$');
+  static final _timeRegex = RegExp(r'^([01]?\d|2[0-3]):[0-5]\d(:[0-5]\d)?$');
 
-  /// Normalise a user-entered time string to HH:mm (drop seconds if provided).
   String _formatTime(String input) {
     final parts = input.trim().split(':');
     if (parts.length >= 2) {
@@ -71,8 +70,22 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
       Get.snackbar('Erreur', 'Date invalide (AAAA-MM-JJ)');
       return;
     }
-    final idCamion = int.tryParse(_idCamionController.text.trim());
-    final idZone = int.tryParse(_idZoneController.text.trim());
+    final idCamion = _idCamionController.text.trim().isEmpty
+        ? null
+        : int.tryParse(_idCamionController.text.trim());
+    final idZone = _idZoneController.text.trim().isEmpty
+        ? null
+        : int.tryParse(_idZoneController.text.trim());
+
+    if (_idCamionController.text.trim().isNotEmpty && idCamion == null) {
+      Get.snackbar('Erreur', 'L\'ID camion doit être un nombre entier');
+      return;
+    }
+    if (_idZoneController.text.trim().isNotEmpty && idZone == null) {
+      Get.snackbar('Erreur', 'L\'ID zone doit être un nombre entier');
+      return;
+    }
+
     final controller = Get.find<TourneeController>();
     final debut = _formatTime(_heureDebutController.text);
     final fin = _heureFinController.text.trim().isEmpty ? null : _formatTime(_heureFinController.text);
@@ -89,20 +102,17 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
           zone: idZone != null ? Zone(id: idZone, nomZone: '', typeZone: '', latitude: '', longitude: '') : null,
         ));
       } else {
-        await controller.updateTournee(
-          widget.tournee!.id,
-          Tournee(
-            id: widget.tournee!.id,
-            dateTournee: date,
-            heureDebut: debut,
-            heureFin: fin,
-            status: _statusController.text.trim(),
-            camion: idCamion != null ? Camion(id: idCamion, immatriculation: '', typeCamion: '', capaciteCamion: 0, status: '') : null,
-            zone: idZone != null ? Zone(id: idZone, nomZone: '', typeZone: '', latitude: '', longitude: '') : null,
-          ),
-        );
+        await controller.updateTournee(Tournee(
+          id: widget.tournee!.id,
+          dateTournee: date,
+          heureDebut: debut,
+          heureFin: fin,
+          status: _statusController.text.trim(),
+          camion: idCamion != null ? Camion(id: idCamion, immatriculation: '', typeCamion: '', capaciteCamion: 0, status: '') : null,
+          zone: idZone != null ? Zone(id: idZone, nomZone: '', typeZone: '', latitude: '', longitude: '') : null,
+        ));
       }
-      Get.back();
+      if (mounted) Navigator.of(context).pop();
     } finally {
       setState(() => _saving = false);
     }
@@ -121,11 +131,10 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
             children: [
               TextFormField(
                 controller: _dateController,
-                decoration: const InputDecoration(
-                    labelText: 'Date (AAAA-MM-JJ)'),
+                decoration: const InputDecoration(labelText: 'Date (AAAA-MM-JJ)'),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Requis';
-                  final regex = RegExp(r'^\d{4}-\d{2}-\d{2}\$');
+                  final regex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
                   if (!regex.hasMatch(v.trim())) return 'Format invalide';
                   return null;
                 },
@@ -133,8 +142,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _heureDebutController,
-                decoration: const InputDecoration(
-                    labelText: 'Heure début (format HH:mm)'),
+                decoration: const InputDecoration(labelText: 'Heure début (format HH:mm)'),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Requis';
                   if (!_timeRegex.hasMatch(v.trim())) return 'Format invalide (HH:mm)';
@@ -144,8 +152,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _heureFinController,
-                decoration: const InputDecoration(
-                    labelText: 'Heure fin (optionnel, HH:mm)'),
+                decoration: const InputDecoration(labelText: 'Heure fin (optionnel, HH:mm)'),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
                   if (!_timeRegex.hasMatch(v.trim())) return 'Format invalide (HH:mm)';
@@ -161,7 +168,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _idCamionController,
-                decoration: const InputDecoration(labelText: 'ID camion'),
+                decoration: const InputDecoration(labelText: 'ID camion (optionnel)'),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
@@ -172,7 +179,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _idZoneController,
-                decoration: const InputDecoration(labelText: 'ID zone'),
+                decoration: const InputDecoration(labelText: 'ID zone (optionnel)'),
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
@@ -185,7 +192,10 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
         FilledButton(
           onPressed: _saving ? null : _save,
           child: _saving

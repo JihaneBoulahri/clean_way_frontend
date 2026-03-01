@@ -38,6 +38,8 @@ class ZonePage extends GetView<ZoneController> {
                 padding: const EdgeInsets.only(bottom: 80),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
+                  // Sécurité contre les accès hors limites
+                  if (i >= list.length) return const SizedBox.shrink();
                   final zone = list[i];
                   return ZoneCard(
                     zone: zone,
@@ -51,7 +53,7 @@ class ZonePage extends GetView<ZoneController> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const ZoneFormDialog()),
+        onPressed: () => Get.dialog(ZoneFormDialog()), // plus de const
         icon: const Icon(Icons.add),
         label: const Text('Ajouter'),
         backgroundColor: const Color(0xFF0F172A),
