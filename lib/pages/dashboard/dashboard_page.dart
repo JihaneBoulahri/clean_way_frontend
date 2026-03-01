@@ -1,4 +1,5 @@
 import 'package:clean_way_frontend/routes/app_routes.dart';
+import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/dashboard_controller.dart';
@@ -10,9 +11,9 @@ class DashboardPage extends GetView<DashboardController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
-      body: SafeArea(
+    return AppLayout(
+      pageName: "Dashboard",
+      child: SafeArea(
         child: Obx(() {
           if (controller.loading.value) {
             return const Center(

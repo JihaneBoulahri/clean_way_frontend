@@ -1,4 +1,5 @@
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
+import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/benne_controller.dart';
@@ -10,13 +11,16 @@ class BennesPage extends GetView<BennesController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Bennes'),
+    return AppLayout(
+      pageName: "Bennes",
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Get.dialog(const BenneFormDialog()),
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter'),
         backgroundColor: const Color(0xFF0F172A),
         foregroundColor: Colors.white,
       ),
-      body: Column(
+      child: Column(
         children: [
           SearchBarField(
             hint: 'Rechercher par type, capacité, coordonnées...',
@@ -51,12 +55,6 @@ class BennesPage extends GetView<BennesController> {
             }),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const BenneFormDialog()),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
-        backgroundColor: const Color(0xFF0F172A),
       ),
     );
   }

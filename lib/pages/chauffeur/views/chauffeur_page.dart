@@ -1,4 +1,5 @@
 import 'package:clean_way_frontend/pages/chauffeur/controllers/chauffeur_controller.dart';
+import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/chauffeur_controller.dart';
@@ -10,8 +11,9 @@ class ChauffeurPage extends GetView<ChauffeurController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
+    return AppLayout(
+      pageName: "Chauffeurs",
+      child: Center(
         child: Obx(() {
           if (controller.isLoading.value) {
             return const CircularProgressIndicator();

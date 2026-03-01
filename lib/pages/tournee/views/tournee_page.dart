@@ -1,4 +1,5 @@
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
+import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/tournee_controller.dart';
@@ -10,13 +11,15 @@ class TourneePage extends GetView<TourneeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tournées'),
+    return AppLayout(
+      pageName: "Tournées",
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Get.dialog(const TourneeFormDialog()),
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter'),
         backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
       ),
-      body: Column(
+      child: Column(
         children: [
           SearchBarField(
             hint: 'Rechercher...',
@@ -45,12 +48,6 @@ class TourneePage extends GetView<TourneeController> {
             }),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const TourneeFormDialog()),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
-        backgroundColor: const Color(0xFF0F172A),
       ),
     );
   }

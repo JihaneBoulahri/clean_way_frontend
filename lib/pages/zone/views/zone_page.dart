@@ -1,6 +1,7 @@
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../widgets/app_layout.dart';
 import '../controllers/zone_controller.dart';
 import '../widgets/zone_card.dart';
 import '../widgets/zone_form_dialog.dart';
@@ -10,13 +11,16 @@ class ZonePage extends GetView<ZoneController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Zones'),
+    return AppLayout(
+      pageName: "Zones",
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Get.dialog(const ZoneFormDialog()),
+        icon: const Icon(Icons.add),
+        label: const Text('Ajouter'),
         backgroundColor: const Color(0xFF0F172A),
         foregroundColor: Colors.white,
       ),
-      body: Column(
+      child: Column(
         children: [
           SearchBarField(
             hint: 'Rechercher par nom, type, coordonnées...',
@@ -49,12 +53,6 @@ class ZonePage extends GetView<ZoneController> {
             }),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const ZoneFormDialog()),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
-        backgroundColor: const Color(0xFF0F172A),
       ),
     );
   }

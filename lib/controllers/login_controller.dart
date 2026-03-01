@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import 'package:get_storage/get_storage.dart';
 import '../routes/app_routes.dart';
@@ -36,12 +38,22 @@ class LoginController extends GetxController {
   final passError = validatePassword(password.value);
 
   if (emailError != null) {
-    Get.snackbar("Error", emailError);
+    Get.snackbar(
+      "Error",
+      emailError,
+      icon: Icon(Icons.error, color: Colors.white),
+      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+      colorText: Colors.white,
+    );
     return;
   }
 
   if (passError != null) {
-    Get.snackbar("Error", passError);
+    Get.snackbar(
+      icon: Icon(Icons.error, color: Colors.white),
+      "Error", passError,
+      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+      colorText: Colors.white);
     return;
   }
 
@@ -56,21 +68,33 @@ class LoginController extends GetxController {
 
       // Direct access with !
       final token = result['data']['token'];
-      final user = result['data']['user'];
+      final user = User.fromJson(result['data']['data']);
 
       await box.write('token', token);
-      await box.write('user', user);
+      await box.write('user', user.toJson());
 
-      print('Token stored: ${box.read('token')}'); // now should print token
-
-      Get.snackbar("Success", "Login successful");
+      Get.snackbar(
+        icon: Icon(Icons.check_circle, color: Colors.white),
+        "Success","Login successful",
+        backgroundColor: const Color.fromARGB(255, 82, 171, 85),
+        colorText: Colors.white,
+      );
       Get.offAllNamed(AppRoutes.dashboard);
     } else {
-      Get.snackbar("Error", result['message'] ?? "Login failed");
+      Get.snackbar(
+        icon: Icon(Icons.error, color: Colors.white),
+        "Error", result['message'] ?? "Login failed",
+      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+        colorText: Colors.white,
+      );
     }
   } catch (e) {
     print("Login error: $e");
-    Get.snackbar("Error", "Something went wrong");
+    Get.snackbar(
+      icon: Icon(Icons.error, color: Colors.white),
+        "Error","Something went wrong",
+      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+        colorText: Colors.white,);
   } finally {
     isLoading.value = false;
   }
