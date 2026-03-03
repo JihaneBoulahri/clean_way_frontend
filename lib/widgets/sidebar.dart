@@ -2,6 +2,7 @@ import 'package:clean_way_frontend/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/user_model.dart';
+import '../routes/app_routes.dart';
 
 class Sidebar extends StatelessWidget {
   final Color primaryColor;
@@ -96,8 +97,8 @@ class Sidebar extends StatelessWidget {
                   _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.bennes)),
                   _SidebarItem(icon: Icons.person_outline, label: 'Chauffeurs', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.chauffeurs)),
                   _SidebarItem(icon: Icons.today_outlined, label: 'Tournées', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.tournees)),
-                  _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected('settings')),
-                  _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected('help')),
+                  _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.settings)),
+                  _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
                 ],
               ),
             ),
