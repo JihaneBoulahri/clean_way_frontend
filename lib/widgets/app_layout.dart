@@ -29,6 +29,12 @@ class _AppLayoutState extends State<AppLayout> {
   }
 
   void handleNavigation(String route) {
+  if (route == 'logout') {
+    GetStorage().erase();
+    Get.offAllNamed(AppRoutes.login);
+    return;
+  }
+  
   if (route == AppRoutes.login) {
     GetStorage().erase();
     Get.offAllNamed(AppRoutes.login);

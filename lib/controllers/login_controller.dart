@@ -98,5 +98,33 @@ class LoginController extends GetxController {
   } finally {
     isLoading.value = false;
   }
-}
+  }
+
+  // Logout function
+  Future<void> logout() async {
+    try {
+      final box = GetStorage();
+      
+      // Clear stored data
+      await box.remove('token');
+      await box.remove('user');
+      
+      Get.snackbar(
+        icon: Icon(Icons.check_circle, color: Colors.white),
+        "Success","Logged out successfully",
+        backgroundColor: const Color.fromARGB(255, 82, 171, 85),
+        colorText: Colors.white,
+      );
+      
+      // Navigate to login
+      Get.offAllNamed(AppRoutes.login);
+    } catch (e) {
+      Get.snackbar(
+        icon: Icon(Icons.error, color: Colors.white),
+        "Error","Logout failed",
+        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+        colorText: Colors.white,
+      );
+    }
+  }
 }
