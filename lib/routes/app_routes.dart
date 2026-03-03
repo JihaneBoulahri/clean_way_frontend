@@ -11,4 +11,6 @@ class AppRoutes {
   static const zones = '/zones';
   static const tournees = '/tournees';
   static const chauffeurs = '/chauffeurs';
+  static const settings = '/settings';
+  static const help = '/help';
 }
