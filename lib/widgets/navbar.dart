@@ -12,7 +12,7 @@ class Navbar extends StatelessWidget {
   User get user {
     final box = GetStorage();
     final storedUser = box.read('user');
-    return User.fromJson(storedUser);
+    return User.fromJsonSafe(storedUser);
   }
 
   void _showUserInfo(BuildContext context) {
@@ -74,11 +74,18 @@ class Navbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+        color: scheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: SafeArea(
         bottom: false,

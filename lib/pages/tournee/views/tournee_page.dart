@@ -1,5 +1,7 @@
+import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:clean_way_frontend/widgets/app_layout.dart';
+import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/tournee_controller.dart';
@@ -16,35 +18,57 @@ class TourneePage extends GetView<TourneeController> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Get.dialog(const TourneeFormDialog()),
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
-        backgroundColor: const Color(0xFF0F172A),
+        label: const Text('Nouvelle tournée'),
+        backgroundColor: AppTheme.accentColor,
+        foregroundColor: AppTheme.textLight,
       ),
       child: Column(
         children: [
-          SearchBarField(
-            hint: 'Rechercher...',
-            onChanged: (v) => controller.searchOrFetch(v),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: SearchBarField(
+              hint: 'Rechercher une tournée...',
+              onChanged: (v) => controller.searchOrFetch(v),
+            ),
           ),
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.accentColor,
+                  ),
+                );
               }
               if (controller.tournees.isEmpty) {
-                return const Center(child: Text('Aucune tournée'));
+                return EmptyState(
+                  icon: Icons.directions_bus,
+                  title: 'Aucune tournée',
+                  subtitle: 'Commencez par créer votre première tournée',
+                  action: ElevatedButton.icon(
+                    onPressed: () => Get.dialog(const TourneeFormDialog()),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Créer'),
+                  ),
+                );
               }
               final list = controller.tournees;
               return ListView.builder(
-                padding: const EdgeInsets.only(bottom: 80),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
-                  // Vérification stricte pour éviter tout accès hors limites
                   if (i < 0 || i >= list.length) return const SizedBox.shrink();
                   final tournee = list[i];
-                  return TourneeCard(
-                    tournee: tournee,
-                    onDelete: () => controller.deleteTournee(tournee.id),
-                    onEdit: () => Get.dialog(TourneeFormDialog(tournee: tournee)),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    child: TourneeCard(
+                      tournee: tournee,
+                      onDelete: () => controller.deleteTournee(tournee.id),
+                      onEdit: () => Get.dialog(TourneeFormDialog(tournee: tournee)),
+                    ),
                   );
                 },
               );
