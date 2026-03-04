@@ -1,5 +1,3 @@
-import 'package:clean_way_frontend/models/chauffeur_model.dart';
-
 class AppRoutes {
   static const splash = '/';
   static const login = '/login';

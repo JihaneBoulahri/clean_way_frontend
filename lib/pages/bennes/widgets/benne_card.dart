@@ -29,9 +29,7 @@ class BenneCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text('Capacité: ${benne.capacite} m³'),
             Text(
-              benne.latitude != null && benne.longitude != null
-                  ? 'Position: (${benne.latitude}, ${benne.longitude})'
-                  : 'Position: Non renseignée',
+              'Position: (${benne.latitude}, ${benne.longitude})',
             ),
             const SizedBox(height: 12),
             Row(

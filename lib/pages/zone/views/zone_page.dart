@@ -1,4 +1,6 @@
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
+import 'package:clean_way_frontend/core/theme/app_theme.dart';
+import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../widgets/app_layout.dart';
@@ -16,39 +18,64 @@ class ZonePage extends GetView<ZoneController> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Get.dialog(const ZoneFormDialog()),
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
+        label: const Text('Ajouter une zone'),
+        backgroundColor: AppTheme.accentColor,
+        foregroundColor: AppTheme.textLight,
       ),
       child: Column(
         children: [
-          SearchBarField(
-            hint: 'Rechercher par nom, type, coordonnées...',
-            onChanged: (v) => controller.searchQuery.value = v,
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: SearchBarField(
+              hint: 'Rechercher par nom, type, coordonnées...',
+              onChanged: (v) => controller.searchQuery.value = v,
+            ),
           ),
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.accentColor,
+                  ),
+                );
               }
               if (controller.zones.isEmpty) {
-                return const Center(child: Text('Aucune zone'));
+                return EmptyState(
+                  icon: Icons.location_on_outlined,
+                  title: 'Aucune zone',
+                  subtitle: 'Commencez par ajouter votre première zone',
+                  action: ElevatedButton.icon(
+                    onPressed: () => Get.dialog(const ZoneFormDialog()),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Ajouter'),
+                  ),
+                );
               }
               final list = controller.filteredZones;
               if (list.isEmpty) {
-                return const Center(child: Text('Aucun résultat'));
+                return EmptyState(
+                  icon: Icons.search_off,
+                  title: 'Aucun résultat',
+                  subtitle: 'Essayez avec d\'autres critères',
+                );
               }
               return ListView.builder(
-                padding: const EdgeInsets.only(bottom: 80),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
-                  // Sécurité contre les accès hors limites
                   if (i >= list.length) return const SizedBox.shrink();
                   final zone = list[i];
-                  return ZoneCard(
-                    zone: zone,
-                    onDelete: () => controller.deleteZone(zone.id),
-                    onEdit: () => Get.dialog(ZoneFormDialog(zone: zone)),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    child: ZoneCard(
+                      zone: zone,
+                      onDelete: () => controller.deleteZone(zone.id),
+                      onEdit: () => Get.dialog(ZoneFormDialog(zone: zone)),
+                    ),
                   );
                 },
               );

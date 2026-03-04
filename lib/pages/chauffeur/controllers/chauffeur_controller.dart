@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import '../../../services/chauffeur_service.dart';
 import '../../../models/chauffeur_model.dart';
-import '../../../models/user_model.dart';
 import '../../../routes/app_routes.dart';
 
 class ChauffeurController extends GetxController {

@@ -13,14 +13,23 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  ThemeData _buildTheme({required int seedColor, required Brightness brightness}) {
+    final scheme = ColorScheme.fromSeed(seedColor: Color(seedColor), brightness: brightness);
+    return ThemeData.from(colorScheme: scheme).copyWith(useMaterial3: true);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final box = GetStorage();
+    final darkMode = box.read('settings:darkMode') ?? false;
+    final accentColor = box.read('settings:accentColor') ?? 0xFF6B21A8;
+
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Clean Way',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
+      theme: _buildTheme(seedColor: accentColor, brightness: Brightness.light),
+      darkTheme: _buildTheme(seedColor: accentColor, brightness: Brightness.dark),
+      themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
       initialRoute: AppRoutes.login,
       getPages: AppPages.routes,
     );

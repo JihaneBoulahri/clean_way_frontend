@@ -2,7 +2,6 @@ import 'package:clean_way_frontend/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/user_model.dart';
-import '../routes/app_routes.dart';
 
 class Sidebar extends StatelessWidget {
   final Color primaryColor;
@@ -17,13 +16,14 @@ class Sidebar extends StatelessWidget {
   User get user {
     final box = GetStorage();
     final storedUser = box.read('user');
-    return User.fromJson(storedUser);
+    return User.fromJsonSafe(storedUser);
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
-      color: Colors.white,
+      color: scheme.surface,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,7 +46,7 @@ class Sidebar extends StatelessWidget {
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
-                              color: const Color.fromARGB(255, 38, 102, 63)),
+                              color: scheme.onSurface),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -72,11 +72,11 @@ class Sidebar extends StatelessWidget {
                             Text(user.fullName,
                                 style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.grey[800],
+                                    color: scheme.onSurface,
                                     fontWeight: FontWeight.w600),
                                 overflow: TextOverflow.ellipsis),
                             Text(user.role,
-                                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                style: TextStyle(fontSize: 12, color: scheme.onSurface.withOpacity(0.7)),
                                 overflow: TextOverflow.ellipsis),
                           ],
                         ),
@@ -147,15 +147,21 @@ class _SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: Colors.grey[700]),
+            Icon(icon, size: 20, color: scheme.onSurface.withOpacity(0.8)),
             const SizedBox(width: 12),
-            Expanded(child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: scheme.onSurface),
+              ),
+            ),
           ],
         ),
       ),

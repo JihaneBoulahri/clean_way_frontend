@@ -28,6 +28,14 @@ class User {
           : null,
     );
   }
+
+  /// Lit les données user depuis GetStorage (LinkedMap<dynamic, dynamic> ou Map).
+  factory User.fromJsonSafe(dynamic data) {
+    if (data == null || data is! Map) {
+      throw ArgumentError('Invalid user data');
+    }
+    return User.fromJson(Map<String, dynamic>.from(data));
+  }
     // Getter pratiques
       String get fullName => '$prenom $nom';
       String get initials => (prenom.isNotEmpty ? prenom[0] : '') +

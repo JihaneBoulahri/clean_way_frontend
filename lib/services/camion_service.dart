@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
-import 'package:get/get.dart';
 import '../core/constants/api_constants.dart';
-import '../routes/app_routes.dart';
 
 class CamionService {
   final _box = GetStorage();
