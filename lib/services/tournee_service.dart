@@ -31,7 +31,9 @@ class TourneeService {
     }
 
     // Show error but don't auto-redirect; let controller handle it
-    throw Exception("Server error (${res.statusCode}): ${res.body.isNotEmpty ? res.body.substring(0, 200) : 'No response'}");
+    throw Exception(
+      "Server error (${res.statusCode}):\n${res.body.isNotEmpty ? (res.body.length > 200 ? res.body.substring(0, 200) + '...' : res.body) : 'No response'}"
+    );
   }
 
   //get all tournees

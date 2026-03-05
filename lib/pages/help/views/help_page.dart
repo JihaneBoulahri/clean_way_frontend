@@ -1,267 +1,233 @@
 import 'package:flutter/material.dart';
-import 'package:clean_way_frontend/core/theme/app_theme.dart';
-import 'package:clean_way_frontend/widgets/modern_widgets.dart';
-import '../../../widgets/app_layout.dart';
 
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AppLayout(
-      pageName: 'Aide & Support',
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Quick Links Section
-            Text(
-              'Accès rapide',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              children: [
-                Expanded(
-                  child: ModernCard(
-                    onTap: () {},
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.help_center_outlined,
-                          size: 32,
-                          color: AppTheme.accentColor,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'FAQ',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.lg),
-                Expanded(
-                  child: ModernCard(
-                    onTap: () {},
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.message_outlined,
-                          size: 32,
-                          color: AppTheme.accentColor,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'Contact',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xl),
+    const darkGreen = Color(0xFF064635); // Dark Moroccan green
+    const whiteColor = Colors.white;
 
-            // Help Categories
-            Text(
-              'Guides d\'utilisation',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _buildHelpCategory(
-              context,
-              icon: Icons.delete_outline,
-              title: 'Gestion des Bennes',
-              description: 'Apprenez à ajouter, modifier et supprimer des bennes',
-              items: [
-                'Ajouter une nouvelle benne',
-                'Modifier les informations d\'une benne',
-                'Localiser une benne sur la carte',
-                'Exporter les données des bennes',
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _buildHelpCategory(
-              context,
-              icon: Icons.directions_bus,
-              title: 'Gestion des Tournées',
-              description: 'Optimisez vos itinéraires de collecte',
-              items: [
-                'Créer une nouvelle tournée',
-                'Assigner des bennes à une tournée',
-                'Suivre la progression en temps réel',
-                'Générer des rapports',
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _buildHelpCategory(
-              context,
-              icon: Icons.local_shipping,
-              title: 'Gestion des Camions',
-              description: 'Administrez votre flotte de véhicules',
-              items: [
-                'Ajouter un camion à la flotte',
-                'Vérifier l\'état d\'un camion',
-                'Planifier la maintenance',
-                'Consulter l\'historique',
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _buildHelpCategory(
-              context,
-              icon: Icons.person_outline,
-              title: 'Gestion des Chauffeurs',
-              description: 'Gérez votre équipe de chauffeurs',
-              items: [
-                'Ajouter un chauffeur',
-                'Consulter les permis',
-                'Attribuer des tournées',
-                'Voir les statistiques',
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _buildHelpCategory(
-              context,
-              icon: Icons.location_on_outlined,
-              title: 'Gestion des Zones',
-              description: 'Organisez vos secteurs de collecte',
-              items: [
-                'Créer une nouvelle zone',
-                'Définir les limites',
-                'Assigner des bennes',
-                'Consulter la couverture',
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xl),
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+  child: LayoutBuilder(
+    builder: (context, constraints) {
+      // Ici tu regardes la largeur de l'écran
+      String imagePath;
+      if (constraints.maxWidth < 600) {
+        // écran mobile
+        imagePath = 'images/moroccan_tile_bg1.jpeg';
+      } else {
+        // écran plus large (PC)
+        imagePath = 'images/moroccan_tile_bg_pc.jpeg';
+      }
 
-            // Support Section
-            ModernCard(
-              gradient: const LinearGradient(
-                colors: [AppTheme.primaryColor, AppTheme.darkCardBackground],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              padding: const EdgeInsets.all(AppSpacing.lg),
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+      );
+    },
+  ),
+),
+          // Semi-transparent overlay to darken background
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.25),
+            ),
+          ),
+          // Content
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.support_agent,
-                        color: AppTheme.textLight,
-                        size: 28,
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Text(
-                        'Besoin d\'aide ?',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: AppTheme.textLight,
+                  // Hero card
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: darkGreen.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(32),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Notre équipe support est disponible pour vous aider',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textLight,
+                      ],
+                    ),
+                    child: Column(
+                      children: const [
+                        Icon(Icons.help_outline, size: 48, color: Colors.white),
+                        SizedBox(height: 12),
+                        Text(
+                          'Need Help?',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Find FAQs, contact support, or send your feedback here.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.email_outlined),
-                          label: const Text('Email'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.accentColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.phone_outlined),
-                          label: const Text('Appel'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.accentColor,
-                          ),
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 24),
+
+                  // FAQs section
+                  _buildSectionTitle('FAQs', darkGreen),
+                  _faqCard(
+                    'How do I add a new tour?',
+                    'Go to the Tours page, click Add, fill in required fields, then save.',
+                    darkGreen,
                   ),
+                  _faqCard(
+                    'What if I forget a required field?',
+                    'Make sure required fields like Date, Start Time, and Status are filled.',
+                    darkGreen,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Contact Support
+                  _buildSectionTitle('Contact Support', darkGreen),
+                  _contactCard(Icons.email, 'Email Us', 'support@example.com', darkGreen),
+                  _contactCard(Icons.phone, 'Call Support', '+212 600 123 456', darkGreen),
+                  const SizedBox(height: 24),
+
+                  // Feedback
+                  _buildSectionTitle('Send Feedback', darkGreen),
+                  _feedbackCard(darkGreen),
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.xl),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String text, Color color) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildHelpCategory(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String description,
-    required List<String> items,
-  }) {
-    return ModernCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _faqCard(String question, String answer, Color darkGreen) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: darkGreen.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ExpansionTile(
+        title: Text(
+          question,
+          style: TextStyle(fontWeight: FontWeight.bold, color: darkGreen),
+        ),
         children: [
-          Row(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(answer),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _contactCard(IconData icon, String title, String info, Color darkGreen) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: darkGreen.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: darkGreen, size: 32),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: AppTheme.accentColor, size: 28),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Text(
-                      description,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
+              Text(title,
+                  style: TextStyle(
+                    color: darkGreen,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  )),
+              Text(info, style: TextStyle(color: darkGreen.withOpacity(0.7), fontSize: 14)),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.check_circle_outline,
-                  size: 18,
-                  color: AppTheme.successColor,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Text(
-                    item,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-              ],
+        ],
+      ),
+    );
+  }
+
+  Widget _feedbackCard(Color darkGreen) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: darkGreen.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          TextFormField(
+            maxLines: 4,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Write your feedback here...',
             ),
-          )),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: darkGreen,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            onPressed: () {},
+            child: const Text('Submit'),
+          ),
         ],
       ),
     );
