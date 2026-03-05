@@ -73,6 +73,8 @@ class BennesPage extends GetView<BennesController> {
                     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
                     child: BenneCard(
                       benne: benne,
+                      fillLevel: 55,
+                      locationName: "Downtown, 5th Avenue",
                       onDelete: () => controller.deleteBenne(benne.id),
                       onEdit: () => Get.dialog(BenneFormDialog(benne: benne)),
                     ),

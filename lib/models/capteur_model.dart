@@ -3,7 +3,7 @@ class Capteur {
   final String typeCapteur;
   final DateTime? dateInstallation;
   final String status;
-  final int? idPoint; 
+  final int? idBenne; 
   final double niveauRemplissage;
 
   Capteur({
@@ -12,7 +12,7 @@ class Capteur {
     required this.niveauRemplissage,
     this.dateInstallation,
     required this.status,
-    this.idPoint,
+    this.idBenne,
   });
 
   factory Capteur.fromJson(Map<String, dynamic> json) {
@@ -24,7 +24,7 @@ class Capteur {
           ? DateTime.parse(json['date_installation'] as String)
           : null,
       status: json['status'] as String,
-      idPoint: json['id_benne'] as int?,
+      idBenne: json['id_benne'] as int?,
     );
   }
 
@@ -35,7 +35,7 @@ class Capteur {
       'niveau_remplissage': niveauRemplissage,
       'date_installation': dateInstallation?.toIso8601String(),
       'status': status,
-      'id_benne': idPoint,
+      'id_benne': idBenne,
     };
   }
 }
