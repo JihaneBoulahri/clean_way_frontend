@@ -64,7 +64,9 @@ class ZoneController extends GetxController {
       final data = await _service.update(zone.id, zone.toJson());
       int index = zones.indexWhere((z) => z.id == zone.id);
       if (index != -1) {
-        zones[index] = Zone.fromJson(data);
+        final updatedZone = Zone.fromJson(data);
+        zones[index] = updatedZone;
+        zones.refresh(); // Force UI refresh
         Get.snackbar('Succès', 'Zone modifiée avec succès');
       }
     } catch (e) {
