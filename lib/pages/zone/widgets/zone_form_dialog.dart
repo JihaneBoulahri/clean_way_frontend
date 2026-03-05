@@ -41,11 +41,21 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Validation supplémentaire des coordonnées (optionnelle mais recommandée)
-    final lat = double.tryParse(_latController.text.trim());
-    final lng = double.tryParse(_longController.text.trim());
+    final nomText = _nomController.text.trim();
+    final typeText = _typeController.text.trim();
+    final latText = _latController.text.trim();
+    final longText = _longController.text.trim();
+
+    // Validation stricte
+    if (nomText.isEmpty || typeText.isEmpty || latText.isEmpty || longText.isEmpty) {
+      Get.snackbar('Erreur', 'Tous les champs sont obligatoires', snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+
+    final lat = double.tryParse(latText);
+    final lng = double.tryParse(longText);
     if (lat == null || lng == null) {
-      Get.snackbar('Erreur', 'Coordonnées invalides');
+      Get.snackbar('Erreur', 'Latitude et Longitude doivent être des nombres valides', snackPosition: SnackPosition.BOTTOM);
       return;
     }
 
@@ -56,24 +66,26 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
         // Ajout
         await controller.addZone(Zone(
           id: 0,
-          nomZone: _nomController.text.trim(),
-          typeZone: _typeController.text.trim(),
-          latitude: _latController.text.trim(),
-          longitude: _longController.text.trim(),
+          nomZone: nomText,
+          typeZone: typeText,
+          latitude: latText,
+          longitude: longText,
         ));
       } else {
-        // Modification : utilisation de la nouvelle signature
+        // Modification
         await controller.updateZone(Zone(
           id: widget.zone!.id,
-          nomZone: _nomController.text.trim(),
-          typeZone: _typeController.text.trim(),
-          latitude: _latController.text.trim(),
-          longitude: _longController.text.trim(),
+          nomZone: nomText,
+          typeZone: typeText,
+          latitude: latText,
+          longitude: longText,
         ));
       }
       if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      Get.snackbar('Erreur', e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
-      setState(() => _saving = false);
+      if (mounted) setState(() => _saving = false);
     }
   }
 

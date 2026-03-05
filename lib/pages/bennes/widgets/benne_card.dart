@@ -35,82 +35,54 @@ class BenneCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2D),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-
-          /// TOP ROW
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              /// LEFT SIDE
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      benne.typeBenne,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on,
-                            size: 16, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Text(
-                          locationName,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Benne ${benne.typeBenne}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('Capacité: ${benne.capacite} m³'),
+            Text(
+              'Position: (${benne.latitude}, ${benne.longitude})',
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Modifier',
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.blue.shade100,
+                    foregroundColor: Colors.blue.shade700,
+                  ),
                 ),
-              ),
-
-              /// RIGHT SIDE (percentage)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "${fillLevel.toInt()}%",
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outlined),
+                  tooltip: 'Supprimer',
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.red.shade100,
+                    foregroundColor: Colors.red.shade700,
                   ),
-                  Text(
-                    getStatusText(),
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 12,
-                    ),
+                ),
+                Text(
+                  getStatusText(),
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 12,
                   ),
+                ),
                 ],
               ),
             ],
-          ),
+          )
 
           const SizedBox(height: 16),
 
@@ -141,7 +113,6 @@ class BenneCard extends StatelessWidget {
               ),
             ],
           ),
-        ],
       ),
     );
   }

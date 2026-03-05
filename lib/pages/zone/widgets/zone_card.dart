@@ -28,25 +28,56 @@ class ZoneCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text('Type: ${zone.typeZone}'),
-            Text('Coordonnées: (${zone.latitude}, ${zone.longitude})'),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Lat: ${zone.latitude}',
+                    style: const TextStyle(fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    'Lon: ${zone.longitude}',
+                    style: const TextStyle(fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton.icon(
+                IconButton(
                   onPressed: onEdit,
-                  icon: const Icon(Icons.edit, size: 20),
-                  label: const Text('Modifier'),
-                  style: TextButton.styleFrom(
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Modifier',
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.blue.shade100,
                     foregroundColor: Colors.blue.shade700,
                   ),
                 ),
                 const SizedBox(width: 8),
-                TextButton.icon(
+                IconButton(
                   onPressed: onDelete,
-                  icon: const Icon(Icons.delete, size: 20),
-                  label: const Text('Supprimer'),
-                  style: TextButton.styleFrom(
+                  icon: const Icon(Icons.delete_outlined),
+                  tooltip: 'Supprimer',
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.red.shade100,
                     foregroundColor: Colors.red.shade700,
                   ),
                 ),
