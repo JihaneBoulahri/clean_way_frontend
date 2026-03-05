@@ -1,87 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../models/zone_model.dart';
+import '../../../routes/app_routes.dart';
+import '../../../core/theme/app_theme.dart';
 
 class ZoneCard extends StatelessWidget {
   final Zone zone;
-  final VoidCallback onDelete;
-  final VoidCallback onEdit;
 
   const ZoneCard({
     super.key,
     required this.zone,
-    required this.onDelete,
-    required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+    final scheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: () => Get.toNamed(AppRoutes.zoneDetail, arguments: zone),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          border: Border.all(color: scheme.outline.withOpacity(0.2)),
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Zone ${zone.nomZone}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.location_on,
+                color: scheme.primary,
+                size: 32,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text('Type: ${zone.typeZone}'),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Lat: ${zone.latitude}',
-                    style: const TextStyle(fontSize: 12),
+            const SizedBox(height: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    zone.nomZone,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: scheme.onSurface,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Type: ${zone.typeZone}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Lat: ${zone.latitude.substring(0, (zone.latitude.length > 10 ? 10 : zone.latitude.length))}...',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: 10,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Lon: ${zone.longitude}',
-                    style: const TextStyle(fontSize: 12),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Modifier',
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.blue.shade100,
-                    foregroundColor: Colors.blue.shade700,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outlined),
-                  tooltip: 'Supprimer',
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.red.shade100,
-                    foregroundColor: Colors.red.shade700,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

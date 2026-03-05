@@ -92,4 +92,15 @@ class TourneeController extends GetxController {
       isLoading(false);
     }
   }
+
+  /// Fetch detailed tournee with all relations (camion, zone)
+  Future<Tournee?> getTourneeDetails(int id) async {
+    try {
+      final data = await _service.getWithRelations(id);
+      return Tournee.fromJson(data is List ? data.first : data);
+    } catch (e) {
+      _handleError(e);
+      return null;
+    }
+  }
 }

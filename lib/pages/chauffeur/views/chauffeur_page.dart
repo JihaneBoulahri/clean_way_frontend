@@ -87,22 +87,23 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                 );
               }
 
-              return ListView.builder(
+              return GridView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.md,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.2,
+                  mainAxisSpacing: AppSpacing.lg,
+                  crossAxisSpacing: AppSpacing.lg,
                 ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
                   if (i >= list.length) return const SizedBox.shrink();
                   final chauffeur = list[i];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                    child: ChauffeurCard(
-                      chauffeur: chauffeur,
-                      onDelete: () => controller.deleteChauffeur(chauffeur.id),
-                      onEdit: () => Get.dialog(ChauffeurFormDialog(chauffeur: chauffeur)),
-                    ),
+                  return ChauffeurCard(
+                    chauffeur: chauffeur,
                   );
                 },
               );

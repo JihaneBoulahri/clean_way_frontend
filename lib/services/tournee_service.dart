@@ -82,6 +82,15 @@ class TourneeService {
     return _handleResponse(res);
   }
 
+  //get tournee with full relations (camion, zone)
+  Future getWithRelations(int id) async {
+    final res = await http.get(
+      Uri.parse('${TourneeEndpoints.detail(id)}?include=camion,zone'),
+      headers: _headers,
+    );
+    return _handleResponse(res);
+  }
+
   //get history
   Future<List<dynamic>> getHistory() async {
     final res = await http.get(

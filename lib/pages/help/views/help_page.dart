@@ -5,22 +5,24 @@ class HelpPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const darkGreen = Color(0xFF064635); // Dark Moroccan green
-    const whiteColor = Colors.white;
+    // use current theme so the page reacts to dark mode and accent color
+    final scheme = Theme.of(context).colorScheme;
+    // hero card uses primary color, cards use surface/background
+    final primaryColor = scheme.primary;
+    final heroColor = primaryColor.withOpacity(0.85);
 
     return Scaffold(
+      backgroundColor: scheme.background,
       body: Stack(
         children: [
           Positioned.fill(
   child: LayoutBuilder(
     builder: (context, constraints) {
-      // Ici tu regardes la largeur de l'écran
+      // choose background image based on width
       String imagePath;
       if (constraints.maxWidth < 600) {
-        // écran mobile
         imagePath = 'images/moroccan_tile_bg1.jpeg';
       } else {
-        // écran plus large (PC)
         imagePath = 'images/moroccan_tile_bg_pc.jpeg';
       }
 
@@ -48,7 +50,7 @@ class HelpPage extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: darkGreen.withOpacity(0.85),
+                      color: heroColor,
                       borderRadius: BorderRadius.circular(32),
                       boxShadow: [
                         BoxShadow(
@@ -59,13 +61,13 @@ class HelpPage extends StatelessWidget {
                       ],
                     ),
                     child: Column(
-                      children: const [
-                        Icon(Icons.help_outline, size: 48, color: Colors.white),
+                      children: [
+                        Icon(Icons.help_outline, size: 48, color: scheme.onPrimary),
                         SizedBox(height: 12),
                         Text(
                           'Need Help?',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: scheme.onPrimary,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                           ),
@@ -74,7 +76,7 @@ class HelpPage extends StatelessWidget {
                         Text(
                           'Find FAQs, contact support, or send your feedback here.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                          style: TextStyle(color: scheme.onPrimary.withOpacity(0.7), fontSize: 16),
                         ),
                       ],
                     ),
@@ -82,28 +84,28 @@ class HelpPage extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   // FAQs section
-                  _buildSectionTitle('FAQs', darkGreen),
-                  _faqCard(
+                  _buildSectionTitle('FAQs', primaryColor),
+                  _faqCard(context,
                     'How do I add a new tour?',
                     'Go to the Tours page, click Add, fill in required fields, then save.',
-                    darkGreen,
+                    primaryColor,
                   ),
-                  _faqCard(
+                  _faqCard(context,
                     'What if I forget a required field?',
                     'Make sure required fields like Date, Start Time, and Status are filled.',
-                    darkGreen,
+                    primaryColor,
                   ),
                   const SizedBox(height: 24),
 
                   // Contact Support
-                  _buildSectionTitle('Contact Support', darkGreen),
-                  _contactCard(Icons.email, 'Email Us', 'support@example.com', darkGreen),
-                  _contactCard(Icons.phone, 'Call Support', '+212 600 123 456', darkGreen),
+                  _buildSectionTitle('Contact Support', primaryColor),
+                  _contactCard(context, Icons.email, 'Email Us', 'support@example.com', primaryColor),
+                  _contactCard(context, Icons.phone, 'Call Support', '+212 600 123 456', primaryColor),
                   const SizedBox(height: 24),
 
                   // Feedback
-                  _buildSectionTitle('Send Feedback', darkGreen),
-                  _feedbackCard(darkGreen),
+                  _buildSectionTitle('Send Feedback', primaryColor),
+                  _feedbackCard(context, primaryColor),
                 ],
               ),
             ),
@@ -130,16 +132,22 @@ class HelpPage extends StatelessWidget {
     );
   }
 
-  Widget _faqCard(String question, String answer, Color darkGreen) {
+  Widget _faqCard(BuildContext context, String question, String answer, Color primaryColor) {
+    // use cardColor for background and scheme colors for text
+    final scheme = Theme.of(context).colorScheme;
+    final cardColor = scheme.surface;
+    final titleColor = primaryColor;
+    final shadow = primaryColor.withOpacity(0.15);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: darkGreen.withOpacity(0.15),
+            color: shadow,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -148,28 +156,33 @@ class HelpPage extends StatelessWidget {
       child: ExpansionTile(
         title: Text(
           question,
-          style: TextStyle(fontWeight: FontWeight.bold, color: darkGreen),
+          style: TextStyle(fontWeight: FontWeight.bold, color: titleColor),
         ),
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(answer),
+            child: Text(answer, style: TextStyle(color: scheme.onSurface)),
           ),
         ],
       ),
     );
   }
 
-  Widget _contactCard(IconData icon, String title, String info, Color darkGreen) {
+  Widget _contactCard(BuildContext context, IconData icon, String title, String info, Color primaryColor) {
+    final scheme = Theme.of(context).colorScheme;
+    final cardColor = scheme.surface;
+    final onCard = scheme.onSurface;
+    final shadow = primaryColor.withOpacity(0.3);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: darkGreen.withOpacity(0.3),
+            color: shadow,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -177,18 +190,18 @@ class HelpPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: darkGreen, size: 32),
+          Icon(icon, color: primaryColor, size: 32),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title,
                   style: TextStyle(
-                    color: darkGreen,
+                    color: primaryColor,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   )),
-              Text(info, style: TextStyle(color: darkGreen.withOpacity(0.7), fontSize: 14)),
+              Text(info, style: TextStyle(color: onCard.withOpacity(0.7), fontSize: 14)),
             ],
           ),
         ],
@@ -196,15 +209,20 @@ class HelpPage extends StatelessWidget {
     );
   }
 
-  Widget _feedbackCard(Color darkGreen) {
+  Widget _feedbackCard(BuildContext context, Color primaryColor) {
+    final scheme = Theme.of(context).colorScheme;
+    final cardColor = scheme.surface;
+    final onCard = scheme.onSurface;
+    final shadow = primaryColor.withOpacity(0.15);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: darkGreen.withOpacity(0.15),
+            color: shadow,
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -214,19 +232,21 @@ class HelpPage extends StatelessWidget {
         children: [
           TextFormField(
             maxLines: 4,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
               hintText: 'Write your feedback here...',
+              hintStyle: TextStyle(color: onCard.withOpacity(0.6)),
             ),
+            style: TextStyle(color: onCard),
           ),
           const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: darkGreen,
+              backgroundColor: primaryColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             onPressed: () {},
-            child: const Text('Submit'),
+            child: Text('Submit', style: TextStyle(color: scheme.onPrimary)),
           ),
         ],
       ),

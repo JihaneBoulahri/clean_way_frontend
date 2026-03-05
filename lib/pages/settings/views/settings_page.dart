@@ -53,12 +53,21 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final userMap = _readUserMap(box);
-    final userName = userMap['nom']?.toString().trim().isNotEmpty == true
-        ? userMap['nom'].toString()
-        : (userMap['prenom']?.toString().trim().isNotEmpty == true
-            ? userMap['prenom'].toString()
-            : 'Utilisateur');
-    final initial = userName.isNotEmpty ? userName.substring(0, 1).toUpperCase() : 'U';
+    final nom = userMap['nom']?.toString().trim() ?? '';
+    final prenom = userMap['prenom']?.toString().trim() ?? '';
+    final userName = nom.isNotEmpty ? nom : (prenom.isNotEmpty ? prenom : 'Utilisateur');
+    
+    // Afficher 1 lettre du prénom + 1 lettre du nom
+    String initials = '';
+    if (prenom.isNotEmpty && nom.isNotEmpty) {
+      initials = (prenom.substring(0, 1) + nom.substring(0, 1)).toUpperCase();
+    } else if (prenom.isNotEmpty) {
+      initials = prenom.substring(0, 1).toUpperCase();
+    } else if (nom.isNotEmpty) {
+      initials = nom.substring(0, 1).toUpperCase();
+    } else {
+      initials = 'U';
+    }
 
     return AppLayout(
       pageName: 'Paramètres',
@@ -77,7 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       radius: 40,
                       backgroundColor: scheme.primary,
                       child: Text(
-                        initial,
+                        initials,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,

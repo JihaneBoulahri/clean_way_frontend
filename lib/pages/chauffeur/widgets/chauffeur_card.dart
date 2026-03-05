@@ -1,62 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../models/chauffeur_model.dart';
+import '../../../routes/app_routes.dart';
+import '../../../core/theme/app_theme.dart';
 
 class ChauffeurCard extends StatelessWidget {
   final Chauffeur chauffeur;
-  final VoidCallback onDelete;
-  final VoidCallback onEdit;
 
   const ChauffeurCard({
     super.key,
     required this.chauffeur,
-    required this.onDelete,
-    required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
+    final scheme = Theme.of(context).colorScheme;
+
+    return InkWell(
+      onTap: () => Get.toNamed(AppRoutes.chauffeurDetail, arguments: chauffeur),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          border: Border.all(color: scheme.outline.withOpacity(0.2)),
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              chauffeur.user != null
-                  ? chauffeur.user!.fullName
-                  : 'Chauffeur #${chauffeur.id}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.person,
+                color: scheme.primary,
+                size: 32,
+              ),
             ),
-            const SizedBox(height: 8),
-            Text('CNI: ${chauffeur.cni}'),
-            Text('Permis: ${chauffeur.permis}'),
-            Text('Téléphone: ${chauffeur.numTelephone}'),
-            Text('Camion: ${chauffeur.camion?.immatriculation ?? 'Aucun'}'),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Modifier',
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.blue.shade100,
-                    foregroundColor: Colors.blue.shade700,
+            const SizedBox(height: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    chauffeur.user != null
+                        ? chauffeur.user!.fullName
+                        : 'Chauffeur #${chauffeur.id}',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: scheme.onSurface,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outlined),
-                  tooltip: 'Supprimer',
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.red.shade100,
-                    foregroundColor: Colors.red.shade700,
+                  const SizedBox(height: AppSpacing.sm),
+                  if (chauffeur.user != null)
+                    Text(
+                      'User: ${chauffeur.user!.nom} ${chauffeur.user!.prenom}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    )
+                  else
+                    Text(
+                      'Utilisateur non assigné',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'CNI: ${chauffeur.cni}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

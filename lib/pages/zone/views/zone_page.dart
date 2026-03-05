@@ -60,22 +60,23 @@ class ZonePage extends GetView<ZoneController> {
                   subtitle: 'Essayez avec d\'autres critères',
                 );
               }
-              return ListView.builder(
+              return GridView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.md,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.2,
+                  mainAxisSpacing: AppSpacing.lg,
+                  crossAxisSpacing: AppSpacing.lg,
                 ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
                   if (i >= list.length) return const SizedBox.shrink();
                   final zone = list[i];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                    child: ZoneCard(
-                      zone: zone,
-                      onDelete: () => controller.deleteZone(zone.id),
-                      onEdit: () => Get.dialog(ZoneFormDialog(zone: zone)),
-                    ),
+                  return ZoneCard(
+                    zone: zone,
                   );
                 },
               );

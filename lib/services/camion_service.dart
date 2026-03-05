@@ -55,6 +55,16 @@ class CamionService {
     return _handleResponse(res);
   }
 
+  /// Get camion with full relations
+  Future<dynamic> getWithRelations(int id) async {
+    final res = await http.get(
+      Uri.parse('${CamionEndpoints.detail(id)}?include=chauffeur'),
+      headers: _headers,
+    );
+
+    return _handleResponse(res);
+  }
+
   /// Create camion
   Future<dynamic> create(Map<String, dynamic> data) async {
     final res = await http.post(

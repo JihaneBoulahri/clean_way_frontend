@@ -7,6 +7,8 @@ class Tournee {
   final String heureDebut;
   final String? heureFin;
   final String status;
+  final int? idCamion;
+  final int? idZone;
   final Camion? camion;
   final Zone? zone;
 
@@ -16,6 +18,8 @@ class Tournee {
     required this.heureDebut,
     required this.heureFin,
     required this.status,
+    this.idCamion,
+    this.idZone,
     this.camion,
     this.zone,
   });
@@ -44,6 +48,8 @@ class Tournee {
       heureDebut: parseString(json['heure_debut']),
       heureFin: json['heure_fin'] != null ? parseString(json['heure_fin']) : null,
       status: parseString(json['status']),
+      idCamion: parseInt(json['id_camion']),
+      idZone: parseInt(json['id_zone']),
       camion: json['camion'] != null
           ? Camion.fromJson((json['camion'] is Map) ? json['camion'] as Map<String, dynamic> : Map<String, dynamic>.from(json['camion']))
           : null,

@@ -53,23 +53,24 @@ class TourneePage extends GetView<TourneeController> {
                 );
               }
               final list = controller.tournees;
-              return ListView.builder(
+              return GridView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.md,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: AppSpacing.lg,
+                  mainAxisSpacing: AppSpacing.lg,
+                  childAspectRatio: 1.2,
                 ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
                   if (i < 0 || i >= list.length) return const SizedBox.shrink();
                   final tournee = list[i];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                    child: TourneeCard(
+                  return TourneeCard(
                       tournee: tournee,
-                      onDelete: () => controller.deleteTournee(tournee.id),
-                      onEdit: () => Get.dialog(TourneeFormDialog(tournee: tournee)),
-                    ),
-                  );
+                    );
                 },
               );
             }),
