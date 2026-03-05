@@ -70,26 +70,49 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return AppLayout(
       pageName: 'Paramètres',
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Section
-            _SectionHeader(title: 'Profil'),
-            ModernCard(
-              child: Column(
-                children: [
-                  Center(
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundColor: scheme.primary,
-                      child: Text(
-                        initials,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textLight,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                String imagePath;
+                if (constraints.maxWidth < 600) {
+                  // écran mobile
+                  imagePath = 'images/moroccan_tile_bg1.jpeg';
+                } else {
+                  // écran plus large (PC)
+                  imagePath = 'images/moroccan_tile_bg_pc.jpeg';
+                }
+
+                return Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+          ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Section
+                _SectionHeader(title: 'Profil'),
+                ModernCard(
+                  child: Column(
+                    children: [
+                      Center(
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundColor: scheme.primary,
+                          child: Text(
+                            initials,
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textLight,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
