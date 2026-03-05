@@ -5,10 +5,14 @@ class AppRoutes {
   static const signup = '/signup';
   static const dashboard = '/dashboard';
   static const camions = '/camions';
+  static const camionDetail = '/camion-detail';
+  static const tournees = '/tournees';
+  static const tourneeDetail = '/tournee-detail';
+  static const chauffeurs = '/chauffeurs';
+  static const chauffeurDetail = '/chauffeur-detail';
   static const bennes = '/bennes';
   static const zones = '/zones';
-  static const tournees = '/tournees';
-  static const chauffeurs = '/chauffeurs';
+  static const zoneDetail = '/zone-detail';
   static const settings = '/settings';
   static const help = '/help';
 }

@@ -39,13 +39,31 @@ class Chauffeur {
 
     User? parseUser(dynamic v) {
       if (v == null) return null;
-      if (v is Map<String, dynamic>) return User.fromJson(v);
+      if (v is Map<String, dynamic>) {
+        try {
+          return User.fromJson(v);
+        } catch (e) {
+          return null;
+        }
+      }
       return null;
+    }
+
+    // Essayer de récupérer l'utilisateur de différentes façons
+    User? user;
+    
+    // D'abord essayer la clé 'user'
+    if (json['user'] != null) {
+      user = parseUser(json['user']);
+    }
+    // Ensuite essayer 'user_id' avec les autres champs
+    else if (json['user_id'] != null || json['user'] != null) {
+      user = parseUser(json['user']);
     }
 
     return Chauffeur(
       id: parseInt(json['id_chauffeur']),
-      user: parseUser(json['user']),
+      user: user,
       numTelephone: parseString(json['num_telephone']),
       cni: parseString(json['cni']),
       permis: parseString(json['permis']),

@@ -94,4 +94,15 @@ class ChauffeurController extends GetxController {
       _handleError(e);
     }
   }
+
+  /// Fetch detailed chauffeur with all relations (user, camion)
+  Future<Chauffeur?> getChauffeurDetails(int id) async {
+    try {
+      final data = await _service.getWithRelations(id);
+      return Chauffeur.fromJson(data is List ? data.first : data);
+    } catch (e) {
+      _handleError(e);
+      return null;
+    }
+  }
 }

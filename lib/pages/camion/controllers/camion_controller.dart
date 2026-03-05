@@ -82,4 +82,15 @@ class CamionController extends GetxController {
       _handleError(e);
     }
   }
+
+  /// Fetch detailed camion with all relations
+  Future<Camion?> getCamionDetails(int id) async {
+    try {
+      final data = await _service.getWithRelations(id);
+      return Camion.fromJson(data is List ? data.first : data);
+    } catch (e) {
+      _handleError(e);
+      return null;
+    }
+  }
 }

@@ -10,12 +10,16 @@ import '../controllers/dashboard_controller.dart';
 import 'app_routes.dart';
 import '../pages/camion/views/camion_page.dart';
 import '../pages/camion/controllers/camion_controller.dart';
-import '../pages/zone/views/zone_page.dart';
-import '../pages/zone/controllers/zone_controller.dart';
+import '../pages/camion/views/camion_detail_page.dart';
 import '../pages/tournee/views/tournee_page.dart';
 import '../pages/tournee/controllers/tournee_controller.dart';
+import '../pages/tournee/views/tournee_detail_page.dart';
+import '../pages/zone/views/zone_page.dart';
+import '../pages/zone/controllers/zone_controller.dart';
+import '../pages/zone/views/zone_detail_page.dart';
 import '../pages/chauffeur/views/chauffeur_page.dart';
 import '../pages/chauffeur/controllers/chauffeur_controller.dart';
+import '../pages/chauffeur/views/chauffeur_detail_page.dart';
 import '../pages/settings/views/settings_page.dart';
 import '../pages/help/views/help_page.dart';
 
@@ -49,6 +53,32 @@ class AppPages {
       }),
     ),
     GetPage(
+      name: AppRoutes.camionDetail,
+      page: () => const CamionDetailPage(),
+    ),
+    GetPage(
+      name: AppRoutes.tournees,
+      page: () => const TourneePage(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => TourneeController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.tourneeDetail,
+      page: () => const TourneeDetailPage(),
+    ),
+    GetPage(
+      name: AppRoutes.chauffeurs,
+      page: () => const ChauffeurPage(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ChauffeurController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.chauffeurDetail,
+      page: () => const ChauffeurDetailPage(),
+    ),
+    GetPage(
       name: AppRoutes.bennes, 
       page: () => const BennesPage(),
       binding: BindingsBuilder((){
@@ -61,6 +91,10 @@ class AppPages {
       binding: BindingsBuilder((){
         Get.lazyPut(() => ZoneController());
       }),
+    ),
+    GetPage(
+      name: AppRoutes.zoneDetail,
+      page: () => const ZoneDetailPage(),
     ),
     GetPage(
       name: AppRoutes.tournees, 

@@ -80,4 +80,13 @@ class ChauffeurService {
     );
     return _handleResponse(res);
   }
+
+  //get chauffeur with full relations (user, camion, etc)
+  Future getWithRelations(int id) async {
+    final res = await http.get(
+      Uri.parse('${ChauffeurEndpoints.detail(id)}?include=user,camion'),
+      headers: _headers,
+    );
+    return _handleResponse(res);
+  }
 }
