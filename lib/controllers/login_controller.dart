@@ -1,3 +1,4 @@
+import 'package:clean_way_frontend/models/chauffeur_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/user_model.dart';
@@ -61,18 +62,23 @@ class LoginController extends GetxController {
     isLoading.value = true;
 
     final result = await AuthService.login(email.value, password.value);
-    print("Login response: $result");
-
+    
     if (result['success'] == true) {
       final box = GetStorage();
 
-      // Direct access with !
+      // Store token and user data
       final token = result['data']['token'];
-      final user = User.fromJson(result['data']['data']);
-
       await box.write('token', token);
-      await box.write('user', user.toJson());
 
+      if(result['data']['type'] == 'chauffeur'){
+        final chauffeur = Chauffeur.fromJson(result['data']['data']);
+        await box.write('chauffeur', chauffeur.toJson());
+      }
+      else{
+        final user = User.fromJson(result['data']['data']);
+        await box.write('user', user.toJson());
+      }
+      
       Get.snackbar(
         icon: Icon(Icons.check_circle, color: Colors.white),
         "Success","Login successful",
