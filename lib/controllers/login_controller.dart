@@ -65,36 +65,82 @@ class LoginController extends GetxController {
 
     if (result['success'] == true) {
       final box = GetStorage();
+      final data = result['data'];
 
-      // Direct access with !
-      final token = result['data']['token'];
-      final user = User.fromJson(result['data']['data']);
+      // Gérer différents formats de réponse (comme dans AuthController.register)
+      String? token;
+      Map<String, dynamic> userData = {};
 
-      await box.write('token', token);
-      await box.write('user', user.toJson());
+      if (data is Map) {
+        final mapData = Map<String, dynamic>.from(data);
+
+        if (mapData.containsKey('token') && mapData.containsKey('data')) {
+          token = mapData['token']?.toString();
+          final inner = mapData['data'];
+          if (inner is Map) {
+            userData = Map<String, dynamic>.from(inner);
+          }
+        } else if (mapData.containsKey('token') && mapData.containsKey('user')) {
+          token = mapData['token']?.toString();
+          final inner = mapData['user'];
+          if (inner is Map) {
+            userData = Map<String, dynamic>.from(inner);
+          }
+        } else {
+          // fallback : on tente de lire un token et des infos user au même niveau
+          token = mapData['token']?.toString() ?? mapData['access_token']?.toString();
+          if (mapData.containsKey('user')) {
+            final inner = mapData['user'];
+            if (inner is Map) {
+              userData = Map<String, dynamic>.from(inner);
+            }
+          } else {
+            userData = mapData;
+          }
+        }
+      }
+
+      if (token != null && token.isNotEmpty) {
+        await box.write('token', token);
+      }
+      if (userData.isNotEmpty) {
+        await box.write('user', userData);
+      }
 
       Get.snackbar(
-        icon: Icon(Icons.check_circle, color: Colors.white),
-        "Success","Login successful",
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+        "Success",
+        "Login successful",
         backgroundColor: const Color.fromARGB(255, 82, 171, 85),
         colorText: Colors.white,
       );
-      Get.offAllNamed(AppRoutes.dashboard);
+
+      // Redirection selon le rôle (si disponible)
+      final role = (userData['role'] ?? '').toString().toLowerCase();
+      if (role == 'chauffeur') {
+        Get.offAllNamed(AppRoutes.tourneeChauffeur);
+      } else {
+        Get.offAllNamed(AppRoutes.dashboard);
+      }
     } else {
+      final message = result['message']?.toString() ?? "Login failed";
       Get.snackbar(
-        icon: Icon(Icons.error, color: Colors.white),
-        "Error", result['message'] ?? "Login failed",
-      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+        icon: const Icon(Icons.error, color: Colors.white),
+        "Error",
+        message,
+        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
         colorText: Colors.white,
       );
     }
   } catch (e) {
     print("Login error: $e");
     Get.snackbar(
-      icon: Icon(Icons.error, color: Colors.white),
-        "Error","Something went wrong",
+      icon: const Icon(Icons.error, color: Colors.white),
+      "Error",
+      "Something went wrong: $e",
       backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-        colorText: Colors.white,);
+      colorText: Colors.white,
+    );
   } finally {
     isLoading.value = false;
   }

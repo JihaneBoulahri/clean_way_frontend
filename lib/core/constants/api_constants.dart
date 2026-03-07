@@ -75,6 +75,7 @@ class TourneeEndpoints {
   static const String base = "${ApiConstants.baseUrl}/tournees";
   static const String history = "${ApiConstants.baseUrl}/tournees/history";
   static const String search = "${ApiConstants.baseUrl}/tournees/search";
+  static const String currentForChauffeur = "${ApiConstants.baseUrl}/tournees/chauffeur/current";
 
   static String detail(int id) => "${ApiConstants.baseUrl}/tournees/$id";
 }

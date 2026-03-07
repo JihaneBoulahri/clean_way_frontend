@@ -4,6 +4,7 @@ class AppRoutes {
   static const home = '/home';
   static const signup = '/signup';
   static const dashboard = '/dashboard';
+  static const tourneeChauffeur = '/tournee-chauffeur';
   static const camions = '/camions';
   static const camionDetail = '/camion-detail';
   static const tournees = '/tournees';

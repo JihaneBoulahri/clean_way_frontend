@@ -108,4 +108,13 @@ class TourneeService {
     );
     return _handleResponse(res);
   }
+
+  /// Get the current optimized tournee assigned to the authenticated chauffeur
+  Future getCurrentForChauffeur() async {
+    final res = await http.get(
+      Uri.parse(TourneeEndpoints.currentForChauffeur),
+      headers: _headers,
+    );
+    return _handleResponse(res);
+  }
 }
