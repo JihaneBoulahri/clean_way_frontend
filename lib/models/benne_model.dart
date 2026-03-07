@@ -8,6 +8,7 @@ class Benne {
   final String longitude;
   final Capteur? capteur;
 
+
   Benne({
     required this.id,
     required this.typeBenne,
