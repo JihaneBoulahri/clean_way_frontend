@@ -93,4 +93,14 @@ class BennesController extends GetxController {
       isLoading(false);
     }
   }
+
+  Future<Benne?> getBenneDetails(int id) async {
+    try {
+      final data = await _service.getBenneById(id);
+      return Benne.fromJson(data is List ? data.first : data);
+    } catch (e) {
+      _handleError(e);
+      return null;
+    }
+  }
 }
