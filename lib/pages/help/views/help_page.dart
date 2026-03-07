@@ -15,36 +15,47 @@ class HelpPage extends StatelessWidget {
       backgroundColor: scheme.background,
       body: Stack(
         children: [
+          // Background
           Positioned.fill(
-  child: LayoutBuilder(
-    builder: (context, constraints) {
-      // choose background image based on width
-      String imagePath;
-      if (constraints.maxWidth < 600) {
-        imagePath = 'images/moroccan_tile_bg1.jpeg';
-      } else {
-        imagePath = 'images/moroccan_tile_bg_pc.jpeg';
-      }
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                String imagePath;
+                if (constraints.maxWidth < 600) {
+                  imagePath = 'images/moroccan_tile_bg1.jpeg';
+                } else {
+                  imagePath = 'images/moroccan_tile_bg_pc.jpeg';
+                }
+                return Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+          ),
 
-      return Image.asset(
-        imagePath,
-        fit: BoxFit.cover,
-      );
-    },
-  ),
-),
-          // Semi-transparent overlay to darken background
+          // Dark overlay
           Positioned.fill(
             child: Container(
               color: Colors.black.withOpacity(0.25),
             ),
           ),
+
           // Content
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
+                  // ================= Back Arrow =================
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
                   // Hero card
                   Container(
                     width: double.infinity,

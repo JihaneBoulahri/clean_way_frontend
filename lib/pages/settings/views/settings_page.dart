@@ -6,7 +6,6 @@ import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:clean_way_frontend/services/user_service.dart';
 import '../../../widgets/app_layout.dart';
 
-
 Map<String, dynamic> _readUserMap(GetStorage box) {
   final raw = box.read('user');
   if (raw == null || raw is! Map) return <String, dynamic>{};
@@ -71,73 +70,147 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return AppLayout(
       pageName: 'Paramètres',
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Section
-            _SectionHeader(title: 'Profil'),
-            ModernCard(
-              child: Column(
-                children: [
-                  Center(
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundColor: scheme.primary,
-                      child: Text(
-                        initials,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textLight,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                String imagePath;
+                if (constraints.maxWidth < 600) {
+                  // écran mobile
+                  imagePath = 'images/moroccan_tile_bg1.jpeg';
+                } else {
+                  // écran plus large (PC)
+                  imagePath = 'images/moroccan_tile_bg_pc.jpeg';
+                }
+
+                return Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+          ),
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Section
+                _SectionHeader(title: 'Profil'),
+                ModernCard(
+                  child: Column(
+                    children: [
+                      Center(
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundColor: scheme.primary,
+                          child: Text(
+                            initials,
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textLight,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        userName,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            final res = await Get.dialog<bool>(_EditProfileDialog(box: box));
+                            if (res == true) setState(() {});
+                          },
+                          icon: const Icon(Icons.edit),
+                          label: const Text('Modifier le profil'),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    userName,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        final res = await Get.dialog<bool>(_EditProfileDialog(box: box));
-                        if (res == true) setState(() {});
-                      },
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Modifier le profil'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
+                ),
+                const SizedBox(height: AppSpacing.xl),
 
-            // Appearance Section
-            _SectionHeader(title: 'Apparence'),
-            ModernCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ModernListTile(
+                // Appearance Section
+                _SectionHeader(title: 'Apparence'),
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ModernListTile(
+                        leading: Icon(
+                          _darkMode ? Icons.dark_mode : Icons.light_mode,
+                          color: scheme.primary,
+                        ),
+                        title: 'Mode sombre',
+                        subtitle: _darkMode ? 'Activé' : 'Désactivé',
+                        trailing: Switch(
+                          value: _darkMode,
+                          onChanged: (v) {
+                            setState(() {
+                              _darkMode = v;
+                              box.write('settings:darkMode', _darkMode);
+                              _applyTheme();
+                            });
+                          },
+                          activeColor: scheme.primary,
+                        ),
+                        showDivider: false,
+                        backgroundColor: Colors.transparent,
+                      ),
+                      Divider(height: 1, color: Colors.grey[200]),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        'Couleur d\'accent',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Wrap(
+                        spacing: AppSpacing.md,
+                        children: [0xFF6B21A8, 0xFF0F172A, 0xFFDC2626, 0xFF065F46, 0xFF1E3A8A]
+                            .map(
+                              (colorValue) => _ColorOption(
+                                colorValue: colorValue,
+                                selected: _accentColor == colorValue,
+                                onTap: () {
+                                  setState(() {
+                                    _accentColor = colorValue;
+                                    box.write('settings:accentColor', _accentColor);
+                                    _applyTheme();
+                                  });
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Notifications Section
+                _SectionHeader(title: 'Notifications'),
+                ModernCard(
+                  child: ModernListTile(
                     leading: Icon(
-                      _darkMode ? Icons.dark_mode : Icons.light_mode,
+                      _notifications ? Icons.notifications_active : Icons.notifications_off,
                       color: scheme.primary,
                     ),
-                    title: 'Mode sombre',
-                    subtitle: _darkMode ? 'Activé' : 'Désactivé',
+                    title: 'Notifications',
+                    subtitle: _notifications ? 'Activées' : 'Désactivées',
                     trailing: Switch(
-                      value: _darkMode,
+                      value: _notifications,
                       onChanged: (v) {
                         setState(() {
-                          _darkMode = v;
-                          box.write('settings:darkMode', _darkMode);
-                          _applyTheme();
+                          _notifications = v;
+                          box.write('settings:notifications', _notifications);
                         });
                       },
                       activeColor: scheme.primary,
@@ -145,64 +218,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     showDivider: false,
                     backgroundColor: Colors.transparent,
                   ),
-                  Divider(height: 1, color: Colors.grey[200]),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Couleur d\'accent',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Wrap(
-                    spacing: AppSpacing.md,
-                    children: [0xFF6B21A8, 0xFF0F172A, 0xFFDC2626, 0xFF065F46, 0xFF1E3A8A]
-                        .map(
-                          (colorValue) => _ColorOption(
-                            colorValue: colorValue,
-                            selected: _accentColor == colorValue,
-                            onTap: () {
-                              setState(() {
-                                _accentColor = colorValue;
-                                box.write('settings:accentColor', _accentColor);
-                                _applyTheme();
-                              });
-                            },
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-
-            // Notifications Section
-            _SectionHeader(title: 'Notifications'),
-            ModernCard(
-              child: ModernListTile(
-                leading: Icon(
-                  _notifications ? Icons.notifications_active : Icons.notifications_off,
-                  color: scheme.primary,
                 ),
-                title: 'Notifications',
-                subtitle: _notifications ? 'Activées' : 'Désactivées',
-                trailing: Switch(
-                  value: _notifications,
-                  onChanged: (v) {
-                    setState(() {
-                      _notifications = v;
-                      box.write('settings:notifications', _notifications);
-                    });
-                  },
-                  activeColor: scheme.primary,
-                ),
-                showDivider: false,
-                backgroundColor: Colors.transparent,
-              ),
+                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.xl),
+              ],
             ),
-            const SizedBox(height: AppSpacing.lg),
-            const SizedBox(height: AppSpacing.xl),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -337,7 +359,6 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
       if (id != null) {
         await UserService.update(id, payload);
       }
-      // Ne jamais stocker le mot de passe localement.
       widget.box.write('user', updated);
       Get.snackbar('Profil', 'Profil mis à jour');
       Navigator.of(context).pop(true);

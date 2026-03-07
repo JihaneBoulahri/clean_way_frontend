@@ -154,16 +154,27 @@ class LoginController extends GetxController {
       // Clear stored data
       await box.remove('token');
       await box.remove('user');
+      final result = await AuthService.logout();
+
+      if (result['success'] != true) {
+        Get.snackbar(
+          icon: Icon(Icons.error, color: Colors.white),
+          "Error", result['message'] ?? "Logout failed",
+          backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+          colorText: Colors.white,
+        );
+        // Navigate to login
+        Get.offAllNamed(AppRoutes.login);
+      }
       
-      Get.snackbar(
-        icon: Icon(Icons.check_circle, color: Colors.white),
-        "Success","Logged out successfully",
-        backgroundColor: const Color.fromARGB(255, 82, 171, 85),
-        colorText: Colors.white,
-      );
-      
-      // Navigate to login
-      Get.offAllNamed(AppRoutes.login);
+      else{
+        Get.snackbar(
+          icon: Icon(Icons.check_circle, color: Colors.white),
+          "Success","Logged out successfully",
+          backgroundColor: const Color.fromARGB(255, 82, 171, 85),
+          colorText: Colors.white,
+        );
+      }
     } catch (e) {
       Get.snackbar(
         icon: Icon(Icons.error, color: Colors.white),

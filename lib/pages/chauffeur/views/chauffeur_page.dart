@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/search_bar_field.dart';
 import '../controllers/chauffeur_controller.dart';
-import '../widgets/chauffeur_card.dart';
+import '../widgets/chauffeur_data_list.dart';
 import '../widgets/chauffeur_form_dialog.dart';
 
 class ChauffeurPage extends GetView<ChauffeurController> {
@@ -87,25 +87,17 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                 );
               }
 
-              return GridView.builder(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.md,
+              return Scrollbar(
+                thumbVisibility: true,
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  ),
+                  children: [
+                    ChauffeurDataList(chauffeurs: list),
+                  ],
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.2,
-                  mainAxisSpacing: AppSpacing.lg,
-                  crossAxisSpacing: AppSpacing.lg,
-                ),
-                itemCount: list.length,
-                itemBuilder: (_, i) {
-                  if (i >= list.length) return const SizedBox.shrink();
-                  final chauffeur = list[i];
-                  return ChauffeurCard(
-                    chauffeur: chauffeur,
-                  );
-                },
               );
             }),
           ),

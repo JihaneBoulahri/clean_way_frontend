@@ -2,6 +2,7 @@ import 'package:clean_way_frontend/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import '../models/user_model.dart';
+import '../routes/app_routes.dart';
 
 class Sidebar extends StatelessWidget {
   final Color primaryColor;
@@ -16,7 +17,7 @@ class Sidebar extends StatelessWidget {
   User get user {
     final box = GetStorage();
     final storedUser = box.read('user');
-    return User.fromJsonSafe(storedUser);
+    return User.fromJson(storedUser);
   }
 
   bool get _isChauffeur =>
@@ -24,9 +25,8 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Container(
-      color: scheme.surface,
+      color: Colors.white,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,26 +36,14 @@ class Sidebar extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(
-                        'images/truck.png',
-                        width: 130,
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Clean Way',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                              color: scheme.onSurface),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Image.asset(
+                      'images/app_logo.png',
+                      width: 160, // ajuste si besoin
+                    ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 30),
                   Row(
                     children: [
                       CircleAvatar(
@@ -75,11 +63,11 @@ class Sidebar extends StatelessWidget {
                             Text(user.fullName,
                                 style: TextStyle(
                                     fontSize: 13,
-                                    color: scheme.onSurface,
+                                    color: Colors.grey[800],
                                     fontWeight: FontWeight.w600),
                                 overflow: TextOverflow.ellipsis),
                             Text(user.role,
-                                style: TextStyle(fontSize: 12, color: scheme.onSurface.withOpacity(0.7)),
+                                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                 overflow: TextOverflow.ellipsis),
                           ],
                         ),
@@ -124,7 +112,7 @@ class Sidebar extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.red.shade100),
-                    color: Colors.red.shade50,
+                    color: const Color.fromARGB(0, 255, 235, 238),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -159,21 +147,15 @@ class _SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: scheme.onSurface.withOpacity(0.8)),
+            Icon(icon, size: 20, color: Colors.grey[700]),
             const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: scheme.onSurface),
-              ),
-            ),
+            Expanded(child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
           ],
         ),
       ),

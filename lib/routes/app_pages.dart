@@ -1,5 +1,6 @@
 import 'package:clean_way_frontend/pages/bennes/controllers/benne_controller.dart';
 import 'package:clean_way_frontend/pages/bennes/views/benne_page.dart';
+import 'package:clean_way_frontend/pages/bennes/views/benne_detail_page.dart';
 import 'package:get/get.dart';
 import '../pages/splash_page.dart';
 import '../pages/login_page.dart';
@@ -85,6 +86,10 @@ class AppPages {
       binding: BindingsBuilder((){
         Get.lazyPut(() => BennesController());
       }),
+    ),
+    GetPage(
+      name: AppRoutes.benneDetail,
+      page: () => const BenneDetailPage(),
     ),
     GetPage(
       name: AppRoutes.zones, 

@@ -12,6 +12,7 @@ class AppRoutes {
   static const chauffeurs = '/chauffeurs';
   static const chauffeurDetail = '/chauffeur-detail';
   static const bennes = '/bennes';
+  static const benneDetail = '/benne-detail';
   static const zones = '/zones';
   static const zoneDetail = '/zone-detail';
   static const settings = '/settings';
