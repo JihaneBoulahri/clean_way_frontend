@@ -58,11 +58,11 @@ class TourneePage extends GetView<TourneeController> {
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.md,
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 420,
                   crossAxisSpacing: AppSpacing.lg,
                   mainAxisSpacing: AppSpacing.lg,
-                  childAspectRatio: 1.2,
+                  mainAxisExtent: 190,
                 ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {

@@ -94,11 +94,11 @@ class CamionPage extends GetView<CamionController> {
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.md,
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 2 columns
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 420,
                   crossAxisSpacing: AppSpacing.lg,
                   mainAxisSpacing: AppSpacing.lg,
-                  childAspectRatio: 1.2, // Adjust for card height
+                  mainAxisExtent: 190,
                 ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
