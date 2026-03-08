@@ -42,7 +42,7 @@ class LoginController extends GetxController {
     Get.snackbar(
       "Error",
       emailError,
-      icon: Icon(Icons.error, color: Colors.white),
+      icon: Icon(Icons.error, color: const Color.fromARGB(255, 125, 92, 92)),
       backgroundColor: const Color.fromARGB(255, 214, 52, 40),
       colorText: Colors.white,
     );
@@ -62,7 +62,7 @@ class LoginController extends GetxController {
     isLoading.value = true;
 
     final result = await AuthService.login(email.value, password.value);
-    
+    print("Login result: $result");
     if (result['success'] == true) {
       final box = GetStorage();
 
@@ -71,14 +71,14 @@ class LoginController extends GetxController {
       await box.write('token', token);
 
       if(result['data']['type'] == 'chauffeur'){
-        final chauffeur = Chauffeur.fromJson(result['data']['data']);
-        await box.write('chauffeur', chauffeur.toJson());
+        final user = Chauffeur.fromJson(result['data']['data']);
+        await box.write('chauffeur', user.toJson());
       }
       else{
         final user = User.fromJson(result['data']['data']);
         await box.write('user', user.toJson());
       }
-      
+      print("user stored: ${box.read('user')}");
       Get.snackbar(
         icon: Icon(Icons.check_circle, color: Colors.white),
         "Success","Login successful",
