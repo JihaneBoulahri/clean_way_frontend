@@ -1,3 +1,4 @@
+import 'package:clean_way_frontend/models/chauffeur_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/user_model.dart';
@@ -34,154 +35,151 @@ class LoginController extends GetxController {
 
   // Login function
   Future<void> login() async {
-  final emailError = validateEmail(email.value);
-  final passError = validatePassword(password.value);
+    final emailError = validateEmail(email.value);
+    final passError = validatePassword(password.value);
 
-  if (emailError != null) {
-    Get.snackbar(
-      "Error",
-      emailError,
-      icon: Icon(Icons.error, color: Colors.white),
-      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-      colorText: Colors.white,
-    );
-    return;
-  }
-
-  if (passError != null) {
-    Get.snackbar(
-      icon: Icon(Icons.error, color: Colors.white),
-      "Error", passError,
-      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-      colorText: Colors.white);
-    return;
-  }
-
-  try {
-    isLoading.value = true;
-
-    final result = await AuthService.login(email.value, password.value);
-    print("Login response: $result");
-
-    if (result['success'] == true) {
-      final box = GetStorage();
-      final data = result['data'];
-
-      // Gérer différents formats de réponse (comme dans AuthController.register)
-      String? token;
-      Map<String, dynamic> userData = {};
-
-      if (data is Map) {
-        final mapData = Map<String, dynamic>.from(data);
-
-        if (mapData.containsKey('token') && mapData.containsKey('data')) {
-          token = mapData['token']?.toString();
-          final inner = mapData['data'];
-          if (inner is Map) {
-            userData = Map<String, dynamic>.from(inner);
-          }
-        } else if (mapData.containsKey('token') && mapData.containsKey('user')) {
-          token = mapData['token']?.toString();
-          final inner = mapData['user'];
-          if (inner is Map) {
-            userData = Map<String, dynamic>.from(inner);
-          }
-        } else {
-          // fallback : on tente de lire un token et des infos user au même niveau
-          token = mapData['token']?.toString() ?? mapData['access_token']?.toString();
-          if (mapData.containsKey('user')) {
-            final inner = mapData['user'];
-            if (inner is Map) {
-              userData = Map<String, dynamic>.from(inner);
-            }
-          } else {
-            userData = mapData;
-          }
-        }
-      }
-
-      if (token != null && token.isNotEmpty) {
-        await box.write('token', token);
-      }
-      if (userData.isNotEmpty) {
-        await box.write('user', userData);
-      }
-
+    if (emailError != null) {
       Get.snackbar(
-        icon: const Icon(Icons.check_circle, color: Colors.white),
-        "Success",
-        "Login successful",
-        backgroundColor: const Color.fromARGB(255, 82, 171, 85),
-        colorText: Colors.white,
-      );
-
-      // Redirection selon le rôle (si disponible)
-      final role = (userData['role'] ?? '').toString().toLowerCase();
-      if (role == 'chauffeur') {
-        Get.offAllNamed(AppRoutes.tourneeChauffeur);
-      } else {
-        Get.offAllNamed(AppRoutes.dashboard);
-      }
-    } else {
-      final message = result['message']?.toString() ?? "Login failed";
-      Get.snackbar(
-        icon: const Icon(Icons.error, color: Colors.white),
         "Error",
-        message,
+        emailError,
+        icon: const Icon(Icons.error, color: Colors.white),
         backgroundColor: const Color.fromARGB(255, 214, 52, 40),
         colorText: Colors.white,
       );
+      return;
     }
+
+    if (passError != null) {
+      Get.snackbar(
+        icon: const Icon(Icons.error, color: Colors.white),
+        "Error",
+        passError,
+        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      final result = await AuthService.login(email.value, password.value);
+
+      if (result['success'] == true) {
+        final box = GetStorage();
+        final root = _asMap(result['data']);
+        final payload = _asMap(root['data']);
+        final token = (root['token'] ?? payload['token'])?.toString();
+
+        if (token != null && token.isNotEmpty) {
+          await box.write('token', token);
+        }
+
+        // Prevent stale role data from previous sessions.
+        await box.remove('user');
+        await box.remove('chauffeur');
+
+        final role = _extractRole(root, payload);
+
+        if (role == 'chauffeur') {
+          final chauffeurMap = _asMap(payload['chauffeur'] ?? payload);
+          final chauffeur = Chauffeur.fromJson(chauffeurMap);
+          await box.write('chauffeur', chauffeur.toJson());
+
+          final userMap = _asMap(payload['user'] ?? chauffeurMap['user']);
+          if (userMap.isNotEmpty) {
+            userMap['role'] = (userMap['role'] ?? 'chauffeur').toString();
+            await box.write('user', userMap);
+          }
+        } else {
+          final userMap = _asMap(payload['user'] ?? payload);
+          final user = User.fromJson(userMap);
+          await box.write('user', user.toJson());
+        }
+
+        Get.snackbar(
+          icon: const Icon(Icons.check_circle, color: Colors.white),
+          "Success",
+          "Login successful",
+          backgroundColor: const Color.fromARGB(255, 82, 171, 85),
+          colorText: Colors.white,
+        );
+        Get.offAllNamed(AppRoutes.dashboard);
+      } else {
+        Get.snackbar(
+          icon: const Icon(Icons.error, color: Colors.white),
+          "Error",
+          result['message'] ?? "Login failed",
+          backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+          colorText: Colors.white,
+        );
+      }
   } catch (e) {
-    print("Login error: $e");
-    Get.snackbar(
-      icon: const Icon(Icons.error, color: Colors.white),
-      "Error",
-      "Something went wrong: $e",
-      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-      colorText: Colors.white,
-    );
-  } finally {
-    isLoading.value = false;
-  }
+      debugPrint("Login error: $e");
+      Get.snackbar(
+        icon: const Icon(Icons.error, color: Colors.white),
+        "Error",
+        "Something went wrong",
+        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   // Logout function
   Future<void> logout() async {
     try {
       final box = GetStorage();
-      
-      // Clear stored data
+
+      final result = await AuthService.logout();
       await box.remove('token');
       await box.remove('user');
-      final result = await AuthService.logout();
+      await box.remove('chauffeur');
 
       if (result['success'] != true) {
         Get.snackbar(
-          icon: Icon(Icons.error, color: Colors.white),
+          icon: const Icon(Icons.error, color: Colors.white),
           "Error", result['message'] ?? "Logout failed",
           backgroundColor: const Color.fromARGB(255, 214, 52, 40),
           colorText: Colors.white,
         );
-        // Navigate to login
-        Get.offAllNamed(AppRoutes.login);
       }
       
-      else{
+      else {
         Get.snackbar(
-          icon: Icon(Icons.check_circle, color: Colors.white),
+          icon: const Icon(Icons.check_circle, color: Colors.white),
           "Success","Logged out successfully",
           backgroundColor: const Color.fromARGB(255, 82, 171, 85),
           colorText: Colors.white,
         );
       }
+      Get.offAllNamed(AppRoutes.login);
     } catch (e) {
       Get.snackbar(
-        icon: Icon(Icons.error, color: Colors.white),
+        icon: const Icon(Icons.error, color: Colors.white),
         "Error","Logout failed",
         backgroundColor: const Color.fromARGB(255, 214, 52, 40),
         colorText: Colors.white,
       );
+      Get.offAllNamed(AppRoutes.login);
     }
+  }
+
+  Map<String, dynamic> _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return <String, dynamic>{};
+  }
+
+  String _extractRole(Map<String, dynamic> root, Map<String, dynamic> payload) {
+    final role = (root['type'] ??
+            root['role'] ??
+            payload['type'] ??
+            payload['role'] ??
+            _asMap(payload['user'])['role'])
+        ?.toString()
+        .toLowerCase();
+    return role ?? '';
   }
 }

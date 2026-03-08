@@ -75,7 +75,30 @@ class AuthService {
   }
 
   //logout
-  static Future logout() async {
-    await http.post(Uri.parse(AuthEndpoints.logout));
+  static Future<Map<String, dynamic>> logout() async {
+    try {
+      final res = await http.post(Uri.parse(AuthEndpoints.logout));
+      if (res.statusCode == 200) {
+        return {"success": true};
+      }
+
+      if (res.body.isNotEmpty) {
+        final data = jsonDecode(res.body);
+        return {
+          "success": false,
+          "message": data['message'] ?? "Logout failed",
+        };
+      }
+
+      return {
+        "success": false,
+        "message": "Logout failed",
+      };
+    } catch (e) {
+      return {
+        "success": false,
+        "message": e.toString(),
+      };
+    }
   }
 }

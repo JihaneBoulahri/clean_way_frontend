@@ -12,7 +12,18 @@ class Navbar extends StatelessWidget {
   User get user {
     final box = GetStorage();
     final storedUser = box.read('user');
-    return User.fromJsonSafe(storedUser);
+    if (storedUser is Map) {
+      try {
+        return User.fromJsonSafe(storedUser);
+      } catch (_) {}
+    }
+    return User(
+      id: 0,
+      nom: 'Utilisateur',
+      prenom: '',
+      email: '',
+      role: 'chauffeur',
+    );
   }
 
   void _showUserInfo(BuildContext context) {
