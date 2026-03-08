@@ -61,13 +61,13 @@ class CamionCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: scheme.primaryContainer.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   camion.typeCamion,
                   style: TextStyle(
-                    color: Colors.blue.shade700,
+                    color: scheme.onPrimaryContainer,
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),
@@ -94,10 +94,11 @@ class CamionCard extends StatelessWidget {
   }
 
   Color _statusColor(String status) {
-    final lower = status.toLowerCase();
+    final lower = status.toLowerCase().replaceAll('_', '').replaceAll('-', '').replaceAll(' ', '');
     if (lower.contains('dispo')) return const Color(0xFF16A34A);
-    if (lower.contains('panne')) return const Color(0xFFDC2626);
-    if (lower.contains('maint')) return const Color(0xFFF59E0B);
+    if (lower.contains('collecte') || lower.contains('encours')) return const Color(0xFFF59E0B);
+    if (lower.contains('horsservice') || lower.contains('panne')) return const Color(0xFFDC2626);
+    if (lower.contains('maint')) return const Color(0xFF2563EB);
     return Colors.grey;
   }
 }

@@ -14,10 +14,12 @@ class TourneeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final statusColor = _statusColor(tournee.status);
 
     return Card(
       margin: EdgeInsets.zero,
       elevation: 3,
+      color: statusColor.withValues(alpha: 0.08),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: InkWell(
         onTap: () => Get.toNamed(AppRoutes.tourneeDetail, arguments: tournee),
@@ -57,7 +59,7 @@ class TourneeCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              _StatusChip(status: tournee.status, color: _statusColor(tournee.status)),
+              _StatusChip(status: tournee.status, color: statusColor),
               const SizedBox(height: 8),
               Text(
                 tournee.dateTournee.toString().split(' ').first,
@@ -84,9 +86,9 @@ class TourneeCard extends StatelessWidget {
   }
 
   Color _statusColor(String status) {
-    final lower = status.toLowerCase();
+    final lower = status.toLowerCase().replaceAll('_', '').replaceAll('-', '').replaceAll(' ', '');
     if (lower.contains('term')) return const Color(0xFF16A34A);
-    if (lower.contains('cours')) return const Color(0xFF2563EB);
+    if (lower.contains('cours')) return const Color(0xFFF59E0B);
     if (lower.contains('annul')) return const Color(0xFFDC2626);
     return const Color(0xFFF59E0B);
   }
