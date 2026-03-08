@@ -4,6 +4,7 @@ import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../controllers/benne_controller.dart';
 import '../widgets/benne_card.dart';
 import '../widgets/benne_form_dialog.dart';
@@ -13,15 +14,18 @@ class BennesPage extends GetView<BennesController> {
 
   @override
   Widget build(BuildContext context) {
+    final isChauffeur = _isChauffeur();
     return AppLayout(
       pageName: "Bennes",
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const BenneFormDialog()),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter une benne'),
-        backgroundColor: AppTheme.accentColor,
-        foregroundColor: AppTheme.textLight,
-      ),
+      floatingActionButton: isChauffeur
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => Get.dialog(const BenneFormDialog()),
+              icon: const Icon(Icons.add),
+              label: const Text('Ajouter une benne'),
+              backgroundColor: AppTheme.accentColor,
+              foregroundColor: AppTheme.textLight,
+            ),
       child: Column(
         children: [
           Padding(
@@ -45,11 +49,13 @@ class BennesPage extends GetView<BennesController> {
                   icon: Icons.delete_outline,
                   title: 'Aucune benne',
                   subtitle: 'Commencez par ajouter votre première benne',
-                  action: ElevatedButton.icon(
-                    onPressed: () => Get.dialog(const BenneFormDialog()),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Ajouter'),
-                  ),
+                  action: isChauffeur
+                      ? null
+                      : ElevatedButton.icon(
+                          onPressed: () => Get.dialog(const BenneFormDialog()),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Ajouter'),
+                        ),
                 );
               }
               final list = controller.filteredBennes;
@@ -75,6 +81,7 @@ class BennesPage extends GetView<BennesController> {
                       benne: benne,
                       onDelete: () => controller.deleteBenne(benne.id),
                       onEdit: () => Get.dialog(BenneFormDialog(benne: benne)),
+                      showActions: !isChauffeur,
                     ),
                   );
                 },
@@ -84,5 +91,13 @@ class BennesPage extends GetView<BennesController> {
         ],
       ),
     );
+  }
+
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
   }
 }

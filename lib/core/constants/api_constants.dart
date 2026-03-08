@@ -76,8 +76,13 @@ class TourneeEndpoints {
   static const String history = "${ApiConstants.baseUrl}/tournees/history";
   static const String search = "${ApiConstants.baseUrl}/tournees/search";
   static const String currentForChauffeur = "${ApiConstants.baseUrl}/tournees/chauffeur/current";
+  static const String currentForChauffeurAlt1 = "${ApiConstants.baseUrl}/tournees/current/chauffeur";
+  static const String currentForChauffeurAlt2 = "${ApiConstants.baseUrl}/tournees/current";
 
   static String detail(int id) => "${ApiConstants.baseUrl}/tournees/$id";
+  static String start(int id) => "${ApiConstants.baseUrl}/tournees/$id/start";
+  static String annuler(int id) => "${ApiConstants.baseUrl}/tournees/$id/annuler";
+  static String terminer(int id) => "${ApiConstants.baseUrl}/tournees/$id/terminer";
 }
 
 /* =========================== */

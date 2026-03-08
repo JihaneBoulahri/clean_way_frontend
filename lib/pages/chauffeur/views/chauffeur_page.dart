@@ -3,6 +3,7 @@ import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/search_bar_field.dart';
 import '../controllers/chauffeur_controller.dart';
@@ -14,15 +15,18 @@ class ChauffeurPage extends GetView<ChauffeurController> {
 
   @override
   Widget build(BuildContext context) {
+    final isChauffeur = _isChauffeur();
     return AppLayout(
       pageName: "Chauffeurs",
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(ChauffeurFormDialog()),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter un chauffeur'),
-        backgroundColor: AppTheme.accentColor,
-        foregroundColor: AppTheme.textLight,
-      ),
+      floatingActionButton: isChauffeur
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => Get.dialog(ChauffeurFormDialog()),
+              icon: const Icon(Icons.add),
+              label: const Text('Ajouter un chauffeur'),
+              backgroundColor: AppTheme.accentColor,
+              foregroundColor: AppTheme.textLight,
+            ),
       child: Column(
         children: [
           Padding(
@@ -70,11 +74,13 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                   icon: Icons.person_outline,
                   title: 'Aucun chauffeur',
                   subtitle: 'Commencez par ajouter votre premier chauffeur',
-                  action: ElevatedButton.icon(
-                    onPressed: () => Get.dialog(ChauffeurFormDialog()),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Ajouter'),
-                  ),
+                  action: isChauffeur
+                      ? null
+                      : ElevatedButton.icon(
+                          onPressed: () => Get.dialog(ChauffeurFormDialog()),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Ajouter'),
+                        ),
                 );
               }
 
@@ -104,6 +110,14 @@ class ChauffeurPage extends GetView<ChauffeurController> {
         ],
       ),
     );
+  }
+
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
   }
 }
         

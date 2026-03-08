@@ -3,6 +3,7 @@ import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../widgets/app_layout.dart';
 import '../controllers/zone_controller.dart';
 import '../widgets/zone_card.dart';
@@ -13,15 +14,18 @@ class ZonePage extends GetView<ZoneController> {
 
   @override
   Widget build(BuildContext context) {
+    final isChauffeur = _isChauffeur();
     return AppLayout(
       pageName: "Zones",
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const ZoneFormDialog()),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter une zone'),
-        backgroundColor: AppTheme.accentColor,
-        foregroundColor: AppTheme.textLight,
-      ),
+      floatingActionButton: isChauffeur
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => Get.dialog(const ZoneFormDialog()),
+              icon: const Icon(Icons.add),
+              label: const Text('Ajouter une zone'),
+              backgroundColor: AppTheme.accentColor,
+              foregroundColor: AppTheme.textLight,
+            ),
       child: Column(
         children: [
           Padding(
@@ -45,11 +49,13 @@ class ZonePage extends GetView<ZoneController> {
                   icon: Icons.location_on_outlined,
                   title: 'Aucune zone',
                   subtitle: 'Commencez par ajouter votre première zone',
-                  action: ElevatedButton.icon(
-                    onPressed: () => Get.dialog(const ZoneFormDialog()),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Ajouter'),
-                  ),
+                  action: isChauffeur
+                      ? null
+                      : ElevatedButton.icon(
+                          onPressed: () => Get.dialog(const ZoneFormDialog()),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Ajouter'),
+                        ),
                 );
               }
               final list = controller.filteredZones;
@@ -85,5 +91,13 @@ class ZonePage extends GetView<ZoneController> {
         ],
       ),
     );
+  }
+
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
   }
 }

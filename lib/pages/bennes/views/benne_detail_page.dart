@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/benne_model.dart';
 import '../../../widgets/app_layout.dart';
@@ -14,6 +15,7 @@ class BenneDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final benneArg = Get.arguments as Benne;
     final controller = Get.find<BennesController>();
+    final isChauffeur = _isChauffeur();
 
     return AppLayout(
       pageName: 'Details de la benne',
@@ -55,29 +57,30 @@ class BenneDetailPage extends StatelessWidget {
                             ),
                       ),
                     ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => Get.dialog(BenneFormDialog(benne: benne)),
-                          icon: const Icon(Icons.edit),
-                          tooltip: 'Modifier',
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.blue.shade100,
-                            foregroundColor: Colors.blue.shade700,
+                    if (!isChauffeur)
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => Get.dialog(BenneFormDialog(benne: benne)),
+                            icon: const Icon(Icons.edit),
+                            tooltip: 'Modifier',
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.blue.shade100,
+                              foregroundColor: Colors.blue.shade700,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        IconButton(
-                          onPressed: () => _showDeleteDialog(context, benne, controller),
-                          icon: const Icon(Icons.delete),
-                          tooltip: 'Supprimer',
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.red.shade100,
-                            foregroundColor: Colors.red.shade700,
+                          const SizedBox(width: AppSpacing.sm),
+                          IconButton(
+                            onPressed: () => _showDeleteDialog(context, benne, controller),
+                            icon: const Icon(Icons.delete),
+                            tooltip: 'Supprimer',
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.red.shade100,
+                              foregroundColor: Colors.red.shade700,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xl),
@@ -242,6 +245,14 @@ class BenneDetailPage extends StatelessWidget {
     if (fillLevel >= 90) return 'Critical';
     if (fillLevel >= 70) return 'Warning';
     return 'Normal';
+  }
+
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
   }
 }
 

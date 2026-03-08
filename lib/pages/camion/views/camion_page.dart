@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
@@ -14,15 +15,18 @@ class CamionPage extends GetView<CamionController> {
 
   @override
   Widget build(BuildContext context) {
+    final isChauffeur = _isChauffeur();
     return AppLayout(
       pageName: "Camions",
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.dialog(const CamionFormDialog()),
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter un camion'),
-        backgroundColor: AppTheme.accentColor,
-        foregroundColor: AppTheme.textLight,
-      ),
+      floatingActionButton: isChauffeur
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => Get.dialog(const CamionFormDialog()),
+              icon: const Icon(Icons.add),
+              label: const Text('Ajouter un camion'),
+              backgroundColor: AppTheme.accentColor,
+              foregroundColor: AppTheme.textLight,
+            ),
       child: Column(
         children: [
           Padding(
@@ -77,7 +81,7 @@ class CamionPage extends GetView<CamionController> {
                   subtitle: controller.camions.isEmpty 
                       ? 'Commencez par ajouter votre premier camion'
                       : 'Aucun résultat trouvé',
-                  action: controller.camions.isEmpty
+                  action: (!isChauffeur && controller.camions.isEmpty)
                       ? ElevatedButton.icon(
                           onPressed: () => Get.dialog(const CamionFormDialog()),
                           icon: const Icon(Icons.add),
@@ -114,5 +118,13 @@ class CamionPage extends GetView<CamionController> {
         ],
       ),
     );
+  }
+
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
   }
 }

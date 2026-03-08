@@ -41,28 +41,17 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
       }
       return null;
     } catch (e) {
-      Get.snackbar('Erreur', e.toString());
+      final message = e.toString();
+      if (!message.contains('404')) {
+        Get.snackbar('Erreur', "Impossible de charger la tournée actuelle.");
+      }
       return null;
     }
   }
 
   Future<void> _startTour(Tournee tournee) async {
     try {
-      final now = TimeOfDay.now();
-      final formattedTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
-      final updated = Tournee(
-        id: tournee.id,
-        dateTournee: tournee.dateTournee,
-        heureDebut: tournee.heureDebut.isNotEmpty ? tournee.heureDebut : formattedTime,
-        heureFin: tournee.heureFin,
-        status: 'en_cours',
-        camion: tournee.camion,
-        zone: tournee.zone,
-      );
-
-      await _service.update(tournee.id, updated.toJson());
+      await _service.start(tournee.id);
 
       Get.snackbar('Succès', 'Tournée démarrée');
       setState(() {
@@ -75,23 +64,21 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
 
   Future<void> _finishTour(Tournee tournee) async {
     try {
-      final now = TimeOfDay.now();
-      final formattedTime =
-          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
-      final updated = Tournee(
-        id: tournee.id,
-        dateTournee: tournee.dateTournee,
-        heureDebut: tournee.heureDebut.isNotEmpty ? tournee.heureDebut : formattedTime,
-        heureFin: formattedTime,
-        status: 'terminee',
-        camion: tournee.camion,
-        zone: tournee.zone,
-      );
-
-      await _service.update(tournee.id, updated.toJson());
+      await _service.terminer(tournee.id);
 
       Get.snackbar('Succès', 'Tournée terminée');
+      setState(() {
+        _futureTournee = _loadCurrentTournee();
+      });
+    } catch (e) {
+      Get.snackbar('Erreur', e.toString());
+    }
+  }
+
+  Future<void> _cancelTour(Tournee tournee) async {
+    try {
+      await _service.annuler(tournee.id);
+      Get.snackbar('Succès', 'Tournée annulée');
       setState(() {
         _futureTournee = _loadCurrentTournee();
       });
@@ -236,12 +223,20 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                         label: const Text('Démarrer'),
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: isFinished ? null : () => _finishTour(tournee),
                         icon: const Icon(Icons.stop),
                         label: const Text('Terminer'),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: TextButton.icon(
+                        onPressed: isFinished ? null : () => _cancelTour(tournee),
+                        icon: const Icon(Icons.cancel_outlined),
+                        label: const Text('Annuler'),
                       ),
                     ),
                   ],

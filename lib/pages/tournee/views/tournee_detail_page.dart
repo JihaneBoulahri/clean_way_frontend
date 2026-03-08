@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import '../../../models/tournee_model.dart';
@@ -15,6 +16,7 @@ class TourneeDetailPage extends StatelessWidget {
     final tournee = Get.arguments as Tournee;
     final controller = Get.find<TourneeController>();
     final scheme = Theme.of(context).colorScheme;
+    final isChauffeur = _isChauffeur();
 
     return AppLayout(
       pageName: 'Détails de la tournée',
@@ -44,29 +46,30 @@ class TourneeDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Get.dialog(TourneeFormDialog(tournee: tournee)),
-                      icon: const Icon(Icons.edit),
-                      tooltip: 'Modifier',
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.blue.shade100,
-                        foregroundColor: Colors.blue.shade700,
+                if (!isChauffeur)
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => Get.dialog(TourneeFormDialog(tournee: tournee)),
+                        icon: const Icon(Icons.edit),
+                        tooltip: 'Modifier',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.blue.shade100,
+                          foregroundColor: Colors.blue.shade700,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    IconButton(
-                      onPressed: () => _showDeleteDialog(context, tournee, controller),
-                      icon: const Icon(Icons.delete),
-                      tooltip: 'Supprimer',
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.red.shade100,
-                        foregroundColor: Colors.red.shade700,
+                      const SizedBox(width: AppSpacing.sm),
+                      IconButton(
+                        onPressed: () => _showDeleteDialog(context, tournee, controller),
+                        icon: const Icon(Icons.delete),
+                        tooltip: 'Supprimer',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.red.shade100,
+                          foregroundColor: Colors.red.shade700,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -283,6 +286,13 @@ class TourneeDetailPage extends StatelessWidget {
     );
   }
 
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
+  }
 }
 
 class _DetailRow extends StatelessWidget {

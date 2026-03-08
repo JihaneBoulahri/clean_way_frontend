@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../widgets/modern_widgets.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/zone_model.dart';
@@ -15,6 +16,7 @@ class ZoneDetailPage extends StatelessWidget {
     final zone = Get.arguments as Zone;
     final controller = Get.find<ZoneController>();
     final scheme = Theme.of(context).colorScheme;
+    final isChauffeur = _isChauffeur();
 
     return AppLayout(
       pageName: 'Détails de la zone',
@@ -44,29 +46,30 @@ class ZoneDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Get.dialog(ZoneFormDialog(zone: zone)),
-                      icon: const Icon(Icons.edit),
-                      tooltip: 'Modifier',
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.blue.shade100,
-                        foregroundColor: Colors.blue.shade700,
+                if (!isChauffeur)
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => Get.dialog(ZoneFormDialog(zone: zone)),
+                        icon: const Icon(Icons.edit),
+                        tooltip: 'Modifier',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.blue.shade100,
+                          foregroundColor: Colors.blue.shade700,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    IconButton(
-                      onPressed: () => _showDeleteDialog(context, zone, controller),
-                      icon: const Icon(Icons.delete),
-                      tooltip: 'Supprimer',
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.red.shade100,
-                        foregroundColor: Colors.red.shade700,
+                      const SizedBox(width: AppSpacing.sm),
+                      IconButton(
+                        onPressed: () => _showDeleteDialog(context, zone, controller),
+                        icon: const Icon(Icons.delete),
+                        tooltip: 'Supprimer',
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.red.shade100,
+                          foregroundColor: Colors.red.shade700,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
@@ -169,6 +172,14 @@ class ZoneDetailPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
   }
 }
 

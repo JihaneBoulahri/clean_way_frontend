@@ -36,6 +36,45 @@ class TourneeService {
     );
   }
 
+  Future<http.Response> _getWithFallback(List<String> urls) async {
+    http.Response? last;
+    for (final url in urls) {
+      final res = await http.get(Uri.parse(url), headers: _headers);
+      if (res.statusCode != 404) {
+        return res;
+      }
+      last = res;
+    }
+    return last ?? http.Response('Route not found', 404);
+  }
+
+  Future<http.Response> _actionWithFallback({
+    required List<String> urls,
+    required List<String> methods,
+  }) async {
+    http.Response? last;
+    for (final url in urls) {
+      for (final method in methods) {
+        late final http.Response res;
+        if (method == 'POST') {
+          res = await http.post(Uri.parse(url), headers: _headers);
+        } else if (method == 'PATCH') {
+          res = await http.patch(Uri.parse(url), headers: _headers);
+        } else {
+          res = await http.put(Uri.parse(url), headers: _headers);
+        }
+
+        if (res.statusCode == 404) {
+          last = res;
+          continue;
+        }
+
+        return res;
+      }
+    }
+    return last ?? http.Response('Route not found', 404);
+  }
+
   //get all tournees
   Future<List<dynamic>> getAll() async {
     final res = await http.get(
@@ -111,9 +150,43 @@ class TourneeService {
 
   /// Get the current optimized tournee assigned to the authenticated chauffeur
   Future getCurrentForChauffeur() async {
-    final res = await http.get(
-      Uri.parse(TourneeEndpoints.currentForChauffeur),
-      headers: _headers,
+    final res = await _getWithFallback([
+      TourneeEndpoints.currentForChauffeur,
+      TourneeEndpoints.currentForChauffeurAlt1,
+      TourneeEndpoints.currentForChauffeurAlt2,
+    ]);
+    return _handleResponse(res);
+  }
+
+  Future start(int id) async {
+    final res = await _actionWithFallback(
+      urls: [
+        TourneeEndpoints.start(id),
+        "${TourneeEndpoints.base}/start/$id",
+      ],
+      methods: const ['POST', 'PATCH', 'PUT'],
+    );
+    return _handleResponse(res);
+  }
+
+  Future annuler(int id) async {
+    final res = await _actionWithFallback(
+      urls: [
+        TourneeEndpoints.annuler(id),
+        "${TourneeEndpoints.base}/cancel/$id",
+      ],
+      methods: const ['POST', 'PATCH', 'PUT'],
+    );
+    return _handleResponse(res);
+  }
+
+  Future terminer(int id) async {
+    final res = await _actionWithFallback(
+      urls: [
+        TourneeEndpoints.terminer(id),
+        "${TourneeEndpoints.base}/finish/$id",
+      ],
+      methods: const ['POST', 'PATCH', 'PUT'],
     );
     return _handleResponse(res);
   }

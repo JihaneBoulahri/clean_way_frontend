@@ -7,12 +7,14 @@ class BenneCard extends StatelessWidget {
   final Benne benne;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final bool showActions;
 
   const BenneCard({
     super.key,
     required this.benne,
     required this.onDelete,
     required this.onEdit,
+    this.showActions = true,
   });
 
   Color _getStatusColor(double fillLevel) {
@@ -74,23 +76,24 @@ class BenneCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        PopupMenuButton<String>(
-                          onSelected: (value) {
-                            if (value == 'edit') onEdit();
-                            if (value == 'delete') onDelete();
-                          },
-                          itemBuilder: (context) => const [
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: Text('Modifier'),
-                            ),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Supprimer'),
-                            ),
-                          ],
-                          icon: const Icon(Icons.more_vert, size: 20),
-                        ),
+                        if (showActions)
+                          PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'edit') onEdit();
+                              if (value == 'delete') onDelete();
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Modifier'),
+                              ),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Supprimer'),
+                              ),
+                            ],
+                            icon: const Icon(Icons.more_vert, size: 20),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 8),
