@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final box = GetStorage();
     final darkMode = box.read('settings:darkMode') ?? false;
-    final accentColor = box.read('settings:accentColor') ?? 0xFF6B21A8;
+    final accentColor = box.read('settings:accentColor') ?? 0xFFFFFFFFF;
 
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,

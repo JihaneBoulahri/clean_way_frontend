@@ -23,7 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final box = GetStorage();
   bool _darkMode = false;
   bool _notifications = true;
-  int _accentColor = 0xFF6B21A8;
+  int _accentColor = 0xFFFFFFFFF;
 
   @override
   void initState() {
@@ -174,7 +174,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: AppSpacing.md),
                       Wrap(
                         spacing: AppSpacing.md,
-                        children: [0xFF6B21A8, 0xFF0F172A, 0xFFDC2626, 0xFF065F46, 0xFF1E3A8A]
+                        children: [0xFFFFFFFFF, 0xFF0F172A, 0xFFDC2626, 0xFF065F46, 0xFF1E3A8A]
                             .map(
                               (colorValue) => _ColorOption(
                                 colorValue: colorValue,
