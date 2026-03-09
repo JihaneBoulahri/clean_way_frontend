@@ -15,6 +15,7 @@ class CamionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final statusColor = _statusColor(camion.status);
+    final serviceDate = camion.dateMiseEnService?.toString().split(' ').first;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -25,67 +26,107 @@ class CamionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         child: Padding(
           padding: const EdgeInsets.all(14),
-          child: Column(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF3A1F14),
-                      borderRadius: BorderRadius.circular(14),
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  Icons.local_shipping_rounded,
+                  color: statusColor,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            camion.immatriculation,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        _StatusChip(
+                          status: _statusLabel(camion.status),
+                          color: statusColor,
+                        ),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.local_shipping,
-                      color: Color(0xFFFF7A00),
-                      size: 24,
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: scheme.primaryContainer.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            camion.typeCamion,
+                            style: TextStyle(
+                              color: scheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          '${camion.capaciteCamion} m3',
+                          style: TextStyle(
+                            color: scheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      camion.immatriculation,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    const SizedBox(height: 8),
+                    Text(
+                      serviceDate == null
+                          ? 'Mise en service: Non renseignee'
+                          : 'Mise en service: $serviceDate',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: scheme.primaryContainer.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  camion.typeCamion,
-                  style: TextStyle(
-                    color: scheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 4),
+                    Text(
+                      'Statut operationnel du camion',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                '${camion.capaciteCamion} m3',
-                style: TextStyle(
-                  color: scheme.onSurface.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 12,
-                ),
-              ),
-              const Spacer(),
-              _StatusChip(status: camion.status, color: statusColor),
             ],
           ),
         ),
@@ -100,6 +141,12 @@ class CamionCard extends StatelessWidget {
     if (lower.contains('horsservice') || lower.contains('panne')) return const Color(0xFFDC2626);
     if (lower.contains('maint')) return const Color(0xFF2563EB);
     return Colors.grey;
+  }
+
+  String _statusLabel(String status) {
+    final s = status.trim();
+    if (s.isEmpty) return 'Inconnu';
+    return s[0].toUpperCase() + s.substring(1).toLowerCase();
   }
 }
 

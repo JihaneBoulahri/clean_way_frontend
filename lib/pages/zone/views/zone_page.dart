@@ -15,7 +15,7 @@ class ZonePage extends GetView<ZoneController> {
   @override
   Widget build(BuildContext context) {
     return AppLayout(
-      pageName: 'Zones de depot',
+      pageName: "Zones",
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Get.dialog(const ZoneFormDialog()),
         icon: const Icon(Icons.add),
@@ -28,7 +28,7 @@ class ZonePage extends GetView<ZoneController> {
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: SearchBarField(
-              hint: 'Rechercher par nom ou type de zone...',
+              hint: 'Rechercher par nom, type...',
               onChanged: (v) => controller.searchQuery.value = v,
             ),
           ),
@@ -43,8 +43,8 @@ class ZonePage extends GetView<ZoneController> {
               if (controller.error.value != null) {
                 return EmptyState(
                   icon: Icons.error_outline,
-                  title: 'Erreur de chargement',
-                  subtitle: controller.error.value ?? 'Une erreur est survenue',
+                  title: 'Erreur',
+                  subtitle: controller.error.value ?? 'Echec du chargement',
                   action: Column(
                     children: [
                       ElevatedButton.icon(
@@ -67,7 +67,7 @@ class ZonePage extends GetView<ZoneController> {
                 return EmptyState(
                   icon: Icons.delete_sweep_outlined,
                   title: 'Aucune zone',
-                  subtitle: 'Commencez par ajouter votre premiere zone',
+                  subtitle: 'Commencez par ajouter votre premiere zone de depot',
                   action: ElevatedButton.icon(
                     onPressed: () => Get.dialog(const ZoneFormDialog()),
                     icon: const Icon(Icons.add),
@@ -85,28 +85,17 @@ class ZonePage extends GetView<ZoneController> {
                 );
               }
 
-              return LayoutBuilder(
-                builder: (context, constraints) {
-                  final isMobile = constraints.maxWidth < 700;
-
-                  return Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 1450),
-                      child: GridView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.md,
-                        ),
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: isMobile ? 700 : 340,
-                          childAspectRatio: isMobile ? 2.1 : 1.2,
-                          mainAxisSpacing: AppSpacing.lg,
-                          crossAxisSpacing: AppSpacing.lg,
-                        ),
-                        itemCount: list.length,
-                        itemBuilder: (_, i) => ZoneCard(zone: list[i]),
-                      ),
-                    ),
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                itemCount: list.length,
+                itemBuilder: (_, i) {
+                  if (i >= list.length) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    child: ZoneCard(zone: list[i]),
                   );
                 },
               );

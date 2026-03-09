@@ -14,109 +14,107 @@ class ZoneCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final typeColor = _typeColor(zone.typeZone);
 
     return Card(
       margin: EdgeInsets.zero,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      clipBehavior: Clip.antiAlias,
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: InkWell(
         onTap: () => Get.toNamed(AppRoutes.zoneDetail, arguments: zone),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                scheme.surface,
-                scheme.primary.withValues(alpha: 0.06),
-              ],
-            ),
-          ),
-          child: Stack(
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Positioned(
-                top: -30,
-                right: -30,
-                child: Container(
-                  width: 110,
-                  height: 110,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: scheme.primary.withValues(alpha: 0.08),
-                  ),
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  color: typeColor.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  Icons.map_outlined,
+                  color: typeColor,
+                  size: 28,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2F3E2F),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Icon(
-                            Icons.delete_sweep_rounded,
-                            color: Color(0xFF9EE37D),
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             zone.nomZone,
-                            style: textTheme.titleMedium?.copyWith(
+                            style: const TextStyle(
+                              fontSize: 17,
                               fontWeight: FontWeight.w700,
                             ),
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        _TypeChip(type: zone.typeZone, color: typeColor),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _Pill(
-                          icon: Icons.local_shipping_outlined,
-                          label: 'Depot de dechets',
-                          bg: scheme.primary.withValues(alpha: 0.10),
-                          fg: scheme.primary,
-                        ),
-                        _Pill(
-                          icon: Icons.category_outlined,
-                          label: zone.typeZone,
-                          bg: const Color(0xFFE9F3FF),
-                          fg: const Color(0xFF1864AB),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 18,
-                          color: scheme.primary,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: scheme.primaryContainer.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'Depot de dechets',
+                            style: TextStyle(
+                              color: scheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 10),
                         Text(
-                          'Voir details',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: scheme.primary,
-                            fontWeight: FontWeight.w700,
+                          'ID: ${zone.id}',
+                          style: TextStyle(
+                            color: scheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Latitude: ${zone.latitude.isEmpty ? 'Non renseignee' : zone.latitude}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Longitude: ${zone.longitude.isEmpty ? 'Non renseignee' : zone.longitude}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -127,48 +125,43 @@ class ZoneCard extends StatelessWidget {
       ),
     );
   }
+
+  Color _typeColor(String type) {
+    final normalized = type
+        .trim()
+        .toLowerCase()
+        .replaceAll('_', '')
+        .replaceAll('-', '')
+        .replaceAll(' ', '');
+    if (normalized.contains('dang')) return const Color(0xFFDC2626);
+    if (normalized.contains('indus')) return const Color(0xFF2563EB);
+    if (normalized.contains('orga')) return const Color(0xFF16A34A);
+    return const Color(0xFFF59E0B);
+  }
 }
 
-class _Pill extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color bg;
-  final Color fg;
+class _TypeChip extends StatelessWidget {
+  final String type;
+  final Color color;
 
-  const _Pill({
-    required this.icon,
-    required this.label,
-    required this.bg,
-    required this.fg,
-  });
+  const _TypeChip({required this.type, required this.color});
 
   @override
   Widget build(BuildContext context) {
+    final label = type.trim().isEmpty ? 'Inconnu' : type;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
-        color: bg,
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: fg),
-          const SizedBox(width: 6),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 170),
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: fg,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
       ),
     );
   }

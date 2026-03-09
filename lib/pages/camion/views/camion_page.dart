@@ -89,23 +89,20 @@ class CamionPage extends GetView<CamionController> {
             }
 
             return Expanded(
-              child: GridView.builder(
+              child: ListView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.md,
-                ),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 420,
-                  crossAxisSpacing: AppSpacing.lg,
-                  mainAxisSpacing: AppSpacing.lg,
-                  mainAxisExtent: 190,
                 ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
                   if (i >= list.length) return const SizedBox.shrink();
                   final camion = list[i];
-                  return CamionCard(
-                    camion: camion,
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    child: CamionCard(
+                      camion: camion,
+                    ),
                   );
                 },
               ),
