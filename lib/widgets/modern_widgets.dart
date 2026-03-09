@@ -25,17 +25,20 @@ class ModernCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Material(
       color: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
-          color: backgroundColor ?? AppTheme.cardBackground,
+          color: backgroundColor ?? scheme.surface,
           gradient: gradient,
           borderRadius: borderRadius ?? BorderRadius.circular(AppRadius.md),
           border: border,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(
+                alpha: Theme.of(context).brightness == Brightness.dark ? 0.24 : 0.10,
+              ),
               blurRadius: elevation * 2,
               offset: Offset(0, elevation),
             ),
@@ -79,6 +82,7 @@ class ModernListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         InkWell(
@@ -101,19 +105,19 @@ class ModernListTile extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textDark,
+                          color: scheme.onSurface,
                         ),
                       ),
                       if (subtitle != null) ...[
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           subtitle!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: AppTheme.textGrey,
+                            color: scheme.onSurface.withValues(alpha: 0.72),
                           ),
                         ),
                       ],
@@ -132,7 +136,7 @@ class ModernListTile extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: Colors.grey[200],
+            color: scheme.onSurface.withValues(alpha: 0.12),
           ),
       ],
     );
@@ -155,6 +159,7 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -162,24 +167,24 @@ class EmptyState extends StatelessWidget {
           Icon(
             icon,
             size: 80,
-            color: Colors.grey[300],
+            color: scheme.onSurface.withValues(alpha: 0.38),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textDark,
+              color: scheme.onSurface,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
-              color: AppTheme.textGrey,
+              color: scheme.onSurface.withValues(alpha: 0.72),
             ),
           ),
           if (action != null) ...[
