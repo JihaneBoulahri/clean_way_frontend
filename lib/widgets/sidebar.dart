@@ -22,8 +22,9 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
-      color: Colors.white,
+      color: scheme.surface,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -45,7 +46,7 @@ class Sidebar extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundColor: primaryColor.withOpacity(0.1),
+                        backgroundColor: primaryColor.withValues(alpha: 0.1),
                         child: Text(
                           user.initials,
                           style: TextStyle(
@@ -60,11 +61,14 @@ class Sidebar extends StatelessWidget {
                             Text(user.fullName,
                                 style: TextStyle(
                                     fontSize: 13,
-                                    color: Colors.grey[800],
+                                    color: scheme.onSurface,
                                     fontWeight: FontWeight.w600),
                                 overflow: TextOverflow.ellipsis),
                             Text(user.role,
-                                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: scheme.onSurface.withValues(alpha: 0.72),
+                                ),
                                 overflow: TextOverflow.ellipsis),
                           ],
                         ),
@@ -74,7 +78,7 @@ class Sidebar extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(height: 1),
+            Divider(height: 1, color: scheme.onSurface.withValues(alpha: 0.12)),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -84,7 +88,7 @@ class Sidebar extends StatelessWidget {
                   _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.zones)),
                   _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.bennes)),
                   _SidebarItem(icon: Icons.person_outline, label: 'Chauffeurs', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.chauffeurs)),
-                  _SidebarItem(icon: Icons.today_outlined, label: 'Tournées', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.tournees)),
+                  _SidebarItem(icon: Icons.route_outlined, label: 'Tournées', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.tournees)),
                   _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.settings)),
                   _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
                 ],
@@ -99,8 +103,8 @@ class Sidebar extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.red.shade100),
-                    color: const Color.fromARGB(0, 255, 235, 238),
+                    border: Border.all(color: Colors.red.shade300.withValues(alpha: 0.5)),
+                    color: Colors.red.withValues(alpha: 0.08),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -135,15 +139,26 @@ class _SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: Colors.grey[700]),
+            Icon(icon, size: 20, color: scheme.onSurface.withValues(alpha: 0.82)),
             const SizedBox(width: 12),
-            Expanded(child: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: scheme.onSurface,
+                ),
+              ),
+            ),
           ],
         ),
       ),

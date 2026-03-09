@@ -16,10 +16,12 @@ class Navbar extends StatelessWidget {
   }
 
   void _showUserInfo(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: scheme.surface,
       builder: (_) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
         child: Column(
@@ -29,42 +31,69 @@ class Navbar extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 22,
-                  backgroundColor: primaryColor.withOpacity(0.1),
+                  backgroundColor: primaryColor.withValues(alpha: 0.1),
                   child: Text(user.initials, style: TextStyle(color: primaryColor, fontWeight: FontWeight.w700)),
                 ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.fullName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                    Text(user.role, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                    Text(
+                      user.fullName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: scheme.onSurface,
+                      ),
+                    ),
+                    Text(
+                      user.role,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: scheme.onSurface.withValues(alpha: 0.72),
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Divider(color: Colors.grey.shade200),
+            Divider(color: scheme.onSurface.withValues(alpha: 0.12)),
             const SizedBox(height: 8),
-            _infoRow(Icons.email_outlined, 'Email', user.email),
+            _infoRow(context, Icons.email_outlined, 'Email', user.email),
           ],
         ),
       ),
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value) {
+  Widget _infoRow(BuildContext context, IconData icon, String label, String value) {
+    final scheme = Theme.of(context).colorScheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.grey[600]),
+        Icon(icon, size: 18, color: scheme.onSurface.withValues(alpha: 0.72)),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: scheme.onSurface.withValues(alpha: 0.62),
+                ),
+              ),
               const SizedBox(height: 2),
-              Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: scheme.onSurface,
+                ),
+              ),
             ],
           ),
         ),
@@ -81,7 +110,7 @@ class Navbar extends StatelessWidget {
         color: scheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).shadowColor.withOpacity(0.08),
+            color: Theme.of(context).shadowColor.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, 4),
           )
@@ -106,7 +135,7 @@ class Navbar extends StatelessWidget {
               onTap: () => _showUserInfo(context),
               child: CircleAvatar(
                 radius: 18,
-                backgroundColor: primaryColor.withOpacity(0.12),
+                backgroundColor: primaryColor.withValues(alpha: 0.12),
                 child: Text(user.initials, style: TextStyle(color: primaryColor, fontWeight: FontWeight.w700)),
               ),
             ),

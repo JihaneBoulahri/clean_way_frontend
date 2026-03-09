@@ -47,7 +47,8 @@ class _AppLayoutState extends State<AppLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).colorScheme.primary;
+    final scheme = Theme.of(context).colorScheme;
+    final primaryColor = scheme.primary;
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 800;
 
@@ -90,7 +91,7 @@ class _AppLayoutState extends State<AppLayout> {
                 child: GestureDetector(
                   onTap: toggleSidebar,
                   child: Container(
-                    color: Colors.black.withOpacity(0.4),
+                    color: scheme.scrim.withValues(alpha: 0.28),
                   ),
                 ),
               ),
