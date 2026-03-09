@@ -94,12 +94,7 @@ class Sidebar extends StatelessWidget {
                 children: [
                   if (_isChauffeur) ...[
                     _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.dashboard)),
-                    _SidebarItem(icon: Icons.local_shipping_outlined, label: 'Camions', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.camions)),
                     _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.zones)),
-                    _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.bennes)),
-          
-                    _SidebarItem(icon: Icons.person_outline, label: 'Chauffeurs', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.chauffeurs)),
-                    _SidebarItem(icon: Icons.today_outlined, label: 'Tournées', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.tournees)),
                     _SidebarItem(
                       icon: Icons.today_outlined,
                       label: 'Ma tournée',
