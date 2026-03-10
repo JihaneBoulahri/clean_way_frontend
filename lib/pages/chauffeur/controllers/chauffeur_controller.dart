@@ -1,14 +1,18 @@
 import 'package:get/get.dart';
 import '../../../services/chauffeur_service.dart';
 import '../../../models/chauffeur_model.dart';
+import '../../../models/tournee_model.dart';
 import '../../../routes/app_routes.dart';
 
 class ChauffeurController extends GetxController {
+  final bool autoFetch;
   final ChauffeurService _service = ChauffeurService();
   var chauffeurs = <Chauffeur>[].obs;
   var isLoading = false.obs;
   var error = RxnString();
   var searchQuery = ''.obs;
+
+  ChauffeurController({this.autoFetch = true});
 
   List<Chauffeur> get filteredChauffeurs {
     if (searchQuery.value.trim().isEmpty) return chauffeurs;
@@ -32,17 +36,27 @@ class ChauffeurController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchChauffeurs();
+    if (autoFetch) {
+      fetchChauffeurs();
+    }
   }
 
-  void _handleError(dynamic e, {bool showSnackbar = true}) {
+  void _handleError(
+    dynamic e, {
+    bool showSnackbar = true,
+    bool refreshOnNotFound = true,
+  }) {
     final errorMsg = e.toString();
     if (errorMsg.contains('401') || errorMsg.contains('Unauthorized')) {
       Get.offAllNamed(AppRoutes.login);
     } else if (errorMsg.contains('404') || errorMsg.contains('Not Found')) {
-      // L'élément n'existe plus, on rafraîchit la liste
-      fetchChauffeurs();
-      if (showSnackbar) Get.snackbar('Info', 'L\'élément a été supprimé ailleurs');
+      // L'element n'existe plus, on rafraichit la liste
+      if (refreshOnNotFound) {
+        fetchChauffeurs();
+      }
+      if (showSnackbar) {
+        Get.snackbar('Info', "L'element a ete supprime ailleurs");
+      }
     } else {
       if (showSnackbar) Get.snackbar('Erreur', errorMsg);
     }
@@ -103,6 +117,21 @@ class ChauffeurController extends GetxController {
     } catch (e) {
       _handleError(e);
       return null;
+    }
+  }
+
+  /// Fetch tournees for the authenticated chauffeur
+  Future<List<Tournee>> fetchMyTournees({bool showSnackbar = true}) async {
+    try {
+      final data = await _service.getMyTournees();
+      return data.map((json) => Tournee.fromJson(json)).toList();
+    } catch (e) {
+      _handleError(
+        e,
+        showSnackbar: showSnackbar,
+        refreshOnNotFound: false,
+      );
+      rethrow;
     }
   }
 }

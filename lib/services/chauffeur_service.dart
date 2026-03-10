@@ -89,4 +89,13 @@ class ChauffeurService {
     );
     return _handleResponse(res);
   }
+
+  //get tournees for authenticated chauffeur
+  Future<List<dynamic>> getMyTournees() async {
+    final res = await http.get(
+      Uri.parse(ChauffeurEndpoints.myTournees),
+      headers: _headers,
+    );
+    return _handleResponse(res);
+  }
 }

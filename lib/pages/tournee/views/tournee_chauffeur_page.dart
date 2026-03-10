@@ -1,12 +1,14 @@
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 
 import '../../../models/tournee_model.dart';
 import '../../../models/zone_model.dart';
+import '../../chauffeur/controllers/chauffeur_controller.dart';
 import '../../../services/tournee_service.dart';
 
 class TourneeChauffeurPage extends StatefulWidget {
@@ -17,7 +19,9 @@ class TourneeChauffeurPage extends StatefulWidget {
 }
 
 class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
-  final TourneeService _service = TourneeService();
+  final TourneeService _tourneeService = TourneeService();
+  final ChauffeurController _chauffeurController =
+      ChauffeurController(autoFetch: false);
   late Future<Tournee?> _futureTournee;
 
   @override
@@ -28,22 +32,14 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
 
   Future<Tournee?> _loadCurrentTournee() async {
     try {
-      final data = await _service.getCurrentForChauffeur();
-      if (data == null) return null;
-      if (data is List && data.isNotEmpty) {
-        return Tournee.fromJson(data.first);
-      }
-      if (data is Map<String, dynamic>) {
-        return Tournee.fromJson(data);
-      }
-      if (data is Map) {
-        return Tournee.fromJson(Map<String, dynamic>.from(data));
-      }
-      return null;
+      final tournees =
+          await _chauffeurController.fetchMyTournees(showSnackbar: false);
+      if (tournees.isEmpty) return null;
+      return tournees.first;
     } catch (e) {
       final message = e.toString();
       if (!message.contains('404')) {
-        Get.snackbar('Erreur', "Impossible de charger la tournée actuelle.");
+        Get.snackbar('Erreur', "Impossible de charger la tournÃ©e actuelle.");
       }
       return null;
     }
@@ -51,7 +47,7 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
 
   Future<void> _startTour(Tournee tournee) async {
     try {
-      await _service.start(tournee.id);
+      await _tourneeService.start(tournee.id);
 
       Get.snackbar('Succès', 'Tournée démarrée');
       setState(() {
@@ -64,7 +60,7 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
 
   Future<void> _finishTour(Tournee tournee) async {
     try {
-      await _service.terminer(tournee.id);
+      await _tourneeService.terminer(tournee.id);
 
       Get.snackbar('Succès', 'Tournée terminée');
       setState(() {
@@ -77,7 +73,7 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
 
   Future<void> _cancelTour(Tournee tournee) async {
     try {
-      await _service.annuler(tournee.id);
+      await _tourneeService.annuler(tournee.id);
       Get.snackbar('Succès', 'Tournée annulée');
       setState(() {
         _futureTournee = _loadCurrentTournee();
@@ -316,7 +312,7 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                                     size: 48, color: scheme.onSurfaceVariant),
                                 const SizedBox(height: AppSpacing.md),
                                 Text(
-                                  'Coordonnées non disponibles ou invalides',
+                                  'Coordonnees non disponibles ou invalides',
                                   style:
                                       TextStyle(color: scheme.onSurfaceVariant),
                                   textAlign: TextAlign.center,
@@ -325,26 +321,46 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                             ),
                           ),
                         )
-                      : GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: position,
-                            zoom: 14,
-                          ),
-                          markers: {
-                            Marker(
-                              markerId: const MarkerId('tournee_zone'),
-                              position: position,
-                              infoWindow: InfoWindow(
-                                title: tournee.zone?.nomZone ?? 'Zone',
-                                snippet:
-                                    '${tournee.zone?.latitude}, ${tournee.zone?.longitude}',
+                      : (kIsWeb
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.map_outlined,
+                                        size: 48,
+                                        color: scheme.onSurfaceVariant),
+                                    const SizedBox(height: AppSpacing.md),
+                                    Text(
+                                      "Carte indisponible sur le web.\\nUtilisez l'application mobile.",
+                                      style: TextStyle(
+                                          color: scheme.onSurfaceVariant),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          },
-                          myLocationButtonEnabled: false,
-                          zoomControlsEnabled: true,
-                        ),
-                ),
+                            )
+                          : GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: position,
+                                zoom: 14,
+                              ),
+                              markers: {
+                                Marker(
+                                  markerId: const MarkerId('tournee_zone'),
+                                  position: position,
+                                  infoWindow: InfoWindow(
+                                    title: tournee.zone?.nomZone ?? 'Zone',
+                                    snippet:
+                                        '${tournee.zone?.latitude}, ${tournee.zone?.longitude}',
+                                  ),
+                                ),
+                              },
+                              myLocationButtonEnabled: false,
+                              zoomControlsEnabled: true,
+                            )))
               ],
             ),
           );

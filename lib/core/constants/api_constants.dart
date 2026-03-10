@@ -55,6 +55,7 @@ class CapteurEndpoints {
 
 class ChauffeurEndpoints {
   static const String base = "${ApiConstants.baseUrl}/chauffeurs";
+  static const String myTournees = "${ApiConstants.baseUrl}/chauffeurs/me/tournees";
   static String detail(int id) => "${ApiConstants.baseUrl}/chauffeurs/$id";
 }
 
