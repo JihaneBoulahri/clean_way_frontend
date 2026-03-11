@@ -36,7 +36,9 @@ class HelpPage extends StatelessWidget {
           // Dark overlay
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.25),
+              color: Colors.black.withValues(
+                alpha: Theme.of(context).brightness == Brightness.dark ? 0.42 : 0.12,
+              ),
             ),
           ),
 

@@ -23,7 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final box = GetStorage();
   bool _darkMode = false;
   bool _notifications = true;
-  int _accentColor = 0xFFFFFFFFF;
+  int _accentColor = 0xFFFFFFFF;
 
   @override
   void initState() {
@@ -89,6 +89,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   fit: BoxFit.cover,
                 );
               },
+            ),
+          ),
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withValues(
+                alpha: Theme.of(context).brightness == Brightness.dark ? 0.42 : 0.12,
+              ),
             ),
           ),
           SingleChildScrollView(
@@ -174,7 +181,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: AppSpacing.md),
                       Wrap(
                         spacing: AppSpacing.md,
-                        children: [0xFFFFFFFFF, 0xFF0F172A, 0xFFDC2626, 0xFF065F46, 0xFF1E3A8A]
+                        children: [0xFFFFFFFF, 0xFF0F172A, 0xFFDC2626, 0xFF065F46, 0xFF1E3A8A]
                             .map(
                               (colorValue) => _ColorOption(
                                 colorValue: colorValue,
@@ -463,3 +470,4 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
     );
   }
 }
+

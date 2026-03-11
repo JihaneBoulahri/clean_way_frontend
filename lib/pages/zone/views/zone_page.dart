@@ -1,9 +1,9 @@
-import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
+import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import '../../../routes/app_routes.dart';
 import '../../../widgets/app_layout.dart';
 import '../controllers/zone_controller.dart';
 import '../widgets/zone_card.dart';
@@ -31,7 +31,7 @@ class ZonePage extends GetView<ZoneController> {
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: SearchBarField(
-              hint: 'Rechercher par nom, type, coordonnées...',
+              hint: 'Rechercher par nom, type...',
               onChanged: (v) => controller.searchQuery.value = v,
             ),
           ),
@@ -39,50 +39,66 @@ class ZonePage extends GetView<ZoneController> {
             child: Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
-                  child: CircularProgressIndicator(
-                    color: AppTheme.accentColor,
+                  child: CircularProgressIndicator(color: AppTheme.accentColor),
+                );
+              }
+
+              if (controller.error.value != null) {
+                return EmptyState(
+                  icon: Icons.error_outline,
+                  title: 'Erreur',
+                  subtitle: controller.error.value ?? 'Echec du chargement',
+                  action: Column(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => controller.fetchZones(),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Reessayer'),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextButton.icon(
+                        onPressed: () => Get.offAllNamed(AppRoutes.login),
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Retour'),
+                      ),
+                    ],
                   ),
                 );
               }
+
               if (controller.zones.isEmpty) {
                 return EmptyState(
-                  icon: Icons.location_on_outlined,
+                  icon: Icons.delete_sweep_outlined,
                   title: 'Aucune zone',
-                  subtitle: 'Commencez par ajouter votre première zone',
-                  action: isChauffeur
-                      ? null
-                      : ElevatedButton.icon(
-                          onPressed: () => Get.dialog(const ZoneFormDialog()),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Ajouter'),
-                        ),
+                  subtitle: 'Commencez par ajouter votre premiere zone de depot',
+                  action: ElevatedButton.icon(
+                    onPressed: () => Get.dialog(const ZoneFormDialog()),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Ajouter'),
+                  ),
                 );
               }
+
               final list = controller.filteredZones;
               if (list.isEmpty) {
-                return EmptyState(
+                return const EmptyState(
                   icon: Icons.search_off,
-                  title: 'Aucun résultat',
-                  subtitle: 'Essayez avec d\'autres critères',
+                  title: 'Aucun resultat',
+                  subtitle: 'Essayez avec d\'autres criteres',
                 );
               }
-              return GridView.builder(
+
+              return ListView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
                   vertical: AppSpacing.md,
                 ),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.2,
-                  mainAxisSpacing: AppSpacing.lg,
-                  crossAxisSpacing: AppSpacing.lg,
-                ),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
                   if (i >= list.length) return const SizedBox.shrink();
-                  final zone = list[i];
-                  return ZoneCard(
-                    zone: zone,
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                    child: ZoneCard(zone: list[i]),
                   );
                 },
               );
@@ -91,13 +107,5 @@ class ZonePage extends GetView<ZoneController> {
         ],
       ),
     );
-  }
-
-  bool _isChauffeur() {
-    final storedUser = GetStorage().read('user');
-    if (storedUser is Map) {
-      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
-    }
-    return false;
   }
 }

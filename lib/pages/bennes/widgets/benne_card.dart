@@ -31,6 +31,7 @@ class BenneCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final fillLevel =
         (benne.capteur?.niveauRemplissage ?? 0).clamp(0, 100).toDouble();
     final statusColor = _getStatusColor(fillLevel);
@@ -51,12 +52,12 @@ class BenneCard extends StatelessWidget {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3A1F14),
+                  color: statusColor.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.delete_outline_rounded,
-                  color: Color(0xFFFF7A00),
+                  color: statusColor,
                   size: 28,
                 ),
               ),
@@ -105,13 +106,13 @@ class BenneCard extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
+                            color: scheme.primaryContainer.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
                             benne.typeBenne,
                             style: TextStyle(
-                              color: Colors.blue.shade700,
+                              color: scheme.onPrimaryContainer,
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
                             ),
@@ -121,7 +122,7 @@ class BenneCard extends StatelessWidget {
                         Text(
                           '${benne.capacite.toStringAsFixed(0)} m3',
                           style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: scheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
                           ),
@@ -137,7 +138,7 @@ class BenneCard extends StatelessWidget {
                             child: LinearProgressIndicator(
                               value: fillLevel / 100,
                               minHeight: 8,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: scheme.outlineVariant.withValues(alpha: 0.35),
                               valueColor: AlwaysStoppedAnimation(statusColor),
                             ),
                           ),
