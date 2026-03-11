@@ -88,7 +88,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
 
     final controller = Get.find<TourneeController>();
     final debut = _formatTime(_heureDebutController.text);
-    final fin = _heureFinController.text.trim().isEmpty ? null : _formatTime(_heureFinController.text);
+    final fin = _formatTime(_heureFinController.text);
     setState(() => _saving = true);
     try {
       if (widget.tournee == null) {
@@ -113,6 +113,8 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
         ));
       }
       if (mounted) Navigator.of(context).pop();
+    } catch (e) {
+      Get.snackbar('Erreur', 'Échec de l\'enregistrement: ${e.toString()}');
     } finally {
       setState(() => _saving = false);
     }
@@ -142,7 +144,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _heureDebutController,
-                decoration: const InputDecoration(labelText: 'Heure début (format HH:mm)'),
+                decoration: const InputDecoration(labelText: 'Heure début (HH:mm)'),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Requis';
                   if (!_timeRegex.hasMatch(v.trim())) return 'Format invalide (HH:mm)';
@@ -152,9 +154,9 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _heureFinController,
-                decoration: const InputDecoration(labelText: 'Heure fin (optionnel, HH:mm)'),
+                decoration: const InputDecoration(labelText: 'Heure fin (HH:mm)'),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return null;
+                  if (v == null || v.trim().isEmpty) return 'Requis';
                   if (!_timeRegex.hasMatch(v.trim())) return 'Format invalide (HH:mm)';
                   return null;
                 },

@@ -47,10 +47,10 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
       return;
     }
     // Contrainte de capacité maximale (exemple)
-    if (cap > 133) {
+    /* if (cap > 133) {
       Get.snackbar('Erreur', 'Capacité doit être ≤ 133');
       return;
-    }
+    } */
     setState(() => _saving = true);
     final controller = Get.find<BennesController>();
     try {
