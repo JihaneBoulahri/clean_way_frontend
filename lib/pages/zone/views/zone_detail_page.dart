@@ -8,12 +8,24 @@ import '../controllers/zone_controller.dart';
 import '../widgets/zone_form_dialog.dart';
 import '../../../widgets/app_layout.dart';
 
-class ZoneDetailPage extends StatelessWidget {
+class ZoneDetailPage extends StatefulWidget {
   const ZoneDetailPage({super.key});
 
   @override
+  State<ZoneDetailPage> createState() => _ZoneDetailPageState();
+}
+
+class _ZoneDetailPageState extends State<ZoneDetailPage> {
+  late Zone zone;
+
+  @override
+  void initState() {
+    super.initState();
+    zone = Get.arguments as Zone;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final zone = Get.arguments as Zone;
     final controller = Get.find<ZoneController>();
     final scheme = Theme.of(context).colorScheme;
     final isChauffeur = _isChauffeur();
@@ -50,7 +62,12 @@ class ZoneDetailPage extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () => Get.dialog(ZoneFormDialog(zone: zone)),
+                        onPressed: () async {
+                          final result = await Get.dialog(ZoneFormDialog(zone: zone));
+                          if (result != null && result is Zone) {
+                            setState(() => zone = result);
+                          }
+                        },
                         icon: const Icon(Icons.edit),
                         tooltip: 'Modifier',
                         style: IconButton.styleFrom(
@@ -147,7 +164,7 @@ class ZoneDetailPage extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Zone zone, ZoneController controller) {
+  void _showDeleteDialog(BuildContext context, Zone zone, ZoneController controller) async {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
@@ -158,8 +175,8 @@ class ZoneDetailPage extends StatelessWidget {
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
-              controller.deleteZone(zone.id);
+            onPressed: () async {
+              await controller.deleteZone(zone.id);
               Get.back();
               Get.back();
             },

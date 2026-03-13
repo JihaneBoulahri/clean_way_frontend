@@ -8,9 +8,14 @@ import '../../../widgets/modern_widgets.dart';
 import '../controllers/benne_controller.dart';
 import '../widgets/benne_form_dialog.dart';
 
-class BenneDetailPage extends StatelessWidget {
+class BenneDetailPage extends StatefulWidget {
   const BenneDetailPage({super.key});
 
+  @override
+  State<BenneDetailPage> createState() => _BenneDetailPageState();
+}
+
+class _BenneDetailPageState extends State<BenneDetailPage> {
   @override
   Widget build(BuildContext context) {
     final benneArg = Get.arguments as Benne;
@@ -61,7 +66,11 @@ class BenneDetailPage extends StatelessWidget {
                       Row(
                         children: [
                           IconButton(
-                            onPressed: () => Get.dialog(BenneFormDialog(benne: benne)),
+                            onPressed: () async {
+                              await Get.dialog(BenneFormDialog(benne: benne));
+                              // Force le rebuild pour rappeler getBenneDetails
+                              setState(() {});
+                            },
                             icon: const Icon(Icons.edit),
                             tooltip: 'Modifier',
                             style: IconButton.styleFrom(
@@ -208,7 +217,7 @@ class BenneDetailPage extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Benne benne, BennesController controller) {
+  void _showDeleteDialog(BuildContext context, Benne benne, BennesController controller) async {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
@@ -219,8 +228,8 @@ class BenneDetailPage extends StatelessWidget {
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            onPressed: () {
-              controller.deleteBenne(benne.id);
+            onPressed: () async {
+              await controller.deleteBenne(benne.id);
               Get.back();
               Get.back();
             },

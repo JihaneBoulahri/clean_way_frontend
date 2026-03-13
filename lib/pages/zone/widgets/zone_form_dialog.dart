@@ -62,6 +62,7 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
     setState(() => _saving = true);
     final controller = Get.find<ZoneController>();
     try {
+      Zone? result;
       if (widget.zone == null) {
         // Ajout
         await controller.addZone(Zone(
@@ -73,15 +74,16 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
         ));
       } else {
         // Modification
-        await controller.updateZone(Zone(
+        result = Zone(
           id: widget.zone!.id,
           nomZone: nomText,
           typeZone: typeText,
           latitude: latText,
           longitude: longText,
-        ));
+        );
+        await controller.updateZone(result);
       }
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop(result);
     } catch (e) {
       Get.snackbar('Erreur', e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
