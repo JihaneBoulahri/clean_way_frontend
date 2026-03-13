@@ -3,6 +3,7 @@ import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/app_layout.dart';
 import '../controllers/zone_controller.dart';
@@ -49,6 +50,7 @@ class ZonePage extends GetView<ZoneController> {
                   title: 'Erreur',
                   subtitle: controller.error.value ?? 'Echec du chargement',
                   action: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       ElevatedButton.icon(
                         onPressed: () => controller.fetchZones(),
@@ -107,5 +109,13 @@ class ZonePage extends GetView<ZoneController> {
         ],
       ),
     );
+  }
+
+  bool _isChauffeur() {
+    final storedUser = GetStorage().read('user');
+    if (storedUser is Map) {
+      return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
+    }
+    return false;
   }
 }
