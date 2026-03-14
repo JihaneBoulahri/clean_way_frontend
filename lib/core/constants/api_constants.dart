@@ -16,6 +16,14 @@ class AuthEndpoints {
   static const String register = "${ApiConstants.baseUrl}/register";
 }
 
+/* =============================== */
+/*           OPTIMIZATION          */
+/* =============================== */
+class OptimisationEndpoints {
+  static const String base = "${ApiConstants.baseUrl}/optimiser";
+}
+
+
 /* =========================== */
 /*           BENNES            */
 /* =========================== */

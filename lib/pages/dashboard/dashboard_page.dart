@@ -14,16 +14,16 @@ class DashboardPage extends GetView<DashboardController> {
       pageName: 'Dashboard',
       child: SafeArea(
         child: Obx(() {
-          if (controller.loading.value) {
+          if (controller.stats_loading.value) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (controller.error.value != null) {
+          if (controller.stats_error.value != null) {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  controller.error.value!,
+                  controller.stats_error.value!,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: scheme.error),
                 ),
@@ -41,12 +41,19 @@ class DashboardPage extends GetView<DashboardController> {
             );
           }
 
+          final canOptimise = _isAdmin();
+
           return RefreshIndicator(
             onRefresh: controller.fetchStats,
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               children: [
-                _HeroBanner(stats: stats),
+                _HeroBanner(
+                  stats: stats,
+                  canOptimise: canOptimise,
+                  isOptimising: controller.optimisation_loading.value,
+                  onOptimiser: controller.optimiser,
+                ),
                 const SizedBox(height: 14),
                 _PerformancePanel(stats: stats),
                 const SizedBox(height: 14),
@@ -64,8 +71,16 @@ class DashboardPage extends GetView<DashboardController> {
 
 class _HeroBanner extends StatelessWidget {
   final Map<String, dynamic> stats;
+  final bool canOptimise;
+  final bool isOptimising;
+  final VoidCallback onOptimiser;
 
-  const _HeroBanner({required this.stats});
+  const _HeroBanner({
+    required this.stats,
+    required this.canOptimise,
+    required this.isOptimising,
+    required this.onOptimiser,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +139,32 @@ class _HeroBanner extends StatelessWidget {
               fontSize: 13,
             ),
           ),
+          if (canOptimise) ...[
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ElevatedButton.icon(
+                onPressed: isOptimising ? null : onOptimiser,
+                icon: isOptimising
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: scheme.primary,
+                        ),
+                      )
+                    : const Icon(Icons.auto_graph_rounded, size: 18),
+                label: Text(isOptimising ? 'Optimisation...' : 'Optimiser les tournees'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: scheme.onPrimary,
+                  foregroundColor: scheme.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -632,6 +673,20 @@ String _readUserName() {
     if (full.isNotEmpty) return full;
   }
   return 'Utilisateur';
+}
+
+bool _isAdmin() {
+  final raw = GetStorage().read('user');
+  if (raw is Map) {
+    final role = raw['role'] ?? raw['roles'];
+    if (role is String) {
+      return role.toLowerCase().contains('admin');
+    }
+    if (role is List) {
+      return role.any((e) => e.toString().toLowerCase().contains('admin'));
+    }
+  }
+  return false;
 }
 
 int _toInt(dynamic value) {
