@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../controllers/auth_controller.dart';
+import '../../routes/app_routes.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});
@@ -20,6 +22,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool showPassword = false;
   bool showConfirm = false;
+
+  bool _isLoggedIn() {
+    final box = GetStorage();
+    final token = box.read('token')?.toString().trim() ?? '';
+    final user = box.read('user');
+    return token.isNotEmpty || user != null;
+  }
 
   @override
   void dispose() {
@@ -47,6 +56,15 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoggedIn()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Get.currentRoute != AppRoutes.dashboard) {
+          Get.offAllNamed(AppRoutes.dashboard);
+        }
+      });
+      return const SizedBox.shrink();
+    }
+
     final primaryGreen = const Color(0xFF22C55E);
 
     return Scaffold(

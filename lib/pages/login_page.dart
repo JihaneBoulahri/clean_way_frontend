@@ -1,13 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../controllers/login_controller.dart';
 import '../routes/app_routes.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
 
+  bool _isLoggedIn() {
+    final box = GetStorage();
+    final token = box.read('token')?.toString().trim() ?? '';
+    final user = box.read('user');
+    return token.isNotEmpty || user != null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoggedIn()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Get.currentRoute != AppRoutes.dashboard) {
+          Get.offAllNamed(AppRoutes.dashboard);
+        }
+      });
+      return const SizedBox.shrink();
+    }
+
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
 
