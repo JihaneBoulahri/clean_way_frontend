@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../core/constants/api_constants.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+
 
 class AuthService {
   //login
@@ -76,7 +79,52 @@ class AuthService {
 
   //logout
   static Future<Map<String, dynamic>> logout() async {
+  try {
+    final storage = const FlutterSecureStorage();
+    final token = await storage.read(key: "token");
+
+    final res = await http.post(
+      Uri.parse(AuthEndpoints.logout),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Accept": "application/json",
+      },
+    );
+
+    if (res.statusCode == 200) {
+
+      // supprimer le token du téléphone
+      await storage.delete(key: "token");
+
+      return {
+        "success": true,
+        "message": "Logout successful"
+      };
+    }
+
+    if (res.body.isNotEmpty) {
+      final data = jsonDecode(res.body);
+      return {
+        "success": false,
+        "message": data['message'] ?? "Logout failed",
+      };
+    }
+
+    return {
+      "success": false,
+      "message": "Logout failed",
+    };
+
+  } catch (e) {
+    return {
+      "success": false,
+      "message": e.toString(),
+    };
+  }
+}
+  /* static Future<Map<String, dynamic>> logout() async {
     try {
+      
       final res = await http.post(Uri.parse(AuthEndpoints.logout));
       if (res.statusCode == 200) {
         return {"success": true};
@@ -100,5 +148,5 @@ class AuthService {
         "message": e.toString(),
       };
     }
-  }
+  } */
 }
