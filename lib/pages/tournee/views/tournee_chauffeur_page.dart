@@ -20,8 +20,8 @@ class TourneeChauffeurPage extends StatefulWidget {
 
 class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
   final TourneeService _tourneeService = TourneeService();
-  final ChauffeurController _chauffeurController =
-      ChauffeurController(autoFetch: false);
+  // Utilise GetX pour trouver ou créer une instance unique du controller
+  final ChauffeurController _chauffeurController = Get.put(ChauffeurController());
   late Future<Tournee?> _futureTournee;
 
   @override
@@ -39,7 +39,7 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     } catch (e) {
       final message = e.toString();
       if (!message.contains('404')) {
-        Get.snackbar('Erreur', "Impossible de charger la tournÃ©e actuelle.");
+        Get.snackbar('Erreur', "Impossible de charger la tournée actuelle.");
       }
       return null;
     }
@@ -148,7 +148,7 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
           final position = _parseLatLng(tournee.zone);
           final statusLower = tournee.status.toLowerCase();
           final isStarted =
-              statusLower == 'en_cours' || statusLower == 'terminee' || statusLower == 'terminée';
+              statusLower == 'en cours' || statusLower == 'en_cours' || statusLower == 'terminee' || statusLower == 'terminée';
           final isFinished = statusLower == 'terminee' || statusLower == 'terminée';
 
           return SingleChildScrollView(
