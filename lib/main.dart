@@ -125,7 +125,7 @@ class MyApp extends StatelessWidget {
       theme: _buildTheme(seedColor: accentColor, brightness: Brightness.light),
       darkTheme: _buildTheme(seedColor: accentColor, brightness: Brightness.dark),
       themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.home,
       getPages: AppPages.routes,
     );
   }

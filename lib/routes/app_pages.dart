@@ -3,6 +3,7 @@ import 'package:clean_way_frontend/pages/bennes/views/benne_page.dart';
 import 'package:clean_way_frontend/pages/bennes/views/benne_detail_page.dart';
 import 'package:get/get.dart';
 import '../pages/splash_page.dart';
+import '../pages/home_page.dart';
 import '../pages/login_page.dart';
 import '../pages/auth/registre_page.dart';
 import '../bindings/login_binding.dart';
@@ -30,6 +31,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.splash,
       page: () => SplashPage(),
+    ),
+    GetPage(
+      name: AppRoutes.home,
+      page: () => const HomePage(),
     ),
     GetPage(
       name: AppRoutes.login,
