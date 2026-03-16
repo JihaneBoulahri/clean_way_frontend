@@ -4,6 +4,7 @@ import '../../../models/chauffeur_model.dart';
 import '../../../models/camion_model.dart';
 import '../../../models/user_model.dart';
 import '../controllers/chauffeur_controller.dart';
+import '../../../widgets/snackbar_helper.dart'; // <-- AJOUTÉ
 
 class ChauffeurFormDialog extends StatefulWidget {
   final Chauffeur? chauffeur;
@@ -59,11 +60,21 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
         : int.tryParse(_userIdController.text.trim());
 
     if (_camionIdController.text.trim().isNotEmpty && camionId == null) {
-      Get.snackbar('Erreur', 'L\'ID camion doit être un nombre entier');
+     
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "L'ID camion doit être un nombre entier",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
     if (_userIdController.text.trim().isNotEmpty && userId == null) {
-      Get.snackbar('Erreur', 'L\'ID utilisateur doit être un nombre entier');
+    
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "L'ID utilisateur doit être un nombre entier",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 

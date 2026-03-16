@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import '../../../services/camion_service.dart';
 import '../../../models/camion_model.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class CamionController extends GetxController {
   final CamionService _service = CamionService();
@@ -31,7 +32,12 @@ class CamionController extends GetxController {
     if (e.toString().contains('401') || e.toString().contains('Unauthorized')) {
       Get.offAllNamed(AppRoutes.login);
     } else {
-      Get.snackbar('Erreur', e.toString());
+      
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
     }
   }
 
@@ -53,9 +59,14 @@ class CamionController extends GetxController {
     try {
       final data = await _service.create(camion.toJson());
       camions.add(Camion.fromJson(data));
-      Get.snackbar('Succès', 'Camion ajouté avec succès');
+      // MODIFIÉ
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Camion ajouté avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
-      print('Erreur lors de l\'ajout: $e'); // Pour déboguer
+      print('Erreur lors de l\'ajout: $e');
       _handleError(e);
     }
   }
@@ -66,7 +77,12 @@ class CamionController extends GetxController {
       int index = camions.indexWhere((c) => c.id == camion.id);
       if (index != -1) {
         camions[index] = Camion.fromJson(data);
-        Get.snackbar('Succès', 'Camion modifié avec succès');
+        // MODIFIÉ
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Camion modifié avec succès",
+          type: NadiSnackbarType.success,
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -77,7 +93,12 @@ class CamionController extends GetxController {
     try {
       await _service.delete(id);
       camions.removeWhere((c) => c.id == id);
-      Get.snackbar('Succès', 'Camion supprimé avec succès');
+      
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Camion supprimé avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }

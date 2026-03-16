@@ -5,6 +5,7 @@ import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:clean_way_frontend/services/user_service.dart';
 import '../../../widgets/app_layout.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 Map<String, dynamic> _readUserMap(GetStorage box) {
   final raw = box.read('user');
@@ -367,10 +368,20 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
         await UserService.update(id, payload);
       }
       widget.box.write('user', updated);
-      Get.snackbar('Profil', 'Profil mis à jour');
+     
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Profil mis à jour",
+        type: NadiSnackbarType.success,
+      );
       Navigator.of(context).pop(true);
     } catch (e) {
-      Get.snackbar('Erreur', e.toString(), snackPosition: SnackPosition.BOTTOM);
+     
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -470,4 +481,3 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
     );
   }
 }
-

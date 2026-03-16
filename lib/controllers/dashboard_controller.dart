@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-
 import '../services/optimization_service.dart';
 import '../services/stats_service.dart';
+import '../widgets/snackbar_helper.dart'; 
 
 class DashboardController extends GetxController {
   final StatsService _statsService = StatsService();
@@ -46,17 +46,21 @@ class DashboardController extends GetxController {
 
       routes.value = _extractRoutesList(data); // store optimized routes
 
-      Get.snackbar(
-        "Success",
-        "Tournée optimisée avec succès",
+      // MODIFIÉ : snackbar de succès
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Tournée optimisée avec succès",
+        type: NadiSnackbarType.success,
       );
 
     } catch (e) {
       optimisation_error.value = e.toString();
 
-      Get.snackbar(
-        "Erreur",
-        e.toString(),
+      // MODIFIÉ : snackbar d'erreur
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
       );
     } finally {
       optimisation_loading.value = false;

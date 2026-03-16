@@ -10,6 +10,7 @@ import '../../../models/tournee_model.dart';
 import '../../../models/zone_model.dart';
 import '../../chauffeur/controllers/chauffeur_controller.dart';
 import '../../../services/tournee_service.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class TourneeChauffeurPage extends StatefulWidget {
   const TourneeChauffeurPage({super.key});
@@ -20,7 +21,6 @@ class TourneeChauffeurPage extends StatefulWidget {
 
 class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
   final TourneeService _tourneeService = TourneeService();
-  // Utilise GetX pour trouver ou créer une instance unique du controller
   final ChauffeurController _chauffeurController = Get.put(ChauffeurController());
   late Future<Tournee?> _futureTournee;
 
@@ -39,7 +39,12 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     } catch (e) {
       final message = e.toString();
       if (!message.contains('404')) {
-        Get.snackbar('Erreur', "Impossible de charger la tournée actuelle.");
+        // MODIFIÉ
+        showNadiSnackbar(
+          title: "Erreur",
+          message: "Impossible de charger la tournée actuelle.",
+          type: NadiSnackbarType.error,
+        );
       }
       return null;
     }
@@ -49,12 +54,22 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     try {
       await _tourneeService.start(tournee.id);
 
-      Get.snackbar('Succès', 'Tournée démarrée');
+     
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Tournée démarrée",
+        type: NadiSnackbarType.success,
+      );
       setState(() {
         _futureTournee = _loadCurrentTournee();
       });
     } catch (e) {
-      Get.snackbar('Erreur', e.toString());
+      
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
     }
   }
 
@@ -62,24 +77,45 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     try {
       await _tourneeService.terminer(tournee.id);
 
-      Get.snackbar('Succès', 'Tournée terminée');
+     
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Tournée terminée",
+        type: NadiSnackbarType.success,
+      );
       setState(() {
         _futureTournee = _loadCurrentTournee();
       });
     } catch (e) {
-      Get.snackbar('Erreur', e.toString());
+     
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
     }
   }
 
   Future<void> _cancelTour(Tournee tournee) async {
     try {
       await _tourneeService.annuler(tournee.id);
-      Get.snackbar('Succès', 'Tournée annulée');
+
+      
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Tournée annulée",
+        type: NadiSnackbarType.success,
+      );
       setState(() {
         _futureTournee = _loadCurrentTournee();
       });
     } catch (e) {
-      Get.snackbar('Erreur', e.toString());
+   
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
     }
   }
 

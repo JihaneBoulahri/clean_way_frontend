@@ -19,7 +19,7 @@ class AuthService {
         final data = jsonDecode(res.body);
         return {
           "success": true,
-          "data": data, // مثلا token, user info...
+          "data": data, 
         };
       } else {
         final data = jsonDecode(res.body);

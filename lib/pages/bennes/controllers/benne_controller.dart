@@ -2,6 +2,7 @@ import 'package:clean_way_frontend/models/benne_model.dart';
 import 'package:get/get.dart';
 import '../../../services/benne_service.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class BennesController extends GetxController {
   final BenneService _service = BenneService();
@@ -30,7 +31,12 @@ class BennesController extends GetxController {
     if (e.toString().contains('401') || e.toString().contains('Unauthorized')) {
       Get.offAllNamed(AppRoutes.login);
     } else {
-      Get.snackbar('Erreur', e.toString());
+      
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
     }
   }
 
@@ -50,20 +56,29 @@ class BennesController extends GetxController {
     try {
       final data = await _service.createBenne(benne.toJson());
       bennes.add(Benne.fromJson(data));
-      Get.snackbar('Succès', 'Benne ajoutée avec succès');
+      
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Benne ajoutée avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }
   }
 
-  // Modification : on passe directement l'objet Benne (qui contient son id)
   Future<void> updateBenne(Benne benne) async {
     try {
       final data = await _service.updateBenne(benne.id, benne.toJson());
       int index = bennes.indexWhere((b) => b.id == benne.id);
       if (index != -1) {
         bennes[index] = Benne.fromJson(data);
-        Get.snackbar('Succès', 'Benne modifiée avec succès');
+       
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Benne modifiée avec succès",
+          type: NadiSnackbarType.success,
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -74,14 +89,17 @@ class BennesController extends GetxController {
     try {
       await _service.deleteBenne(id);
       bennes.removeWhere((b) => b.id == id);
-      Get.snackbar('Succès', 'Benne supprimée avec succès');
+      
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Benne supprimée avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }
   }
 
-  // Méthode inutilisée supprimée (getBenneById)
-  // Méthode getBennesWithSensors conservée
   void getBennesWithSensors() async {
     try {
       isLoading(true);

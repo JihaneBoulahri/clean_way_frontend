@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../models/camion_model.dart';
 import '../controllers/camion_controller.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class CamionFormDialog extends StatefulWidget {
   final Camion? camion;
@@ -65,7 +66,12 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     if (!_formKey.currentState!.validate()) return;
     final cap = double.tryParse(_capaciteController.text);
     if (cap == null || cap <= 0) {
-      Get.snackbar('Erreur', 'Capacité invalide');
+    
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Capacité invalide",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
     DateTime? date;

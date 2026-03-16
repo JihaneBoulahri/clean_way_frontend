@@ -1,11 +1,11 @@
 import 'package:clean_way_frontend/models/chauffeur_model.dart';
-import 'package:clean_way_frontend/models/chauffeur_model.dart';
+import 'package:clean_way_frontend/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import 'package:get_storage/get_storage.dart';
 import '../routes/app_routes.dart';
+import '../widgets/snackbar_helper.dart'; // <-- AJOUTÉ
 
 class LoginController extends GetxController {
   // Fields
@@ -40,23 +40,21 @@ class LoginController extends GetxController {
     final passError = validatePassword(password.value);
 
     if (emailError != null) {
-      Get.snackbar(
-        "Error",
-        emailError,
-        icon: const Icon(Icons.error, color: Colors.white),
-        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-        colorText: Colors.white,
+      // MODIFIÉ : utilisation du helper
+      showNadiSnackbar(
+        title: "Erreur",
+        message: emailError,
+        type: NadiSnackbarType.error,
       );
       return;
     }
 
     if (passError != null) {
-      Get.snackbar(
-        icon: const Icon(Icons.error, color: Colors.white),
-        "Error",
-        passError,
-        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-        colorText: Colors.white,
+      // MODIFIÉ
+      showNadiSnackbar(
+        title: "Erreur",
+        message: passError,
+        type: NadiSnackbarType.error,
       );
       return;
     }
@@ -97,31 +95,28 @@ class LoginController extends GetxController {
           await box.write('user', user.toJson());
         }
 
-        Get.snackbar(
-          icon: const Icon(Icons.check_circle, color: Colors.white),
-          "Success",
-          "Login successful",
-          backgroundColor: const Color.fromARGB(255, 82, 171, 85),
-          colorText: Colors.white,
+        // MODIFIÉ
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Connexion réussie",
+          type: NadiSnackbarType.success,
         );
         Get.offAllNamed(AppRoutes.dashboard);
       } else {
-        Get.snackbar(
-          icon: const Icon(Icons.error, color: Colors.white),
-          "Error",
-          result['message'] ?? "Login failed",
-          backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-          colorText: Colors.white,
+        // MODIFIÉ
+        showNadiSnackbar(
+          title: "Erreur",
+          message: result['message'] ?? "Échec de la connexion",
+          type: NadiSnackbarType.error,
         );
       }
-  } catch (e) {
+    } catch (e) {
       debugPrint("Login error: $e");
-      Get.snackbar(
-        icon: const Icon(Icons.error, color: Colors.white),
-        "Error",
-        "Something went wrong",
-        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-        colorText: Colors.white,
+      // MODIFIÉ
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Quelque chose s'est mal passé",
+        type: NadiSnackbarType.error,
       );
     } finally {
       isLoading.value = false;
@@ -139,29 +134,27 @@ class LoginController extends GetxController {
       await box.remove('chauffeur');
 
       if (result['success'] != true) {
-        Get.snackbar(
-          icon: const Icon(Icons.error, color: Colors.white),
-          "Error", result['message'] ?? "Logout failed",
-          backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-          colorText: Colors.white,
+        // MODIFIÉ
+        showNadiSnackbar(
+          title: "Erreur",
+          message: result['message'] ?? "Échec de la déconnexion",
+          type: NadiSnackbarType.error,
         );
-      }
-      
-      else {
-        Get.snackbar(
-          icon: const Icon(Icons.check_circle, color: Colors.white),
-          "Success","Logged out successfully",
-          backgroundColor: const Color.fromARGB(255, 82, 171, 85),
-          colorText: Colors.white,
+      } else {
+        // MODIFIÉ
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Déconnexion réussie",
+          type: NadiSnackbarType.success,
         );
       }
       Get.offAllNamed(AppRoutes.login);
     } catch (e) {
-      Get.snackbar(
-        icon: const Icon(Icons.error, color: Colors.white),
-        "Error","Logout failed",
-        backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-        colorText: Colors.white,
+      // MODIFIÉ
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Échec de la déconnexion",
+        type: NadiSnackbarType.error,
       );
       Get.offAllNamed(AppRoutes.login);
     }

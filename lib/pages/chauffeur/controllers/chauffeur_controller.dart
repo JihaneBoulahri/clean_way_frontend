@@ -3,6 +3,7 @@ import '../../../services/chauffeur_service.dart';
 import '../../../models/chauffeur_model.dart';
 import '../../../models/tournee_model.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class ChauffeurController extends GetxController {
   final bool autoFetch;
@@ -50,15 +51,27 @@ class ChauffeurController extends GetxController {
     if (errorMsg.contains('401') || errorMsg.contains('Unauthorized')) {
       Get.offAllNamed(AppRoutes.login);
     } else if (errorMsg.contains('404') || errorMsg.contains('Not Found')) {
-      // L'element n'existe plus, on rafraichit la liste
+     
       if (refreshOnNotFound) {
         fetchChauffeurs();
       }
       if (showSnackbar) {
-        Get.snackbar('Info', "L'element a ete supprime ailleurs");
+        
+        showNadiSnackbar(
+          title: "Info",
+          message: "L'élément a été supprimé ailleurs",
+          type: NadiSnackbarType.info,
+        );
       }
     } else {
-      if (showSnackbar) Get.snackbar('Erreur', errorMsg);
+      if (showSnackbar) {
+        
+        showNadiSnackbar(
+          title: "Erreur",
+          message: errorMsg,
+          type: NadiSnackbarType.error,
+        );
+      }
     }
   }
 
@@ -80,7 +93,12 @@ class ChauffeurController extends GetxController {
     try {
       final data = await _service.create(chauffeur.toJson());
       chauffeurs.add(Chauffeur.fromJson(data));
-      Get.snackbar('Succès', 'Chauffeur ajouté avec succès');
+      
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Chauffeur ajouté avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -92,7 +110,12 @@ class ChauffeurController extends GetxController {
       final index = chauffeurs.indexWhere((c) => c.id == chauffeur.id);
       if (index != -1) {
         chauffeurs[index] = Chauffeur.fromJson(data);
-        Get.snackbar('Succès', 'Chauffeur modifié avec succès');
+       
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Chauffeur modifié avec succès",
+          type: NadiSnackbarType.success,
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -103,7 +126,12 @@ class ChauffeurController extends GetxController {
     try {
       await _service.delete(id);
       chauffeurs.removeWhere((c) => c.id == id);
-      Get.snackbar('Succès', 'Chauffeur supprimé avec succès');
+    
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Chauffeur supprimé avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }

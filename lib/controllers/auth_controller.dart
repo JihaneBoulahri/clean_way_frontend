@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../services/auth_service.dart';
 import '../routes/app_routes.dart';
+import '../widgets/snackbar_helper.dart'; // Import du helper
 
 class AuthController extends GetxController {
   // Fields
@@ -51,34 +52,54 @@ class AuthController extends GetxController {
     final nomError = validateNom(nom);
     if (nomError != null) {
       errorMessage.value = nomError;
-      _showError(nomError);
+      showNadiSnackbar(
+        title: "Erreur",
+        message: nomError,
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
     final prenomError = validatePrenom(prenom);
     if (prenomError != null) {
       errorMessage.value = prenomError;
-      _showError(prenomError);
+      showNadiSnackbar(
+        title: "Erreur",
+        message: prenomError,
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
     final emailError = validateEmail(email);
     if (emailError != null) {
       errorMessage.value = emailError;
-      _showError(emailError);
+      showNadiSnackbar(
+        title: "Erreur",
+        message: emailError,
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
     final passError = validatePassword(password);
     if (passError != null) {
       errorMessage.value = passError;
-      _showError(passError);
+      showNadiSnackbar(
+        title: "Erreur",
+        message: passError,
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
     if (password != confirmPassword) {
       errorMessage.value = "Passwords do not match";
-      _showError("Passwords do not match");
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Les mots de passe ne correspondent pas",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
@@ -102,13 +123,11 @@ class AuthController extends GetxController {
         String? token;
         Map<String, dynamic> userData = {};
 
-        // Check if data has nested structure (token + data)
         if (data is Map) {
           if (data.containsKey('token') && data.containsKey('data')) {
             token = data['token'];
             userData = Map<String, dynamic>.from(data['data'] ?? {});
           } else {
-            // Direct user data
             userData = Map<String, dynamic>.from(data);
             token = data['token'];
           }
@@ -122,42 +141,32 @@ class AuthController extends GetxController {
           await box.write('user', userData);
         }
 
-        _showSuccess("Registration successful");
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Inscription réussie",
+          type: NadiSnackbarType.success,
+        );
         Get.offAllNamed(AppRoutes.dashboard);
       } else {
         final message = result['message'] ?? "Registration failed";
         errorMessage.value = message;
-        _showError(message);
+        showNadiSnackbar(
+          title: "Erreur",
+          message: message,
+          type: NadiSnackbarType.error,
+        );
       }
     } catch (e) {
       print("Register error: $e");
       errorMessage.value = "Something went wrong";
-      _showError("Something went wrong: $e");
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Quelque chose s'est mal passé",
+        type: NadiSnackbarType.error,
+      );
     } finally {
       isLoading.value = false;
     }
-  }
-
-  void _showError(String message) {
-    Get.snackbar(
-      "Error",
-      message,
-      icon: const Icon(Icons.error, color: Colors.white),
-      backgroundColor: const Color.fromARGB(255, 214, 52, 40),
-      colorText: Colors.white,
-      duration: const Duration(seconds: 3),
-    );
-  }
-
-  void _showSuccess(String message) {
-    Get.snackbar(
-      "Success",
-      message,
-      icon: const Icon(Icons.check_circle, color: Colors.white),
-      backgroundColor: const Color.fromARGB(255, 82, 171, 85),
-      colorText: Colors.white,
-      duration: const Duration(seconds: 3),
-    );
   }
 
   @override

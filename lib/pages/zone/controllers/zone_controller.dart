@@ -2,6 +2,7 @@ import 'package:clean_way_frontend/models/zone_model.dart';
 import 'package:get/get.dart';
 import '../../../services/zone_service.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class ZoneController extends GetxController {
   final ZoneService _service = ZoneService();
@@ -32,7 +33,14 @@ class ZoneController extends GetxController {
     if (errorMsg.contains('401') || errorMsg.contains('Unauthorized')) {
       Get.offAllNamed(AppRoutes.login);
     } else {
-      if (showSnackbar) Get.snackbar('Erreur', errorMsg);
+      if (showSnackbar) {
+        
+        showNadiSnackbar(
+          title: "Erreur",
+          message: errorMsg,
+          type: NadiSnackbarType.error,
+        );
+      }
     }
   }
 
@@ -54,7 +62,12 @@ class ZoneController extends GetxController {
     try {
       final data = await _service.create(zone.toJson());
       zones.add(Zone.fromJson(data));
-      Get.snackbar('Succes', 'Zone ajoutee avec succes');
+    
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Zone ajoutée avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -68,7 +81,12 @@ class ZoneController extends GetxController {
         final updatedZone = Zone.fromJson(data);
         zones[index] = updatedZone;
         zones.refresh();
-        Get.snackbar('Succes', 'Zone modifiee avec succes');
+      
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Zone modifiée avec succès",
+          type: NadiSnackbarType.success,
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -79,7 +97,12 @@ class ZoneController extends GetxController {
     try {
       await _service.delete(id);
       zones.removeWhere((z) => z.id == id);
-      Get.snackbar('Succes', 'Zone supprimee avec succes');
+      
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Zone supprimée avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }

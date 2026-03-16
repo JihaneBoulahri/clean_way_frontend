@@ -2,6 +2,7 @@ import 'package:clean_way_frontend/models/tournee_model.dart';
 import 'package:get/get.dart';
 import '../../../services/tournee_service.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/snackbar_helper.dart';
 
 class TourneeController extends GetxController {
   final TourneeService _service = TourneeService();
@@ -30,9 +31,23 @@ class TourneeController extends GetxController {
       Get.offAllNamed(AppRoutes.login);
     } else if (errorMsg.contains('404') || errorMsg.contains('Not Found')) {
       fetchTournees();
-      if (showSnackbar) Get.snackbar('Info', 'L\'élément a été supprimé ailleurs');
+      if (showSnackbar) {
+     
+        showNadiSnackbar(
+          title: "Info",
+          message: "L'élément a été supprimé ailleurs",
+          type: NadiSnackbarType.info,
+        );
+      }
     } else {
-      if (showSnackbar) Get.snackbar('Erreur', errorMsg);
+      if (showSnackbar) {
+      
+        showNadiSnackbar(
+          title: "Erreur",
+          message: errorMsg,
+          type: NadiSnackbarType.error,
+        );
+      }
     }
   }
 
@@ -52,7 +67,12 @@ class TourneeController extends GetxController {
     try {
       final data = await _service.create(tournee.toJson());
       tournees.add(Tournee.fromJson(data));
-      Get.snackbar('Succès', 'Tournée ajoutée avec succès');
+     
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Tournée ajoutée avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -64,7 +84,12 @@ class TourneeController extends GetxController {
       int index = tournees.indexWhere((t) => t.id == tournee.id);
       if (index != -1) {
         tournees[index] = Tournee.fromJson(data);
-        Get.snackbar('Succès', 'Tournée modifiée avec succès');
+     
+        showNadiSnackbar(
+          title: "Succès",
+          message: "Tournée modifiée avec succès",
+          type: NadiSnackbarType.success,
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -75,7 +100,12 @@ class TourneeController extends GetxController {
     try {
       await _service.delete(id);
       tournees.removeWhere((t) => t.id == id);
-      Get.snackbar('Succès', 'Tournée supprimée avec succès');
+     
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Tournée supprimée avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }
