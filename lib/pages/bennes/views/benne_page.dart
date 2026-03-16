@@ -1,4 +1,6 @@
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
+import 'package:clean_way_frontend/core/constants/filter_constants.dart';
+import 'package:clean_way_frontend/widgets/filter_bottom_sheet.dart';
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
@@ -30,9 +32,13 @@ class BennesPage extends GetView<BennesController> {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: SearchBarField(
-              hint: 'Rechercher par type, capacité, coordonnées...',
-              onChanged: (v) => controller.searchQuery.value = v,
+            child: Obx(
+              () => SearchBarField(
+                hint: 'Rechercher par type, capacite, coordonnees...',
+                onChanged: (v) => controller.searchQuery.value = v,
+                onFilterTap: () => _openFilters(context),
+                filterActive: controller.hasActiveFilters,
+              ),
             ),
           ),
           Expanded(
@@ -99,5 +105,46 @@ class BennesPage extends GetView<BennesController> {
       return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
     }
     return false;
+  }
+
+  void _openFilters(BuildContext context) {
+    FilterBottomSheet.show(
+      context: context,
+      title: 'Filtrer les bennes',
+      sections: [
+        FilterSection(
+          id: 'type',
+          title: 'Type de benne',
+          options: [FilterDefaults.all, ...controller.typeOptions],
+          selected: controller.filterType.value,
+          defaultValue: FilterDefaults.all,
+        ),
+        FilterSection(
+          id: 'capteur',
+          title: 'Capteur',
+          options: const [
+            FilterDefaults.all,
+            FilterDefaults.withCapteur,
+            FilterDefaults.withoutCapteur,
+          ],
+          selected: controller.filterCapteur.value,
+          defaultValue: FilterDefaults.all,
+        ),
+        FilterSection(
+          id: 'statut',
+          title: 'Statut capteur',
+          options: [FilterDefaults.all, ...controller.capteurStatusOptions],
+          selected: controller.filterCapteurStatus.value,
+          defaultValue: FilterDefaults.all,
+        ),
+      ],
+      onApply: (values) {
+        controller.applyFilters(
+          type: values['type'] ?? FilterDefaults.all,
+          capteur: values['capteur'] ?? FilterDefaults.all,
+          status: values['statut'] ?? FilterDefaults.all,
+        );
+      },
+    );
   }
 }

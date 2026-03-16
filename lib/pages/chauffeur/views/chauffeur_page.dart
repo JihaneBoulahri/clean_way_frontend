@@ -1,5 +1,7 @@
 import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
+import 'package:clean_way_frontend/core/constants/filter_constants.dart';
+import 'package:clean_way_frontend/widgets/filter_bottom_sheet.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,9 +33,13 @@ class ChauffeurPage extends GetView<ChauffeurController> {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: SearchBarField(
-              hint: 'Rechercher par téléphone, CNI, permis...',
-              onChanged: (v) => controller.searchQuery.value = v,
+            child: Obx(
+              () => SearchBarField(
+                hint: 'Rechercher par telephone, CNI, permis...',
+                onChanged: (v) => controller.searchQuery.value = v,
+                onFilterTap: () => _openFilters(context),
+                filterActive: controller.hasActiveFilters,
+              ),
             ),
           ),
           Expanded(
@@ -118,6 +124,39 @@ class ChauffeurPage extends GetView<ChauffeurController> {
       return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
     }
     return false;
+  }
+
+  void _openFilters(BuildContext context) {
+    FilterBottomSheet.show(
+      context: context,
+      title: 'Filtrer les chauffeurs',
+      sections: [
+        FilterSection(
+          id: 'affectation',
+          title: 'Affectation',
+          options: const [
+            FilterDefaults.all,
+            FilterDefaults.withCamion,
+            FilterDefaults.withoutCamion,
+          ],
+          selected: controller.filterAffectation.value,
+          defaultValue: FilterDefaults.all,
+        ),
+        FilterSection(
+          id: 'permis',
+          title: 'Permis',
+          options: [FilterDefaults.all, ...controller.permisOptions],
+          selected: controller.filterPermis.value,
+          defaultValue: FilterDefaults.all,
+        ),
+      ],
+      onApply: (values) {
+        controller.applyFilters(
+          affectation: values['affectation'] ?? FilterDefaults.all,
+          permis: values['permis'] ?? FilterDefaults.all,
+        );
+      },
+    );
   }
 }
         

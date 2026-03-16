@@ -2,6 +2,7 @@ import 'package:clean_way_frontend/models/zone_model.dart';
 import 'package:get/get.dart';
 import '../../../services/zone_service.dart';
 import '../../../routes/app_routes.dart';
+import '../../../core/constants/filter_constants.dart';
 
 class ZoneController extends GetxController {
   final ZoneService _service = ZoneService();
@@ -9,16 +10,46 @@ class ZoneController extends GetxController {
   var isLoading = false.obs;
   var error = RxnString();
   var searchQuery = ''.obs;
+  var filterType = FilterDefaults.all.obs;
 
   List<Zone> get filteredZones {
-    if (searchQuery.value.trim().isEmpty) return zones;
     final q = searchQuery.value.trim().toLowerCase();
     return zones.where((z) {
-      return z.nomZone.toLowerCase().contains(q) ||
+      final matchesSearch = q.isEmpty ||
+          z.nomZone.toLowerCase().contains(q) ||
           z.typeZone.toLowerCase().contains(q) ||
           z.latitude.toLowerCase().contains(q) ||
           z.longitude.toLowerCase().contains(q);
+      final matchesType = filterType.value == FilterDefaults.all ||
+          z.typeZone.toLowerCase() == filterType.value.toLowerCase();
+      return matchesSearch && matchesType;
     }).toList();
+  }
+
+  bool get hasActiveFilters => filterType.value != FilterDefaults.all;
+
+  List<String> get typeOptions =>
+      _distinctStrings(zones.map((z) => z.typeZone));
+
+  void applyFilters({required String type}) {
+    filterType.value = type;
+  }
+
+  void resetFilters() {
+    filterType.value = FilterDefaults.all;
+  }
+
+  List<String> _distinctStrings(Iterable<String> values) {
+    final set = <String>{};
+    for (final value in values) {
+      final trimmed = value.trim();
+      if (trimmed.isNotEmpty) {
+        set.add(trimmed);
+      }
+    }
+    final list = set.toList();
+    list.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return list;
   }
 
   @override
