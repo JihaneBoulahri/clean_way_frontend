@@ -1,7 +1,16 @@
 class ApiConstants {
   static const String baseUrl = 'http://127.0.0.1:8000/api';
 }
+/* =========================== */
+/*            EMAIL            */
+/* =========================== */
+class EmailEndpoints {
+  static const String send = "${ApiConstants.baseUrl}/send-email";
+}
 
+/* =============================== */
+/*            STATISTICS           */
+/* =============================== */
 class StatsEndpoint {
   static const String statistiques = "${ApiConstants.baseUrl}/stats";
 }

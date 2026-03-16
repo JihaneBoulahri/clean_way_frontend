@@ -25,6 +25,7 @@ import '../pages/chauffeur/controllers/chauffeur_controller.dart';
 import '../pages/chauffeur/views/chauffeur_detail_page.dart';
 import '../pages/settings/views/settings_page.dart';
 import '../pages/help/views/help_page.dart';
+import '../pages/help/controllers/help_controller.dart';
 
 class AppPages {
   static final routes = [
@@ -132,6 +133,9 @@ class AppPages {
     GetPage(
       name: AppRoutes.help,
       page: () => const HelpPage(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => HelpController());
+      }),
     ),
   ];
 }
