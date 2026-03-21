@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../models/benne_model.dart';
+import '../models/benne_model.dart';
 import '../../../widgets/app_layout.dart';
 import '../../../widgets/modern_widgets.dart';
 import '../controllers/benne_controller.dart';

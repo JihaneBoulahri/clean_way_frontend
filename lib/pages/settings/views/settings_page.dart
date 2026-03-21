@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
-import 'package:clean_way_frontend/services/user_service.dart';
+import 'package:clean_way_frontend/core/services/user_service.dart';
 import '../../../widgets/app_layout.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 

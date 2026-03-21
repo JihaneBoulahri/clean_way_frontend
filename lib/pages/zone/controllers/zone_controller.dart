@@ -1,6 +1,6 @@
-import 'package:clean_way_frontend/models/zone_model.dart';
+import 'package:clean_way_frontend/pages/zone/models/zone_model.dart';
 import 'package:get/get.dart';
-import '../../../services/zone_service.dart';
+import '../../../core/services/zone_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 

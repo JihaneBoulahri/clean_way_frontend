@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/camion_model.dart';
-import '../../../models/zone_model.dart';
-import '../../../models/tournee_model.dart';
+import '../../camion/models/camion_model.dart';
+import '../../zone/models/zone_model.dart';
+import '../models/tournee_model.dart';
 import '../controllers/tournee_controller.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 

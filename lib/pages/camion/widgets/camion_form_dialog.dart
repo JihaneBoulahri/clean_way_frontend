@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/camion_model.dart';
+import '../models/camion_model.dart';
 import '../controllers/camion_controller.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 

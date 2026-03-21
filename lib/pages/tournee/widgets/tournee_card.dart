@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/tournee_model.dart';
+import '../models/tournee_model.dart';
 import '../../../routes/app_routes.dart';
 
 class TourneeCard extends StatelessWidget {

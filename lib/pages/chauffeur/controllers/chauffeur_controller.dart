@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import '../../../services/chauffeur_service.dart';
-import '../../../models/chauffeur_model.dart';
-import '../../../models/tournee_model.dart';
+import '../../../core/services/chauffeur_service.dart';
+import '../models/chauffeur_model.dart';
+import '../../tournee/models/tournee_model.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 

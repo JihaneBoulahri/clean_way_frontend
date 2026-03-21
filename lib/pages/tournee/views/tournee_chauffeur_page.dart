@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 
-import '../../../models/tournee_model.dart';
-import '../../../models/zone_model.dart';
+import '../models/tournee_model.dart';
+import '../../zone/models/zone_model.dart';
 import '../../chauffeur/controllers/chauffeur_controller.dart';
-import '../../../services/tournee_service.dart';
+import '../../../core/services/tournee_service.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 
 class TourneeChauffeurPage extends StatefulWidget {

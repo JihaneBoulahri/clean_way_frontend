@@ -1,4 +1,4 @@
-import 'capteur_model.dart';
+import '../../../capteur_model.dart';
 
 class Benne {
   final int id;

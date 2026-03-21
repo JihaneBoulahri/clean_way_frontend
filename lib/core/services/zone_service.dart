@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
-import '../core/constants/api_constants.dart';
+import '../constants/api_constants.dart';
 
-class OptimizationService {
+class ZoneService {
   final _box = GetStorage();
 
   /// Base headers with token
@@ -18,6 +18,7 @@ class OptimizationService {
 
   /// Handle common response logic
   dynamic _handleResponse(http.Response res) {
+    
     if (res.statusCode == 200 || res.statusCode == 201) {
       final decoded = jsonDecode(res.body);
       if (decoded is List) return decoded;
@@ -33,13 +34,50 @@ class OptimizationService {
     throw Exception("Server error (${res.statusCode}): ${res.body.isNotEmpty ? res.body.substring(0, 200) : 'No response'}");
   }
 
-  /// Fetch optimized routes
-  Future<dynamic> optimiser() async {
+  //get all zones
+  Future<List<dynamic>> getAll() async {
     final res = await http.get(
-      Uri.parse(OptimisationEndpoints.base),
+      Uri.parse(ZoneEndpoints.base),
       headers: _headers,
     );
+    return _handleResponse(res);
+  }
 
+  //create zone
+  Future create(Map data) async {
+    final res = await http.post(
+      Uri.parse(ZoneEndpoints.base),
+      headers: _headers,
+      body: jsonEncode(data),
+    );
+    return _handleResponse(res);
+  }
+
+  //update zone
+  Future update(int id, Map data) async {
+    final res = await http.put(
+      Uri.parse(ZoneEndpoints.detail(id)),
+      headers: _headers,
+      body: jsonEncode(data),
+    );
+    return _handleResponse(res);
+  }
+
+  //delete zone
+  Future delete(int id) async {
+    final res = await http.delete(
+      Uri.parse(ZoneEndpoints.detail(id)),
+      headers: _headers,
+    );
+    return _handleResponse(res);
+  }
+
+  //get zone by id
+  Future getById(int id) async {
+    final res = await http.get(
+      Uri.parse(ZoneEndpoints.detail(id)),
+      headers: _headers,
+    );
     return _handleResponse(res);
   }
 }

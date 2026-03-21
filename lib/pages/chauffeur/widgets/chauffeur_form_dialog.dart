@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/chauffeur_model.dart';
-import '../../../models/camion_model.dart';
-import '../../../models/user_model.dart';
+import '../models/chauffeur_model.dart';
+import '../../camion/models/camion_model.dart';
+import '../../auth/models/user_model.dart';
 import '../controllers/chauffeur_controller.dart';
 import '../../../widgets/snackbar_helper.dart'; // <-- AJOUTÉ
 

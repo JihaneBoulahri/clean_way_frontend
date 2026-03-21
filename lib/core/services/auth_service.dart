@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../core/constants/api_constants.dart';
+import '../constants/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 

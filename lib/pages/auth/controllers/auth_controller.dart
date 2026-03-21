@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import '../services/auth_service.dart';
-import '../routes/app_routes.dart';
-import '../widgets/snackbar_helper.dart'; // Import du helper
+import '../../../core/services/auth_service.dart';
+import '../../../routes/app_routes.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class AuthController extends GetxController {
   // Fields

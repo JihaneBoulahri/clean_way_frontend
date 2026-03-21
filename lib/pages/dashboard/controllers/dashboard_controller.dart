@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import '../services/optimization_service.dart';
-import '../services/stats_service.dart';
-import '../widgets/snackbar_helper.dart'; 
+import '../../../core/services/optimization_service.dart';
+import '../../../core/services/stats_service.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class DashboardController extends GetxController {
   final StatsService _statsService = StatsService();

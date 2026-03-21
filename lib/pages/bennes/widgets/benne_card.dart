@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/benne_model.dart';
+import '../models/benne_model.dart';
 import '../../../routes/app_routes.dart';
 
 class BenneCard extends StatelessWidget {

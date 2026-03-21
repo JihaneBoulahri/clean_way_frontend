@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/zone_model.dart';
+import '../models/zone_model.dart';
 import '../controllers/zone_controller.dart';
 import '../../../widgets/snackbar_helper.dart';
 

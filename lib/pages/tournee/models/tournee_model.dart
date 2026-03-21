@@ -1,5 +1,5 @@
-import 'camion_model.dart';
-import 'zone_model.dart';
+import '../../camion/models/camion_model.dart';
+import '../../zone/models/zone_model.dart';
 
 class Tournee {
   final int id;

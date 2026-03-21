@@ -1,6 +1,6 @@
-import 'package:clean_way_frontend/models/tournee_model.dart';
+import 'package:clean_way_frontend/pages/tournee/models/tournee_model.dart';
 import 'package:get/get.dart';
-import '../../../services/tournee_service.dart';
+import '../../../core/services/tournee_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart';
 

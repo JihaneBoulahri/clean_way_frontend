@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../widgets/modern_widgets.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../models/zone_model.dart';
+import '../models/zone_model.dart';
 import '../controllers/zone_controller.dart';
 import '../widgets/zone_form_dialog.dart';
 import '../../../widgets/app_layout.dart';

@@ -1,6 +1,6 @@
-import 'package:clean_way_frontend/models/benne_model.dart';
+import 'package:clean_way_frontend/pages/bennes/models/benne_model.dart';
 import 'package:get/get.dart';
-import '../../../services/benne_service.dart';
+import '../../../core/services/benne_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 

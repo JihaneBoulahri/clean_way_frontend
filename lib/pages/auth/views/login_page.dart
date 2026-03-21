@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../controllers/login_controller.dart';
-import '../routes/app_routes.dart';
+import '../../../routes/app_routes.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});

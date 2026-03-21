@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../../../services/camion_service.dart';
-import '../../../models/camion_model.dart';
+import '../../../core/services/camion_service.dart';
+import '../models/camion_model.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 
