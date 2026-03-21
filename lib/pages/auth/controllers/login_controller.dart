@@ -3,6 +3,7 @@ import 'package:clean_way_frontend/pages/auth/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/notification_service.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart'; // <-- AJOUTÉ
@@ -94,6 +95,7 @@ class LoginController extends GetxController {
           final user = User.fromJson(userMap);
           await box.write('user', user.toJson());
         }
+        await NotificationService.instance.refreshToken();
 
         // MODIFIÉ
         showNadiSnackbar(
@@ -132,6 +134,7 @@ class LoginController extends GetxController {
       await box.remove('token');
       await box.remove('user');
       await box.remove('chauffeur');
+      await NotificationService.instance.clearToken();
 
       if (result['success'] != true) {
         // MODIFIÉ

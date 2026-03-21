@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../core/services/auth_service.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart'; 
 
@@ -140,6 +141,7 @@ class AuthController extends GetxController {
         if (userData.isNotEmpty) {
           await box.write('user', userData);
         }
+        await NotificationService.instance.refreshToken();
 
         showNadiSnackbar(
           title: "Succès",

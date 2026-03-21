@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
+import 'package:clean_way_frontend/core/services/notification_service.dart';
 import 'package:clean_way_frontend/core/services/user_service.dart';
 import '../../../widgets/app_layout.dart';
 import '../../../widgets/snackbar_helper.dart'; 
@@ -47,6 +48,32 @@ class _SettingsPageState extends State<SettingsPage> {
     final theme = ThemeData.from(colorScheme: scheme).copyWith(useMaterial3: true);
     Get.changeTheme(theme);
     Get.changeThemeMode(_darkMode ? ThemeMode.dark : ThemeMode.light);
+  }
+
+  Future<void> _toggleNotifications(bool enabled) async {
+    final applied = await NotificationService.instance.setNotificationsEnabled(enabled);
+    if (!mounted) return;
+
+    setState(() {
+      _notifications = applied;
+    });
+
+    if (applied) {
+      if (enabled) {
+        await NotificationService.instance.showLocalTestNotification();
+      }
+      showNadiSnackbar(
+        title: "Succès",
+        message: enabled ? "Notifications activées" : "Notifications désactivées",
+        type: NadiSnackbarType.success,
+      );
+    } else {
+      showNadiSnackbar(
+        title: "Permission refusée",
+        message: "Autorisez les notifications dans les paramètres système.",
+        type: NadiSnackbarType.warning,
+      );
+    }
   }
 
   @override
@@ -215,12 +242,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     subtitle: _notifications ? 'Activées' : 'Désactivées',
                     trailing: Switch(
                       value: _notifications,
-                      onChanged: (v) {
-                        setState(() {
-                          _notifications = v;
-                          box.write('settings:notifications', _notifications);
-                        });
-                      },
+                      onChanged: _toggleNotifications,
                       activeColor: scheme.primary,
                     ),
                     showDivider: false,
