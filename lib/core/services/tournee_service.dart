@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../core/constants/api_constants.dart';
+import '../constants/api_constants.dart';
 import 'package:get_storage/get_storage.dart';
 
 class TourneeService {
@@ -158,7 +158,48 @@ class TourneeService {
     return _handleResponse(res);
   }
 
-  Future start(int id) async {
+
+  // Dans TourneeService
+
+Future<void> start(int tourneeId) async {
+  final res = await _actionWithFallback(
+    urls: [
+      TourneeEndpoints.start(tourneeId),
+      "${TourneeEndpoints.base}/start/$tourneeId",
+      "${TourneeEndpoints.base}/$tourneeId/start",
+    ],
+    methods: const ['POST', 'PATCH', 'PUT'],
+  );
+
+  _handleResponse(res);
+}
+
+Future<void> annuler(int id) async {
+  final res = await _actionWithFallback(
+    urls: [
+      TourneeEndpoints.annuler(id),
+      "${TourneeEndpoints.base}/annuler/$id",
+      "${TourneeEndpoints.base}/$id/annuler",
+    ],
+    methods: const ['POST', 'PATCH', 'PUT'],
+  );
+
+  _handleResponse(res);
+}
+
+Future<void> terminer(int id) async {
+  final res = await _actionWithFallback(
+    urls: [
+      TourneeEndpoints.terminer(id),
+      "${TourneeEndpoints.base}/terminer/$id",
+      "${TourneeEndpoints.base}/$id/terminer",
+    ],
+    methods: const ['POST', 'PATCH', 'PUT'],
+  );
+
+  _handleResponse(res);
+}
+  /* Future start(int id) async {
     final res = await _actionWithFallback(
       urls: [
         TourneeEndpoints.start(id),
@@ -167,27 +208,39 @@ class TourneeService {
       methods: const ['POST', 'PATCH', 'PUT'],
     );
     return _handleResponse(res);
-  }
+  } */
 
-  Future annuler(int id) async {
+
+  /* Future<void> start(int tourneeId) async {
+    final res = await http.post(
+      Uri.parse(TourneeEndpoints.start(tourneeId)),
+      headers: _headers,
+    );
+    _handleResponse(res);
+  } */
+
+  
+
+
+  /* Future annuler(int id) async {
     final res = await _actionWithFallback(
       urls: [
         TourneeEndpoints.annuler(id),
-        "${TourneeEndpoints.base}/cancel/$id",
+        "${TourneeEndpoints.base}/annuler/$id",
       ],
       methods: const ['POST', 'PATCH', 'PUT'],
     );
     return _handleResponse(res);
-  }
+  } */
 
-  Future terminer(int id) async {
+ /*  Future terminer(int id) async {
     final res = await _actionWithFallback(
       urls: [
         TourneeEndpoints.terminer(id),
-        "${TourneeEndpoints.base}/finish/$id",
+        "${TourneeEndpoints.base}/terminer/$id",
       ],
       methods: const ['POST', 'PATCH', 'PUT'],
     );
     return _handleResponse(res);
-  }
+  } */
 }

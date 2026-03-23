@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/chauffeur_model.dart';
+import '../models/chauffeur_model.dart';
 import '../../../routes/app_routes.dart';
 import '../../../core/theme/app_theme.dart';
 

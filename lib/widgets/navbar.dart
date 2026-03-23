@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import '../models/user_model.dart';
+import '../pages/auth/models/user_model.dart';
 
 class Navbar extends StatelessWidget {
   final Color primaryColor;

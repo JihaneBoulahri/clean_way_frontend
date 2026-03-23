@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/camion_model.dart';
-import '../../../models/zone_model.dart';
-import '../../../models/tournee_model.dart';
+import '../../camion/models/camion_model.dart';
+import '../../zone/models/zone_model.dart';
+import '../models/tournee_model.dart';
 import '../controllers/tournee_controller.dart';
+import '../../../widgets/snackbar_helper.dart'; 
 
 class TourneeFormDialog extends StatefulWidget {
   final Tournee? tournee;
@@ -67,7 +68,11 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
     if (!_formKey.currentState!.validate()) return;
     final date = DateTime.tryParse(_dateController.text.trim());
     if (date == null) {
-      Get.snackbar('Erreur', 'Date invalide (AAAA-MM-JJ)');
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Date invalide (AAAA-MM-JJ)",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
     final idCamion = _idCamionController.text.trim().isEmpty
@@ -78,11 +83,19 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
         : int.tryParse(_idZoneController.text.trim());
 
     if (_idCamionController.text.trim().isNotEmpty && idCamion == null) {
-      Get.snackbar('Erreur', 'L\'ID camion doit être un nombre entier');
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "L'ID camion doit être un nombre entier",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
     if (_idZoneController.text.trim().isNotEmpty && idZone == null) {
-      Get.snackbar('Erreur', 'L\'ID zone doit être un nombre entier');
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "L'ID zone doit être un nombre entier",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
@@ -114,7 +127,11 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
       }
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
-      Get.snackbar('Erreur', 'Échec de l\'enregistrement: ${e.toString()}');
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Échec de l'enregistrement: ${e.toString()}",
+        type: NadiSnackbarType.error,
+      );
     } finally {
       setState(() => _saving = false);
     }

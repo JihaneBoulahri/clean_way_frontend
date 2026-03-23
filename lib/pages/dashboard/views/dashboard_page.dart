@@ -2,7 +2,7 @@ import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import '../../../controllers/dashboard_controller.dart';
+import '../controllers/dashboard_controller.dart';
 
 class DashboardPage extends GetView<DashboardController> {
   const DashboardPage({super.key});

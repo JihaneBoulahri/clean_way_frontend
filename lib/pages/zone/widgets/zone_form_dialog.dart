@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/zone_model.dart';
+import '../models/zone_model.dart';
 import '../controllers/zone_controller.dart';
+import '../../../widgets/snackbar_helper.dart';
 
 class ZoneFormDialog extends StatefulWidget {
   final Zone? zone;
@@ -48,14 +49,24 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
 
     // Validation stricte
     if (nomText.isEmpty || typeText.isEmpty || latText.isEmpty || longText.isEmpty) {
-      Get.snackbar('Erreur', 'Tous les champs sont obligatoires', snackPosition: SnackPosition.BOTTOM);
+      
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Tous les champs sont obligatoires",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
     final lat = double.tryParse(latText);
     final lng = double.tryParse(longText);
     if (lat == null || lng == null) {
-      Get.snackbar('Erreur', 'Latitude et Longitude doivent être des nombres valides', snackPosition: SnackPosition.BOTTOM);
+     
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Latitude et Longitude doivent être des nombres valides",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
 
@@ -85,7 +96,12 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
       }
       if (mounted) Navigator.of(context).pop(result);
     } catch (e) {
-      Get.snackbar('Erreur', e.toString(), snackPosition: SnackPosition.BOTTOM);
+    
+      showNadiSnackbar(
+        title: "Erreur",
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
     } finally {
       if (mounted) setState(() => _saving = false);
     }

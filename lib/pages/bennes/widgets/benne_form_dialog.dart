@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/benne_model.dart';
+import '../models/benne_model.dart';
 import '../controllers/benne_controller.dart';
+import '../../../widgets/snackbar_helper.dart';
 
 class BenneFormDialog extends StatefulWidget {
   final Benne? benne;
@@ -43,12 +44,21 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
     if (!_formKey.currentState!.validate()) return;
     final cap = double.tryParse(_capaciteController.text);
     if (cap == null || cap <= 0) {
-      Get.snackbar('Erreur', 'Capacité invalide');
+      
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Capacité invalide",
+        type: NadiSnackbarType.error,
+      );
       return;
     }
     // Contrainte de capacité maximale (exemple)
     /* if (cap > 133) {
-      Get.snackbar('Erreur', 'Capacité doit être ≤ 133');
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Capacité doit être ≤ 133",
+        type: NadiSnackbarType.error,
+      );
       return;
     } */
     setState(() => _saving = true);
@@ -63,7 +73,6 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
           longitude: _longController.text.trim(),
         ));
       } else {
-        // Utilisation de la nouvelle signature (objet Benne complet)
         await controller.updateBenne(Benne(
           id: widget.benne!.id,
           typeBenne: _typeController.text.trim(),

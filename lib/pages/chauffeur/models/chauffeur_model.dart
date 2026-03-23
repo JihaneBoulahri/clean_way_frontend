@@ -1,5 +1,5 @@
-import 'package:clean_way_frontend/models/camion_model.dart';
-import 'package:clean_way_frontend/models/user_model.dart';
+import 'package:clean_way_frontend/pages/camion/models/camion_model.dart';
+import 'package:clean_way_frontend/pages/auth/models/user_model.dart';
 
 class Chauffeur {
   final int id;

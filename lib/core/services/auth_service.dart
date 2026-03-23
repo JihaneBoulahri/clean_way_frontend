@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../core/constants/api_constants.dart';
+import '../constants/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 
@@ -19,7 +19,7 @@ class AuthService {
         final data = jsonDecode(res.body);
         return {
           "success": true,
-          "data": data, // مثلا token, user info...
+          "data": data, 
         };
       } else {
         final data = jsonDecode(res.body);
