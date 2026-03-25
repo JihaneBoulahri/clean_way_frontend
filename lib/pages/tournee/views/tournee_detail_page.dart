@@ -7,6 +7,7 @@ import '../models/tournee_model.dart';
 import '../controllers/tournee_controller.dart';
 import '../widgets/tournee_form_dialog.dart';
 import '../../../widgets/app_layout.dart';
+import '../../../widgets/location_map_card.dart';
 
 class TourneeDetailPage extends StatelessWidget {
   const TourneeDetailPage({super.key});
@@ -33,7 +34,9 @@ class TourneeDetailPage extends StatelessWidget {
                   tooltip: 'Retour',
                   style: IconButton.styleFrom(
                     backgroundColor: scheme.surface,
-                    side: BorderSide(color: scheme.outline.withOpacity(0.2)),
+                    side: BorderSide(
+                      color: scheme.outline.withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -50,7 +53,8 @@ class TourneeDetailPage extends StatelessWidget {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () => Get.dialog(TourneeFormDialog(tournee: tournee)),
+                        onPressed: () =>
+                            Get.dialog(TourneeFormDialog(tournee: tournee)),
                         icon: const Icon(Icons.edit),
                         tooltip: 'Modifier',
                         style: IconButton.styleFrom(
@@ -60,7 +64,8 @@ class TourneeDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       IconButton(
-                        onPressed: () => _showDeleteDialog(context, tournee, controller),
+                        onPressed: () =>
+                            _showDeleteDialog(context, tournee, controller),
                         icon: const Icon(Icons.delete),
                         tooltip: 'Supprimer',
                         style: IconButton.styleFrom(
@@ -136,7 +141,7 @@ class TourneeDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
-              
+
               // Camion Details Section
               if (tournee.camion != null) ...[
                 Text(
@@ -183,7 +188,10 @@ class TourneeDetailPage extends StatelessWidget {
                         icon: Icons.calendar_today,
                         label: 'Mise en service',
                         value: tournee.camion!.dateMiseEnService != null
-                            ? tournee.camion!.dateMiseEnService.toString().split(' ').first
+                            ? tournee.camion!.dateMiseEnService
+                                  .toString()
+                                  .split(' ')
+                                  .first
                             : 'Non définie',
                         scheme: scheme,
                       ),
@@ -251,6 +259,15 @@ class TourneeDetailPage extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: AppSpacing.lg),
+                LocationMapCard(
+                  title: 'Carte de la zone',
+                  latitude: tournee.zone!.latitude,
+                  longitude: tournee.zone!.longitude,
+                  markerTitle: tournee.zone!.nomZone,
+                  markerSubtitle:
+                      '${tournee.zone!.latitude}, ${tournee.zone!.longitude}',
+                ),
               ],
             ],
           ],
@@ -259,16 +276,19 @@ class TourneeDetailPage extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Tournee tournee, TourneeController controller) {
+  void _showDeleteDialog(
+    BuildContext context,
+    Tournee tournee,
+    TourneeController controller,
+  ) {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
-        content: Text('Êtes-vous sûr de vouloir supprimer la tournée "${tournee.id}" ?'),
+        content: Text(
+          'Êtes-vous sûr de vouloir supprimer la tournée "${tournee.id}" ?',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Annuler'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
           ElevatedButton(
             onPressed: () {
               controller.deleteTournee(tournee.id);
@@ -323,7 +343,7 @@ class _DetailRow extends StatelessWidget {
               label,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w500,
-                color: scheme.onSurface.withOpacity(0.7),
+                color: scheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ),
@@ -331,9 +351,9 @@ class _DetailRow extends StatelessWidget {
             flex: 3,
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: scheme.onSurface,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: scheme.onSurface),
             ),
           ),
         ],

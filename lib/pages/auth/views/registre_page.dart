@@ -12,8 +12,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-
-  final AuthController controller = Get.put(AuthController());
+  late final AuthController controller;
 
   final nomController = TextEditingController();
   final prenomController = TextEditingController();
@@ -23,6 +22,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool showPassword = false;
   bool showConfirm = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.isRegistered<AuthController>()
+        ? Get.find<AuthController>()
+        : Get.put(AuthController());
+  }
+
+  @override
+  void dispose() {
+    nomController.dispose();
+    prenomController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   bool _isLoggedIn() {
     final box = GetStorage();

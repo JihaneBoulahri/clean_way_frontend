@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../../../core/services/auth_service.dart';
@@ -49,8 +48,14 @@ class AuthController extends GetxController {
     required String password,
     required String confirmPassword,
   }) async {
+    final nomValue = nom.trim();
+    final prenomValue = prenom.trim();
+    final emailValue = email.trim();
+    final passwordValue = password.trim();
+    final confirmPasswordValue = confirmPassword.trim();
+
     // Validation
-    final nomError = validateNom(nom);
+    final nomError = validateNom(nomValue);
     if (nomError != null) {
       errorMessage.value = nomError;
       showNadiSnackbar(
@@ -61,7 +66,7 @@ class AuthController extends GetxController {
       return;
     }
 
-    final prenomError = validatePrenom(prenom);
+    final prenomError = validatePrenom(prenomValue);
     if (prenomError != null) {
       errorMessage.value = prenomError;
       showNadiSnackbar(
@@ -72,7 +77,7 @@ class AuthController extends GetxController {
       return;
     }
 
-    final emailError = validateEmail(email);
+    final emailError = validateEmail(emailValue);
     if (emailError != null) {
       errorMessage.value = emailError;
       showNadiSnackbar(
@@ -83,7 +88,7 @@ class AuthController extends GetxController {
       return;
     }
 
-    final passError = validatePassword(password);
+    final passError = validatePassword(passwordValue);
     if (passError != null) {
       errorMessage.value = passError;
       showNadiSnackbar(
@@ -94,7 +99,7 @@ class AuthController extends GetxController {
       return;
     }
 
-    if (password != confirmPassword) {
+    if (passwordValue != confirmPasswordValue) {
       errorMessage.value = "Passwords do not match";
       showNadiSnackbar(
         title: "Erreur",
@@ -110,10 +115,11 @@ class AuthController extends GetxController {
 
       // Call register service
       final result = await AuthService.register(
-        nom: nom,
-        prenom: prenom,
-        email: email,
-        password: password,
+        nom: nomValue,
+        prenom: prenomValue,
+        email: emailValue,
+        password: passwordValue,
+        confirmPassword: confirmPasswordValue,
       );
 
       if (result['success'] == true) {
@@ -159,7 +165,7 @@ class AuthController extends GetxController {
         );
       }
     } catch (e) {
-      print("Register error: $e");
+      Get.log("Register error: $e");
       errorMessage.value = "Something went wrong";
       showNadiSnackbar(
         title: "Erreur",
@@ -171,8 +177,4 @@ class AuthController extends GetxController {
     }
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 }

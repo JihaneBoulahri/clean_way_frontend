@@ -7,6 +7,7 @@ import '../models/zone_model.dart';
 import '../controllers/zone_controller.dart';
 import '../widgets/zone_form_dialog.dart';
 import '../../../widgets/app_layout.dart';
+import '../../../widgets/location_map_card.dart';
 
 class ZoneDetailPage extends StatefulWidget {
   const ZoneDetailPage({super.key});
@@ -45,7 +46,9 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                   tooltip: 'Retour',
                   style: IconButton.styleFrom(
                     backgroundColor: scheme.surface,
-                    side: BorderSide(color: scheme.outline.withOpacity(0.2)),
+                    side: BorderSide(
+                      color: scheme.outline.withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.md),
@@ -63,7 +66,9 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                     children: [
                       IconButton(
                         onPressed: () async {
-                          final result = await Get.dialog(ZoneFormDialog(zone: zone));
+                          final result = await Get.dialog(
+                            ZoneFormDialog(zone: zone),
+                          );
                           if (result != null && result is Zone) {
                             setState(() => zone = result);
                           }
@@ -77,7 +82,8 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       IconButton(
-                        onPressed: () => _showDeleteDialog(context, zone, controller),
+                        onPressed: () =>
+                            _showDeleteDialog(context, zone, controller),
                         icon: const Icon(Icons.delete),
                         tooltip: 'Supprimer',
                         style: IconButton.styleFrom(
@@ -158,22 +164,33 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                 ],
               ),
             ),
+            const SizedBox(height: AppSpacing.xl),
+            LocationMapCard(
+              title: 'Carte de la zone',
+              latitude: zone.latitude,
+              longitude: zone.longitude,
+              markerTitle: zone.nomZone,
+              markerSubtitle: '${zone.latitude}, ${zone.longitude}',
+            ),
           ],
         ),
       ),
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Zone zone, ZoneController controller) async {
+  void _showDeleteDialog(
+    BuildContext context,
+    Zone zone,
+    ZoneController controller,
+  ) async {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
-        content: Text('Êtes-vous sûr de vouloir supprimer la zone "${zone.nomZone}" ?'),
+        content: Text(
+          'Êtes-vous sûr de vouloir supprimer la zone "${zone.nomZone}" ?',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Annuler'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
           ElevatedButton(
             onPressed: () async {
               await controller.deleteZone(zone.id);
@@ -228,7 +245,7 @@ class _DetailRow extends StatelessWidget {
               label,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w500,
-                color: scheme.onSurface.withOpacity(0.7),
+                color: scheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ),
@@ -236,9 +253,9 @@ class _DetailRow extends StatelessWidget {
             flex: 3,
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: scheme.onSurface,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: scheme.onSurface),
             ),
           ),
         ],

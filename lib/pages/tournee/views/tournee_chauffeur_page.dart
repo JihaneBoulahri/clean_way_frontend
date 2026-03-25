@@ -1,16 +1,14 @@
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/app_layout.dart';
+import 'package:clean_way_frontend/widgets/location_map_card.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 
 import '../models/tournee_model.dart';
-import '../../zone/models/zone_model.dart';
 import '../../chauffeur/controllers/chauffeur_controller.dart';
 import '../../../core/services/tournee_service.dart';
-import '../../../widgets/snackbar_helper.dart'; 
+import '../../../widgets/snackbar_helper.dart';
 
 class TourneeChauffeurPage extends StatefulWidget {
   const TourneeChauffeurPage({super.key});
@@ -21,7 +19,9 @@ class TourneeChauffeurPage extends StatefulWidget {
 
 class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
   final TourneeService _tourneeService = TourneeService();
-  final ChauffeurController _chauffeurController = Get.put(ChauffeurController());
+  final ChauffeurController _chauffeurController = Get.put(
+    ChauffeurController(),
+  );
   late Future<Tournee?> _futureTournee;
 
   @override
@@ -32,8 +32,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
 
   Future<Tournee?> _loadCurrentTournee() async {
     try {
-      final tournees =
-          await _chauffeurController.fetchMyTournees(showSnackbar: false);
+      final tournees = await _chauffeurController.fetchMyTournees(
+        showSnackbar: false,
+      );
       if (tournees.isEmpty) return null;
       return tournees.first;
     } catch (e) {
@@ -54,7 +55,6 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     try {
       await _tourneeService.start(tournee.id);
 
-     
       showNadiSnackbar(
         title: "Succès",
         message: "Tournée démarrée",
@@ -64,7 +64,6 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         _futureTournee = _loadCurrentTournee();
       });
     } catch (e) {
-      
       showNadiSnackbar(
         title: "Erreur",
         message: e.toString(),
@@ -77,7 +76,6 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     try {
       await _tourneeService.terminer(tournee.id);
 
-     
       showNadiSnackbar(
         title: "Succès",
         message: "Tournée terminée",
@@ -87,7 +85,6 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         _futureTournee = _loadCurrentTournee();
       });
     } catch (e) {
-     
       showNadiSnackbar(
         title: "Erreur",
         message: e.toString(),
@@ -100,7 +97,6 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     try {
       await _tourneeService.annuler(tournee.id);
 
-      
       showNadiSnackbar(
         title: "Succès",
         message: "Tournée annulée",
@@ -110,21 +106,12 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         _futureTournee = _loadCurrentTournee();
       });
     } catch (e) {
-   
       showNadiSnackbar(
         title: "Erreur",
         message: e.toString(),
         type: NadiSnackbarType.error,
       );
     }
-  }
-
-  LatLng? _parseLatLng(Zone? zone) {
-    if (zone == null) return null;
-    final lat = double.tryParse(zone.latitude);
-    final lng = double.tryParse(zone.longitude);
-    if (lat == null || lng == null) return null;
-    return LatLng(lat, lng);
   }
 
   @override
@@ -136,9 +123,7 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: AppTheme.accentColor,
-              ),
+              child: CircularProgressIndicator(color: AppTheme.accentColor),
             );
           }
 
@@ -149,7 +134,8 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                 child: EmptyState(
                   icon: Icons.error_outline,
                   title: 'Erreur',
-                  subtitle: 'Impossible de charger votre tournée.\n${snapshot.error}',
+                  subtitle:
+                      'Impossible de charger votre tournée.\n${snapshot.error}',
                   action: ElevatedButton.icon(
                     onPressed: () {
                       setState(() {
@@ -181,11 +167,14 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
           }
 
           final scheme = Theme.of(context).colorScheme;
-          final position = _parseLatLng(tournee.zone);
           final statusLower = tournee.status.toLowerCase();
           final isStarted =
-              statusLower == 'en cours' || statusLower == 'en_cours' || statusLower == 'terminee' || statusLower == 'terminée';
-          final isFinished = statusLower == 'terminee' || statusLower == 'terminée';
+              statusLower == 'en cours' ||
+              statusLower == 'en_cours' ||
+              statusLower == 'terminee' ||
+              statusLower == 'terminée';
+          final isFinished =
+              statusLower == 'terminee' || statusLower == 'terminée';
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -195,9 +184,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                 Text(
                   'Tournée affectée',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: scheme.primary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: scheme.primary,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
 
@@ -258,7 +247,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: isFinished ? null : () => _finishTour(tournee),
+                        onPressed: isFinished
+                            ? null
+                            : () => _finishTour(tournee),
                         icon: const Icon(Icons.stop),
                         label: const Text('Terminer'),
                       ),
@@ -266,7 +257,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: TextButton.icon(
-                        onPressed: isFinished ? null : () => _cancelTour(tournee),
+                        onPressed: isFinished
+                            ? null
+                            : () => _cancelTour(tournee),
                         icon: const Icon(Icons.cancel_outlined),
                         label: const Text('Annuler'),
                       ),
@@ -279,9 +272,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                   Text(
                     'Zone de collecte',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: scheme.primary,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: scheme.primary,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   ModernCard(
@@ -321,82 +314,15 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                   const SizedBox(height: AppSpacing.xl),
                 ],
 
-                // Carte Google Maps
-                Text(
-                  'Carte de la tournée',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: scheme.primary,
-                      ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Container(
+                LocationMapCard(
+                  title: 'Carte de la tournée',
+                  latitude: tournee.zone?.latitude ?? '',
+                  longitude: tournee.zone?.longitude ?? '',
+                  markerTitle: tournee.zone?.nomZone ?? 'Zone',
+                  markerSubtitle:
+                      '${tournee.zone?.latitude ?? '-'}, ${tournee.zone?.longitude ?? '-'}',
                   height: 350,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    border: Border.all(color: scheme.outline.withOpacity(0.3)),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: position == null
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.map_outlined,
-                                    size: 48, color: scheme.onSurfaceVariant),
-                                const SizedBox(height: AppSpacing.md),
-                                Text(
-                                  'Coordonnees non disponibles ou invalides',
-                                  style:
-                                      TextStyle(color: scheme.onSurfaceVariant),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      : (kIsWeb
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(AppSpacing.lg),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.map_outlined,
-                                        size: 48,
-                                        color: scheme.onSurfaceVariant),
-                                    const SizedBox(height: AppSpacing.md),
-                                    Text(
-                                      "Carte indisponible sur le web.\\nUtilisez l'application mobile.",
-                                      style: TextStyle(
-                                          color: scheme.onSurfaceVariant),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          : GoogleMap(
-                              initialCameraPosition: CameraPosition(
-                                target: position,
-                                zoom: 14,
-                              ),
-                              markers: {
-                                Marker(
-                                  markerId: const MarkerId('tournee_zone'),
-                                  position: position,
-                                  infoWindow: InfoWindow(
-                                    title: tournee.zone?.nomZone ?? 'Zone',
-                                    snippet:
-                                        '${tournee.zone?.latitude}, ${tournee.zone?.longitude}',
-                                  ),
-                                ),
-                              },
-                              myLocationButtonEnabled: false,
-                              zoomControlsEnabled: true,
-                            )))
+                ),
               ],
             ),
           );
@@ -433,18 +359,18 @@ class _InfoRow extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: scheme.onSurface.withOpacity(0.7),
-                  ),
+                fontWeight: FontWeight.w500,
+                color: scheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: scheme.onSurface,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: scheme.onSurface),
             ),
           ),
         ],
