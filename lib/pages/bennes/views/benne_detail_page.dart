@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../models/benne_model.dart';
 import '../../../widgets/app_layout.dart';
 import '../../../widgets/modern_widgets.dart';
+import '../../../widgets/location_map_card.dart';
 import '../controllers/benne_controller.dart';
 import '../widgets/benne_form_dialog.dart';
 
@@ -33,8 +34,9 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
 
           final benne = snapshot.data ?? benneArg;
           final scheme = Theme.of(context).colorScheme;
-          final fillLevel =
-              (benne.capteur?.niveauRemplissage ?? 0).clamp(0, 100).toDouble();
+          final fillLevel = (benne.capteur?.niveauRemplissage ?? 0)
+              .clamp(0, 100)
+              .toDouble();
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -49,14 +51,17 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                       tooltip: 'Retour',
                       style: IconButton.styleFrom(
                         backgroundColor: scheme.surface,
-                        side: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
+                        side: BorderSide(
+                          color: scheme.outline.withValues(alpha: 0.2),
+                        ),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
                         'Benne #${benne.id}',
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: scheme.primary,
                             ),
@@ -80,7 +85,8 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           IconButton(
-                            onPressed: () => _showDeleteDialog(context, benne, controller),
+                            onPressed: () =>
+                                _showDeleteDialog(context, benne, controller),
                             icon: const Icon(Icons.delete),
                             tooltip: 'Supprimer',
                             style: IconButton.styleFrom(
@@ -121,6 +127,14 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                     ],
                   ),
                 ),
+                const SizedBox(height: AppSpacing.lg),
+                LocationMapCard(
+                  title: 'Carte de la benne',
+                  latitude: benne.latitude,
+                  longitude: benne.longitude,
+                  markerTitle: 'Benne #${benne.id}',
+                  markerSubtitle: '${benne.latitude}, ${benne.longitude}',
+                ),
                 const SizedBox(height: AppSpacing.xl),
                 ModernCard(
                   child: Column(
@@ -132,7 +146,8 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Coordonnées geographiques',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: scheme.primary,
                                 ),
@@ -167,7 +182,8 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Capteur et remplissage',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: scheme.primary,
                                 ),
@@ -195,16 +211,18 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                           value: fillLevel / 100,
                           minHeight: 10,
                           backgroundColor: Colors.grey.shade200,
-                          valueColor: AlwaysStoppedAnimation(_statusColor(fillLevel)),
+                          valueColor: AlwaysStoppedAnimation(
+                            _statusColor(fillLevel),
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         'Niveau de remplissage: ${fillLevel.toInt()}% (${_statusText(fillLevel)})',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: _statusColor(fillLevel),
-                            ),
+                          fontWeight: FontWeight.w600,
+                          color: _statusColor(fillLevel),
+                        ),
                       ),
                     ],
                   ),
@@ -217,16 +235,17 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Benne benne, BennesController controller) async {
+  void _showDeleteDialog(
+    BuildContext context,
+    Benne benne,
+    BennesController controller,
+  ) async {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
         content: Text('Voulez-vous supprimer la benne #${benne.id} ?'),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Annuler'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
           ElevatedButton(
             onPressed: () async {
               await controller.deleteBenne(benne.id);
@@ -292,18 +311,18 @@ class _DetailRow extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: scheme.onSurface.withValues(alpha: 0.7),
-                  ),
+                fontWeight: FontWeight.w500,
+                color: scheme.onSurface.withValues(alpha: 0.7),
+              ),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: scheme.onSurface,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: scheme.onSurface),
             ),
           ),
         ],

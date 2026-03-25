@@ -3,39 +3,133 @@ import 'package:http/http.dart' as http;
 import '../constants/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-
-
 class AuthService {
+  static bool _isGenericValidationMessage(String value) {
+    final normalized = value.trim().toLowerCase();
+    const genericFragments = [
+      'validation failed',
+      'the given data was invalid',
+      'validation error',
+      'invalid data',
+      'unprocessable entity',
+      'erreur de validation',
+    ];
+    return genericFragments.any(normalized.contains);
+  }
+
+  static String? _firstStringFrom(dynamic value, {bool allowGeneric = true}) {
+    if (value is String) {
+      final text = value.trim();
+      if (text.isEmpty) return null;
+      if (!allowGeneric && _isGenericValidationMessage(text)) return null;
+      return text;
+    }
+
+    if (value is List) {
+      for (final item in value) {
+        final candidate = _firstStringFrom(item, allowGeneric: allowGeneric);
+        if (candidate != null) return candidate;
+      }
+      return null;
+    }
+
+    if (value is Map) {
+      for (final entry in value.entries) {
+        final candidate = _firstStringFrom(
+          entry.value,
+          allowGeneric: allowGeneric,
+        );
+        if (candidate != null) return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  static String _extractErrorMessage(
+    String responseBody, {
+    required String fallback,
+  }) {
+    if (responseBody.trim().isEmpty) return fallback;
+
+    try {
+      final decoded = jsonDecode(responseBody);
+
+      if (decoded is Map<String, dynamic>) {
+        // Prefer field-level validation details over generic root messages.
+        final detailedError = _firstStringFrom(
+          decoded['errors'] ??
+              decoded['validation_errors'] ??
+              decoded['details'] ??
+              decoded['detail'],
+          allowGeneric: false,
+        );
+        if (detailedError != null) {
+          return detailedError;
+        }
+
+        final message = _firstStringFrom(
+          decoded['message'],
+          allowGeneric: false,
+        );
+        if (message != null) {
+          return message;
+        }
+
+        final error = _firstStringFrom(decoded['error'], allowGeneric: false);
+        if (error != null) {
+          return error;
+        }
+
+        final anySpecificText = _firstStringFrom(decoded, allowGeneric: false);
+        if (anySpecificText != null) {
+          return anySpecificText;
+        }
+
+        // Last chance inside decoded body, even if the message is generic.
+        final anyText = _firstStringFrom(decoded, allowGeneric: true);
+        if (anyText != null) {
+          return anyText;
+        }
+      }
+    } catch (_) {}
+
+    final plainText = responseBody.trim();
+    if (plainText.isNotEmpty && !_isGenericValidationMessage(plainText)) {
+      return plainText;
+    }
+
+    return fallback;
+  }
+
   //login
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+    String email,
+    String password,
+  ) async {
     try {
       final res = await http.post(
         Uri.parse(AuthEndpoints.login),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
         body: jsonEncode({"email": email, "password": password}),
       );
 
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
-        return {
-          "success": true,
-          "data": data, 
-        };
-      } else {
-        final data = jsonDecode(res.body);
-        return {
-          "success": false,
-          "message": data['message'] ?? "Login failed",
-        };
+        return {"success": true, "data": data};
       }
-    } catch (e) {
+
       return {
         "success": false,
-        "message": e.toString(),
+        "message": _extractErrorMessage(res.body, fallback: "Login failed"),
       };
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
     }
   }
-
 
   //register
   static Future<Map<String, dynamic>> register({
@@ -43,85 +137,75 @@ class AuthService {
     required String prenom,
     required String email,
     required String password,
+    required String confirmPassword,
   }) async {
     try {
       final res = await http.post(
         Uri.parse(AuthEndpoints.register),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
         body: jsonEncode({
           "nom": nom,
           "prenom": prenom,
           "email": email,
           "password": password,
+          "password_confirmation": confirmPassword,
         }),
       );
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         final data = jsonDecode(res.body);
-        return {
-          "success": true,
-          "data": data,
-        };
-      } else {
-        final data = jsonDecode(res.body);
-        return {
-          "success": false,
-          "message": data['message'] ?? "Registration failed",
-        };
+        return {"success": true, "data": data};
       }
-    } catch (e) {
+
       return {
         "success": false,
-        "message": e.toString(),
+        "message": _extractErrorMessage(
+          res.body,
+          fallback: "Registration failed",
+        ),
       };
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
     }
   }
 
   //logout
   static Future<Map<String, dynamic>> logout() async {
-  try {
-    final storage = const FlutterSecureStorage();
-    final token = await storage.read(key: "token");
+    try {
+      final storage = const FlutterSecureStorage();
+      final token = await storage.read(key: "token");
 
-    final res = await http.post(
-      Uri.parse(AuthEndpoints.logout),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-      },
-    );
+      final res = await http.post(
+        Uri.parse(AuthEndpoints.logout),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      );
 
-    if (res.statusCode == 200) {
+      if (res.statusCode == 200) {
+        // supprimer le token du téléphone
+        await storage.delete(key: "token");
 
-      // supprimer le token du téléphone
-      await storage.delete(key: "token");
+        return {"success": true, "message": "Logout successful"};
+      }
 
-      return {
-        "success": true,
-        "message": "Logout successful"
-      };
+      if (res.body.isNotEmpty) {
+        return {
+          "success": false,
+          "message": _extractErrorMessage(res.body, fallback: "Logout failed"),
+        };
+      }
+
+      return {"success": false, "message": "Logout failed"};
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
     }
-
-    if (res.body.isNotEmpty) {
-      final data = jsonDecode(res.body);
-      return {
-        "success": false,
-        "message": data['message'] ?? "Logout failed",
-      };
-    }
-
-    return {
-      "success": false,
-      "message": "Logout failed",
-    };
-
-  } catch (e) {
-    return {
-      "success": false,
-      "message": e.toString(),
-    };
   }
-}
+
   /* static Future<Map<String, dynamic>> logout() async {
     try {
       
