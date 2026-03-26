@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import '../../../services/email_service.dart';
+import '../../../core/services/email_service.dart';
 
 class HelpController extends GetxController {
   final EmailService _emailService = EmailService();
