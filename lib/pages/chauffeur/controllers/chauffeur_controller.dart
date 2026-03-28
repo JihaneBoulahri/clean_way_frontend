@@ -88,12 +88,19 @@ class ChauffeurController extends GetxController {
           .toList();
 
       final chauffeurByUserId = await _fetchChauffeurDetailsByUserId();
-      final mapped = users
+      final hasChauffeurRows = chauffeurByUserId.isNotEmpty;
+      final mergedUsers = users
           .map(
             (userJson) => _mergeUserWithChauffeur(userJson, chauffeurByUserId),
           )
-          .map(Chauffeur.fromJson)
+          .where((json) {
+            if (!hasChauffeurRows) return true;
+            final id = _parseNullableInt(json['id']);
+            return _hasChauffeurPayload(json) ||
+                (id != null && chauffeurByUserId.containsKey(id));
+          })
           .toList();
+      final mapped = mergedUsers.map(Chauffeur.fromJson).toList();
       chauffeurs.value = mapped;
     } catch (e) {
       error.value = e.toString();
@@ -120,33 +127,44 @@ class ChauffeurController extends GetxController {
         type: NadiSnackbarType.success,
       );
     } catch (e) {
+      if (_isCniConstraintError(e)) {
+        try {
+          await _fallbackCreateChauffeur(payload);
+          await fetchChauffeurs();
+          showNadiSnackbar(
+            title: "Succès",
+            message: "Chauffeur ajouté avec succès",
+            type: NadiSnackbarType.success,
+          );
+          return;
+        } catch (fallbackError) {
+          _handleError(fallbackError);
+          return;
+        }
+      }
       _handleError(e);
     }
   }
 
   Future<void> updateChauffeur(int userId, Map<String, dynamic> payload) async {
     try {
-      final response = await UserService.update(userId, payload);
-      final updatedMap = _extractMap(response);
-      final updated = updatedMap == null
-          ? null
-          : Chauffeur.fromJson(updatedMap);
-      final index = chauffeurs.indexWhere((c) => c.id == userId);
-      if (index != -1) {
-        if (updated != null && _isChauffeurModel(updated)) {
-          chauffeurs[index] = updated;
-        } else {
-          await fetchChauffeurs();
-        }
+      final current = _findLocalChauffeurByUserId(userId);
 
-        showNadiSnackbar(
-          title: "Succès",
-          message: "Chauffeur modifié avec succès",
-          type: NadiSnackbarType.success,
-        );
-      } else {
-        await fetchChauffeurs();
-      }
+      await _upsertChauffeurForUser(
+        userId: userId,
+        payload: payload,
+        preferredChauffeurId: current?.chauffeurId,
+      );
+
+      final userPayload = _buildUserPayload(payload, forceRoleChauffeur: true);
+      await UserService.update(userId, userPayload);
+
+      await fetchChauffeurs();
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Chauffeur modifié avec succès",
+        type: NadiSnackbarType.success,
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -176,6 +194,8 @@ class ChauffeurController extends GetxController {
 
       final chauffeurByUserId = await _fetchChauffeurDetailsByUserId();
       final merged = _mergeUserWithChauffeur(map, chauffeurByUserId);
+      final hasChauffeurRows = chauffeurByUserId.isNotEmpty;
+      if (hasChauffeurRows && !_hasChauffeurPayload(merged)) return null;
       return Chauffeur.fromJson(merged);
     } catch (e) {
       _handleError(e);
@@ -226,10 +246,11 @@ class ChauffeurController extends GetxController {
   }
 
   bool _isChauffeurModel(Chauffeur chauffeur) {
-    return (chauffeur.user?.role.toLowerCase() == 'chauffeur') ||
+    return chauffeur.chauffeurId != null ||
         chauffeur.cni.isNotEmpty ||
         chauffeur.permis.isNotEmpty ||
-        chauffeur.userId != null;
+        chauffeur.numTelephone.isNotEmpty ||
+        chauffeur.camionId != null;
   }
 
   Future<Map<int, Map<String, dynamic>>>
@@ -291,5 +312,138 @@ class ChauffeurController extends GetxController {
     if (value is int) return value;
     if (value is num) return value.toInt();
     return int.tryParse(value.toString());
+  }
+
+  bool _hasChauffeurPayload(Map<String, dynamic> json) {
+    final nested = json['chauffeur'];
+    if (nested is Map) {
+      final map = Map<String, dynamic>.from(nested);
+      return _hasValue(map['id_chauffeur']) ||
+          _hasValue(map['cni']) ||
+          _hasValue(map['permis']) ||
+          _hasValue(map['num_telephone']) ||
+          _hasValue(map['id_camion']) ||
+          _hasValue(map['camion_id']) ||
+          _hasValue(map['user_id']);
+    }
+
+    return _hasValue(json['id_chauffeur']) ||
+        _hasValue(json['cni']) ||
+        _hasValue(json['permis']) ||
+        _hasValue(json['num_telephone']) ||
+        _hasValue(json['id_camion']) ||
+        _hasValue(json['camion_id']) ||
+        _hasValue(json['user_id']);
+  }
+
+  bool _hasValue(dynamic value) {
+    if (value == null) return false;
+    if (value is String) return value.trim().isNotEmpty;
+    return true;
+  }
+
+  Chauffeur? _findLocalChauffeurByUserId(int userId) {
+    for (final c in chauffeurs) {
+      if (c.id == userId || c.userId == userId || c.user?.id == userId) {
+        return c;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _upsertChauffeurForUser({
+    required int userId,
+    required Map<String, dynamic> payload,
+    int? preferredChauffeurId,
+  }) async {
+    final chauffeurPayload = _buildChauffeurPayload(payload, userId: userId);
+    int? chauffeurId = preferredChauffeurId;
+    if (chauffeurId == null) {
+      final mapByUser = await _fetchChauffeurDetailsByUserId();
+      final existing = mapByUser[userId];
+      chauffeurId = _parseNullableInt(
+        existing?['id_chauffeur'] ?? existing?['id'],
+      );
+    }
+
+    if (chauffeurId != null) {
+      await _chauffeurService.update(chauffeurId, chauffeurPayload);
+    } else {
+      await _chauffeurService.create(chauffeurPayload);
+    }
+  }
+
+  Map<String, dynamic> _buildChauffeurPayload(
+    Map<String, dynamic> source, {
+    required int userId,
+  }) {
+    return <String, dynamic>{
+      'user_id': userId,
+      'num_telephone': source['num_telephone'],
+      'cni': source['cni'],
+      'permis': source['permis'],
+      'id_camion': source['id_camion'],
+    };
+  }
+
+  Map<String, dynamic> _buildUserPayload(
+    Map<String, dynamic> source, {
+    required bool forceRoleChauffeur,
+  }) {
+    final payload = <String, dynamic>{
+      'nom': source['nom'],
+      'prenom': source['prenom'],
+      'email': source['email'],
+    };
+    if (forceRoleChauffeur) {
+      payload['role'] = 'chauffeur';
+    }
+    final password = source['password']?.toString().trim() ?? '';
+    if (password.isNotEmpty) {
+      payload['password'] = password;
+    }
+    return payload;
+  }
+
+  Future<void> _fallbackCreateChauffeur(Map<String, dynamic> payload) async {
+    final email = payload['email']?.toString().trim().toLowerCase();
+    int? userId = await _findUserIdByEmail(email);
+
+    if (userId == null) {
+      final userPayload = _buildUserPayload(payload, forceRoleChauffeur: false)
+        ..['role'] = 'admin';
+      final createdUser = await UserService.create(userPayload);
+      userId = _parseNullableInt(_extractMap(createdUser)?['id']);
+    }
+
+    if (userId == null) {
+      throw Exception("Impossible de créer l'utilisateur chauffeur");
+    }
+
+    await _upsertChauffeurForUser(userId: userId, payload: payload);
+    await UserService.update(userId, {'role': 'chauffeur'});
+  }
+
+  Future<int?> _findUserIdByEmail(String? email) async {
+    final normalized = email?.trim().toLowerCase() ?? '';
+    if (normalized.isEmpty) return null;
+
+    final response = await UserService.getUsers();
+    final rows = _extractList(response);
+    for (final row in rows) {
+      if (row is! Map) continue;
+      final map = Map<String, dynamic>.from(row);
+      final rowEmail = map['email']?.toString().trim().toLowerCase() ?? '';
+      if (rowEmail == normalized) {
+        return _parseNullableInt(map['id']);
+      }
+    }
+    return null;
+  }
+
+  bool _isCniConstraintError(dynamic e) {
+    final msg = e.toString().toLowerCase();
+    return msg.contains('chauffeurs.cni') &&
+        msg.contains('not null constraint failed');
   }
 }
