@@ -7,23 +7,35 @@ class UserService {
   static Map<String, String> _headers() {
     final box = GetStorage();
     final token = box.read('token')?.toString();
-    final headers = <String, String>{
-      "Content-Type": "application/json",
-    };
+    final headers = <String, String>{"Content-Type": "application/json"};
     if (token != null && token.isNotEmpty) {
       headers["Authorization"] = "Bearer $token";
     }
     return headers;
   }
 
+  static dynamic _handleResponse(http.Response res) {
+    final body = res.body.trim();
+    final decoded = body.isEmpty ? <String, dynamic>{} : jsonDecode(body);
+
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      return decoded;
+    }
+
+    throw Exception(
+      "Server error (${res.statusCode}): "
+      "${body.isNotEmpty ? body.substring(0, body.length > 200 ? 200 : body.length) : 'No response'}",
+    );
+  }
+
   //get all users
-  static Future<List<dynamic>> getUsers() async {
+  static Future<dynamic> getUsers() async {
     final res = await http.get(
       Uri.parse(UserEndpoints.base),
       headers: _headers(),
     );
 
-    return jsonDecode(res.body);
+    return _handleResponse(res);
   }
 
   //create user
@@ -33,7 +45,7 @@ class UserService {
       headers: _headers(),
       body: jsonEncode(data),
     );
-    return jsonDecode(res.body);
+    return _handleResponse(res);
   }
 
   //update user
@@ -43,18 +55,24 @@ class UserService {
       headers: _headers(),
       body: jsonEncode(data),
     );
-    return jsonDecode(res.body);
+    return _handleResponse(res);
   }
 
   //delete user
   static Future delete(int id) async {
-    await http.delete(Uri.parse(UserEndpoints.detail(id)), headers: _headers());
+    final res = await http.delete(
+      Uri.parse(UserEndpoints.detail(id)),
+      headers: _headers(),
+    );
+    _handleResponse(res);
   }
 
   //get user by id
   static Future getById(int id) async {
-    final res = await http.get(Uri.parse(UserEndpoints.detail(id)), headers: _headers());
-    return jsonDecode(res.body);
+    final res = await http.get(
+      Uri.parse(UserEndpoints.detail(id)),
+      headers: _headers(),
+    );
+    return _handleResponse(res);
   }
-
 }

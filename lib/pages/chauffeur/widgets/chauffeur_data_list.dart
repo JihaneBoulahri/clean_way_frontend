@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/chauffeur_model.dart';
 import '../../../routes/app_routes.dart';
-import '../../../core/theme/app_theme.dart';
 
 class ChauffeurDataList extends StatelessWidget {
   final List<Chauffeur> chauffeurs;
 
-  const ChauffeurDataList({
-    super.key,
-    required this.chauffeurs,
-  });
+  const ChauffeurDataList({super.key, required this.chauffeurs});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +20,9 @@ class ChauffeurDataList extends StatelessWidget {
         return Card(
           margin: EdgeInsets.zero,
           elevation: 3,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: DataTable(
@@ -76,7 +74,10 @@ class ChauffeurDataList extends StatelessWidget {
                   index: index,
                   color: MaterialStatePropertyAll(rowColor),
                   onSelectChanged: (_) {
-                    Get.toNamed(AppRoutes.chauffeurDetail, arguments: chauffeur);
+                    Get.toNamed(
+                      AppRoutes.chauffeurDetail,
+                      arguments: chauffeur,
+                    );
                   },
                   cells: [
                     DataCell(
@@ -97,7 +98,10 @@ class ChauffeurDataList extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            chauffeur.user?.fullName ?? 'Chauffeur #${chauffeur.id}',
+                            chauffeur.user?.fullName ??
+                                (chauffeur.userId != null
+                                    ? 'Utilisateur #${chauffeur.userId}'
+                                    : 'Chauffeur #${chauffeur.id}'),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: textTheme.bodyMedium?.copyWith(
@@ -110,7 +114,9 @@ class ChauffeurDataList extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        chauffeur.cni,
+                        chauffeur.cni.trim().isEmpty
+                            ? 'Non renseigne'
+                            : chauffeur.cni,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodyMedium?.copyWith(
@@ -120,7 +126,10 @@ class ChauffeurDataList extends StatelessWidget {
                     ),
                     DataCell(
                       Text(
-                        chauffeur.camion?.immatriculation ?? '-',
+                        chauffeur.camion?.immatriculation ??
+                            (chauffeur.camionId != null
+                                ? 'Camion #${chauffeur.camionId}'
+                                : '-'),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodyMedium?.copyWith(

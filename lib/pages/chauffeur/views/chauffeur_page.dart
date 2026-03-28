@@ -32,7 +32,7 @@ class ChauffeurPage extends GetView<ChauffeurController> {
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: SearchBarField(
-              hint: 'Rechercher par téléphone, CNI, permis...',
+              hint: 'Rechercher par nom, email, téléphone, CNI...',
               onChanged: (v) => controller.searchQuery.value = v,
             ),
           ),
@@ -40,9 +40,7 @@ class ChauffeurPage extends GetView<ChauffeurController> {
             child: Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
-                  child: CircularProgressIndicator(
-                    color: AppTheme.accentColor,
-                  ),
+                  child: CircularProgressIndicator(color: AppTheme.accentColor),
                 );
               }
 
@@ -100,9 +98,7 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                     horizontal: AppSpacing.lg,
                     vertical: AppSpacing.md,
                   ),
-                  children: [
-                    ChauffeurDataList(chauffeurs: list),
-                  ],
+                  children: [ChauffeurDataList(chauffeurs: list)],
                 ),
               );
             }),
@@ -120,4 +116,3 @@ class ChauffeurPage extends GetView<ChauffeurController> {
     return false;
   }
 }
-        

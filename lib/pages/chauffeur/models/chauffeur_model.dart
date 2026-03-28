@@ -2,19 +2,26 @@ import 'package:clean_way_frontend/pages/camion/models/camion_model.dart';
 import 'package:clean_way_frontend/pages/auth/models/user_model.dart';
 
 class Chauffeur {
+  // In users-based flow this is the User ID.
   final int id;
-  final User? user;          // nouveau champ utilisateur
+  final int? chauffeurId;
+  final int? userId;
+  final User? user;
   final String numTelephone;
   final String cni;
   final String permis;
-  final Camion? camion;      // lien vers camion
+  final int? camionId;
+  final Camion? camion;
 
   Chauffeur({
     required this.id,
+    this.chauffeurId,
+    this.userId,
     this.user,
     required this.numTelephone,
     required this.cni,
     required this.permis,
+    this.camionId,
     this.camion,
   });
 
@@ -26,6 +33,13 @@ class Chauffeur {
       return int.tryParse(v.toString()) ?? 0;
     }
 
+    int? parseOptionalInt(dynamic v) {
+      if (v == null) return null;
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return int.tryParse(v.toString());
+    }
+
     String parseString(dynamic v) {
       if (v == null) return '';
       return v.toString();
@@ -33,15 +47,15 @@ class Chauffeur {
 
     Camion? parseCamion(dynamic v) {
       if (v == null) return null;
-      if (v is Map<String, dynamic>) return Camion.fromJson(v);
+      if (v is Map) return Camion.fromJson(Map<String, dynamic>.from(v));
       return null;
     }
 
     User? parseUser(dynamic v) {
       if (v == null) return null;
-      if (v is Map<String, dynamic>) {
+      if (v is Map) {
         try {
-          return User.fromJson(v);
+          return User.fromJson(Map<String, dynamic>.from(v));
         } catch (e) {
           return null;
         }
@@ -49,36 +63,85 @@ class Chauffeur {
       return null;
     }
 
-    // Essayer de récupérer l'utilisateur de différentes façons
-    User? user;
-    
-    // D'abord essayer la clé 'user'
-    if (json['user'] != null) {
-      user = parseUser(json['user']);
-    }
-    // Ensuite essayer 'user_id' avec les autres champs
-    else if (json['user_id'] != null || json['user'] != null) {
-      user = parseUser(json['user']);
+    Map<String, dynamic>? parseMap(dynamic v) {
+      if (v is Map) return Map<String, dynamic>.from(v);
+      return null;
     }
 
+    final nestedChauffeur = parseMap(json['chauffeur']);
+    final looksLikeUserPayload =
+        nestedChauffeur != null ||
+        (json.containsKey('role') &&
+            json.containsKey('email') &&
+            json.containsKey('id'));
+
+    if (looksLikeUserPayload) {
+      final userMap = parseMap(json['user']) ?? Map<String, dynamic>.from(json);
+      final chauffeurMap = nestedChauffeur ?? <String, dynamic>{};
+
+      final user = parseUser(userMap);
+      final camion = parseCamion(chauffeurMap['camion'] ?? json['camion']);
+      final parsedUserId = parseOptionalInt(
+        userMap['id'] ??
+            chauffeurMap['user_id'] ??
+            json['user_id'] ??
+            json['id_user'],
+      );
+      final parsedCamionId = parseOptionalInt(
+        chauffeurMap['id_camion'] ??
+            chauffeurMap['camion_id'] ??
+            json['id_camion'] ??
+            json['camion_id'],
+      );
+
+      return Chauffeur(
+        id: parseInt(userMap['id'] ?? json['id']),
+        chauffeurId: parseOptionalInt(
+          chauffeurMap['id_chauffeur'] ?? json['id_chauffeur'],
+        ),
+        userId: parsedUserId ?? user?.id,
+        user: user,
+        numTelephone: parseString(
+          chauffeurMap['num_telephone'] ?? json['num_telephone'],
+        ),
+        cni: parseString(chauffeurMap['cni'] ?? json['cni']),
+        permis: parseString(chauffeurMap['permis'] ?? json['permis']),
+        camionId: parsedCamionId ?? camion?.id,
+        camion: camion,
+      );
+    }
+
+    final user = parseUser(json['user']);
+    final camion = parseCamion(json['camion']);
+    final parsedUserId = parseOptionalInt(
+      json['user_id'] ?? json['id_user'] ?? user?.id,
+    );
+    final parsedCamionId = parseOptionalInt(
+      json['id_camion'] ?? json['camion_id'] ?? camion?.id,
+    );
+
     return Chauffeur(
-      id: parseInt(json['id_chauffeur']),
+      id: parseInt(json['id_chauffeur'] ?? json['id']),
+      chauffeurId: parseOptionalInt(json['id_chauffeur']),
+      userId: parsedUserId ?? user?.id,
       user: user,
       numTelephone: parseString(json['num_telephone']),
       cni: parseString(json['cni']),
       permis: parseString(json['permis']),
-      camion: parseCamion(json['camion']),
+      camionId: parsedCamionId ?? camion?.id,
+      camion: camion,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id_chauffeur': id,
-      'user_id': user?.id,
+      'id': id,
+      'user_id': userId ?? user?.id,
       'num_telephone': numTelephone,
       'cni': cni,
       'permis': permis,
-      'id_camion': camion?.id,
+      'id_camion': camionId ?? camion?.id,
     };
   }
 }

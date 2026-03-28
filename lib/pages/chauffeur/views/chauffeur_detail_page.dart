@@ -23,16 +23,21 @@ class ChauffeurDetailPage extends StatelessWidget {
         future: controller.getChauffeurDetails(chauffeurArg.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           final chauffeur = snapshot.data ?? chauffeurArg;
           final scheme = Theme.of(context).colorScheme;
+          final hasUserRelation = chauffeur.user != null;
+          final hasCamionRelation = chauffeur.camion != null;
+          final hasUserIdOnly = !hasUserRelation && chauffeur.userId != null;
+          final hasCamionIdOnly =
+              !hasCamionRelation && chauffeur.camionId != null;
 
           final userName = chauffeur.user != null
               ? chauffeur.user!.fullName
+              : hasUserIdOnly
+              ? 'Utilisateur #${chauffeur.userId}'
               : 'Chauffeur #${chauffeur.id}';
 
           return SingleChildScrollView(
@@ -48,24 +53,29 @@ class ChauffeurDetailPage extends StatelessWidget {
                       tooltip: 'Retour',
                       style: IconButton.styleFrom(
                         backgroundColor: scheme.surface,
-                        side: BorderSide(color: scheme.outline.withOpacity(0.2)),
+                        side: BorderSide(
+                          color: scheme.outline.withOpacity(0.2),
+                        ),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
                         userName,
-                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: scheme.primary,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: scheme.primary,
+                            ),
                       ),
                     ),
                     if (!isChauffeur)
                       Row(
                         children: [
                           IconButton(
-                            onPressed: () => Get.dialog(ChauffeurFormDialog(chauffeur: chauffeur)),
+                            onPressed: () => Get.dialog(
+                              ChauffeurFormDialog(chauffeur: chauffeur),
+                            ),
                             icon: const Icon(Icons.edit),
                             tooltip: 'Modifier',
                             style: IconButton.styleFrom(
@@ -75,7 +85,11 @@ class ChauffeurDetailPage extends StatelessWidget {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           IconButton(
-                            onPressed: () => _showDeleteDialog(context, chauffeur, controller),
+                            onPressed: () => _showDeleteDialog(
+                              context,
+                              chauffeur,
+                              controller,
+                            ),
                             icon: const Icon(Icons.delete),
                             tooltip: 'Supprimer',
                             style: IconButton.styleFrom(
@@ -98,7 +112,7 @@ class ChauffeurDetailPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                if (chauffeur.user != null)
+                if (hasUserRelation)
                   ModernCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,6 +154,20 @@ class ChauffeurDetailPage extends StatelessWidget {
                       ],
                     ),
                   )
+                else if (hasUserIdOnly)
+                  ModernCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _DetailRow(
+                          icon: Icons.badge,
+                          label: 'ID Utilisateur',
+                          value: '${chauffeur.userId}',
+                          scheme: scheme,
+                        ),
+                      ],
+                    ),
+                  )
                 else
                   ModernCard(
                     child: Center(
@@ -147,7 +175,11 @@ class ChauffeurDetailPage extends StatelessWidget {
                         padding: const EdgeInsets.all(AppSpacing.lg),
                         child: Column(
                           children: [
-                            Icon(Icons.person_off, size: 48, color: scheme.onSurfaceVariant),
+                            Icon(
+                              Icons.person_off,
+                              size: 48,
+                              color: scheme.onSurfaceVariant,
+                            ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
                               'Aucun utilisateur assigné',
@@ -199,7 +231,7 @@ class ChauffeurDetailPage extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xl),
 
                 // Camion Information Section
-                if (chauffeur.camion != null) ...[
+                if (hasCamionRelation) ...[
                   Text(
                     'Camion Assigné',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -242,14 +274,32 @@ class ChauffeurDetailPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                ] else
+                ] else if (hasCamionIdOnly)
+                  ModernCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _DetailRow(
+                          icon: Icons.local_shipping,
+                          label: 'ID Camion',
+                          value: '${chauffeur.camionId}',
+                          scheme: scheme,
+                        ),
+                      ],
+                    ),
+                  )
+                else
                   ModernCard(
                     child: Center(
                       child: Padding(
                         padding: const EdgeInsets.all(AppSpacing.lg),
                         child: Column(
                           children: [
-                            Icon(Icons.local_shipping, size: 48, color: scheme.onSurfaceVariant),
+                            Icon(
+                              Icons.local_shipping,
+                              size: 48,
+                              color: scheme.onSurfaceVariant,
+                            ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
                               'Aucun camion assigné',
@@ -268,16 +318,17 @@ class ChauffeurDetailPage extends StatelessWidget {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Chauffeur chauffeur, ChauffeurController controller) {
+  void _showDeleteDialog(
+    BuildContext context,
+    Chauffeur chauffeur,
+    ChauffeurController controller,
+  ) {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
         content: Text('Êtes-vous sûr de vouloir supprimer ce chauffeur ?'),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Annuler'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
           ElevatedButton(
             onPressed: () {
               controller.deleteChauffeur(chauffeur.id);
@@ -319,6 +370,7 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayValue = value.trim().isEmpty ? 'Non renseigne' : value;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       child: Row(
@@ -339,10 +391,10 @@ class _DetailRow extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: scheme.onSurface,
-              ),
+              displayValue,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: scheme.onSurface),
             ),
           ),
         ],
