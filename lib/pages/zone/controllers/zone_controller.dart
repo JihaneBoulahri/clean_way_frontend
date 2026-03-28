@@ -2,7 +2,7 @@ import 'package:clean_way_frontend/pages/zone/models/zone_model.dart';
 import 'package:get/get.dart';
 import '../../../core/services/zone_service.dart';
 import '../../../routes/app_routes.dart';
-import '../../../widgets/snackbar_helper.dart'; 
+import '../../../widgets/snackbar_helper.dart';
 
 class ZoneController extends GetxController {
   final ZoneService _service = ZoneService();
@@ -28,16 +28,29 @@ class ZoneController extends GetxController {
     fetchZones();
   }
 
+  String _friendlyErrorMessage(String raw) {
+    final lower = raw.toLowerCase();
+    if (lower.contains('zones.latitude') ||
+        lower.contains('constraint failed')) {
+      return "Échec d'ajout de zone: latitude/longitude rejetées par le serveur. Vérifiez la configuration API des champs de zone.";
+    }
+    if (lower.contains('server error (500)')) {
+      return "Le serveur a renvoyé une erreur lors de l'enregistrement de la zone.";
+    }
+    return raw;
+  }
+
   void _handleError(dynamic e, {bool showSnackbar = true}) {
     final errorMsg = e.toString();
     if (errorMsg.contains('401') || errorMsg.contains('Unauthorized')) {
       Get.offAllNamed(AppRoutes.login);
     } else {
       if (showSnackbar) {
-        
+        final friendly = _friendlyErrorMessage(errorMsg);
+
         showNadiSnackbar(
           title: "Erreur",
-          message: errorMsg,
+          message: friendly,
           type: NadiSnackbarType.error,
         );
       }
@@ -62,7 +75,7 @@ class ZoneController extends GetxController {
     try {
       final data = await _service.create(zone.toJson());
       zones.add(Zone.fromJson(data));
-    
+
       showNadiSnackbar(
         title: "Succès",
         message: "Zone ajoutée avec succès",
@@ -81,7 +94,7 @@ class ZoneController extends GetxController {
         final updatedZone = Zone.fromJson(data);
         zones[index] = updatedZone;
         zones.refresh();
-      
+
         showNadiSnackbar(
           title: "Succès",
           message: "Zone modifiée avec succès",
@@ -97,7 +110,7 @@ class ZoneController extends GetxController {
     try {
       await _service.delete(id);
       zones.removeWhere((z) => z.id == id);
-      
+
       showNadiSnackbar(
         title: "Succès",
         message: "Zone supprimée avec succès",

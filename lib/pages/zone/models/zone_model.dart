@@ -1,5 +1,5 @@
 class Zone {
-  final int id; 
+  final int id;
   final String nomZone;
   final String typeZone;
   final String latitude;
@@ -27,21 +27,24 @@ class Zone {
     }
 
     return Zone(
-      id: parseInt(json['id_zone']),
-      nomZone: parseString(json['nom_zone']),
-      typeZone: parseString(json['type_zone']),
-      latitude: parseString(json['latitude']),
-      longitude: parseString(json['longitude']),
+      id: parseInt(json['id_zone'] ?? json['id']),
+      nomZone: parseString(json['nom_zone'] ?? json['nom']),
+      typeZone: parseString(json['type_zone'] ?? json['type']),
+      latitude: parseString(json['latitude'] ?? json['lat']),
+      longitude: parseString(json['longitude'] ?? json['lng'] ?? json['long']),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id_zone': id,
+    final data = <String, dynamic>{
       'nom_zone': nomZone,
       'type_zone': typeZone,
       'latitude': latitude,
       'longitude': longitude,
     };
+    if (id > 0) {
+      data['id_zone'] = id;
+    }
+    return data;
   }
 }

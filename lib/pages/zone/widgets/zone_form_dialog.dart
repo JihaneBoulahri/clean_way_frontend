@@ -14,10 +14,7 @@ class ZoneFormDialog extends StatefulWidget {
 }
 
 class _ZoneFormDialogState extends State<ZoneFormDialog> {
-  static const List<String> _typeZoneOptions = [
-    'decharge',
-    'recyclage',
-  ];
+  static const List<String> _typeZoneOptions = ['decharge', 'recyclage'];
 
   final _formKey = GlobalKey<FormState>();
   bool _saving = false;
@@ -53,17 +50,23 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
     return null;
   }
 
+  String _normalizeCoordinateInput(String input) {
+    return input.trim().replaceAll(',', '.');
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
     final nomText = _nomController.text.trim();
     final typeText = (_selectedTypeZone ?? '').trim();
-    final latText = _latController.text.trim();
-    final longText = _longController.text.trim();
+    final latText = _normalizeCoordinateInput(_latController.text);
+    final longText = _normalizeCoordinateInput(_longController.text);
 
     // Validation stricte
-    if (nomText.isEmpty || typeText.isEmpty || latText.isEmpty || longText.isEmpty) {
-      
+    if (nomText.isEmpty ||
+        typeText.isEmpty ||
+        latText.isEmpty ||
+        longText.isEmpty) {
       showNadiSnackbar(
         title: "Erreur",
         message: "Tous les champs sont obligatoires",
@@ -75,7 +78,6 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
     final lat = double.tryParse(latText);
     final lng = double.tryParse(longText);
     if (lat == null || lng == null) {
-     
       showNadiSnackbar(
         title: "Erreur",
         message: "Latitude et Longitude doivent être des nombres valides",
@@ -90,13 +92,15 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
       Zone? result;
       if (widget.zone == null) {
         // Ajout
-        await controller.addZone(Zone(
-          id: 0,
-          nomZone: nomText,
-          typeZone: typeText,
-          latitude: latText,
-          longitude: longText,
-        ));
+        await controller.addZone(
+          Zone(
+            id: 0,
+            nomZone: nomText,
+            typeZone: typeText,
+            latitude: latText,
+            longitude: longText,
+          ),
+        );
       } else {
         // Modification
         result = Zone(
@@ -110,7 +114,6 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
       }
       if (mounted) Navigator.of(context).pop(result);
     } catch (e) {
-    
       showNadiSnackbar(
         title: "Erreur",
         message: e.toString(),
@@ -135,11 +138,12 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
               TextFormField(
                 controller: _nomController,
                 decoration: const InputDecoration(labelText: 'Nom zone'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedTypeZone,
+                initialValue: _selectedTypeZone,
                 decoration: const InputDecoration(labelText: 'Type zone'),
                 items: _typeZoneOptions
                     .map(
@@ -150,7 +154,8 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
                     )
                     .toList(),
                 onChanged: (value) => setState(() => _selectedTypeZone = value),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -159,7 +164,8 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Requis';
-                  if (double.tryParse(v.trim()) == null) return 'Doit être un nombre';
+                  if (double.tryParse(v.trim()) == null)
+                    return 'Doit être un nombre';
                   return null;
                 },
               ),
@@ -170,7 +176,8 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Requis';
-                  if (double.tryParse(v.trim()) == null) return 'Doit être un nombre';
+                  if (double.tryParse(v.trim()) == null)
+                    return 'Doit être un nombre';
                   return null;
                 },
               ),
