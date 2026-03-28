@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import '../../../capteur_model.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/services/capteur_service.dart';
 import '../models/benne_model.dart';
 import '../../../widgets/app_layout.dart';
 import '../../../widgets/modern_widgets.dart';
 import '../../../widgets/location_map_card.dart';
+import '../../../widgets/snackbar_helper.dart';
 import '../controllers/benne_controller.dart';
 import '../widgets/benne_form_dialog.dart';
 
@@ -34,9 +37,6 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
 
           final benne = snapshot.data ?? benneArg;
           final scheme = Theme.of(context).colorScheme;
-          final fillLevel = (benne.capteur?.niveauRemplissage ?? 0)
-              .clamp(0, 100)
-              .toDouble();
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -172,60 +172,11 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
-                ModernCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.sensors, color: scheme.primary),
-                          const SizedBox(width: AppSpacing.sm),
-                          Text(
-                            'Capteur et remplissage',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: scheme.primary,
-                                ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      _DetailRow(
-                        icon: Icons.memory,
-                        label: 'Type capteur',
-                        value: benne.capteur?.typeCapteur ?? 'Non disponible',
-                        scheme: scheme,
-                      ),
-                      const Divider(),
-                      _DetailRow(
-                        icon: Icons.info_outline,
-                        label: 'Status capteur',
-                        value: benne.capteur?.status ?? 'Non disponible',
-                        scheme: scheme,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: fillLevel / 100,
-                          minHeight: 10,
-                          backgroundColor: Colors.grey.shade200,
-                          valueColor: AlwaysStoppedAnimation(
-                            _statusColor(fillLevel),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        'Niveau de remplissage: ${fillLevel.toInt()}% (${_statusText(fillLevel)})',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: _statusColor(fillLevel),
-                        ),
-                      ),
-                    ],
-                  ),
+                _buildCapteursSection(
+                  context: context,
+                  scheme: scheme,
+                  benne: benne,
+                  isChauffeur: isChauffeur,
                 ),
               ],
             ),
@@ -273,6 +224,446 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
     if (fillLevel >= 90) return 'Critical';
     if (fillLevel >= 70) return 'Warning';
     return 'Normal';
+  }
+
+  Widget _buildCapteursSection({
+    required BuildContext context,
+    required ColorScheme scheme,
+    required Benne benne,
+    required bool isChauffeur,
+  }) {
+    return ModernCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.sensors, color: scheme.primary),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'Capteurs liés à la benne',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: scheme.primary,
+                  ),
+                ),
+              ),
+              if (!isChauffeur)
+                FilledButton.icon(
+                  onPressed: () async {
+                    await _openAddCapteurDialog(context, benne.id);
+                    if (mounted) setState(() {});
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Ajouter Capteur'),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          FutureBuilder<List<Capteur>>(
+            future: _fetchCapteursForBenne(benne),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (snapshot.hasError) {
+                return Text(
+                  'Erreur chargement capteurs: ${snapshot.error}',
+                  style: TextStyle(color: scheme.error),
+                );
+              }
+
+              final capteurs = snapshot.data ?? const [];
+              if (capteurs.isEmpty) {
+                return Text(
+                  'Aucun capteur lié à cette benne',
+                  style: TextStyle(color: scheme.onSurfaceVariant),
+                );
+              }
+
+              return Column(
+                children: List.generate(capteurs.length, (index) {
+                  final capteur = capteurs[index];
+                  final fillLevel = capteur.niveauRemplissage
+                      .clamp(0, 100)
+                      .toDouble();
+                  final installationDate = capteur.dateInstallation == null
+                      ? 'Non disponible'
+                      : _formatDate(capteur.dateInstallation!);
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (index > 0) const Divider(height: AppSpacing.xl),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Capteur #${capteur.id}',
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: scheme.primary,
+                                  ),
+                            ),
+                          ),
+                          if (!isChauffeur)
+                            Row(
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: () async {
+                                    await _openAddCapteurDialog(
+                                      context,
+                                      benne.id,
+                                      existingCapteur: capteur,
+                                    );
+                                    if (mounted) setState(() {});
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                  label: const Text('Modifier'),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                OutlinedButton.icon(
+                                  onPressed: () => _deleteCapteurWithConfirm(
+                                    context,
+                                    capteur,
+                                  ),
+                                  icon: const Icon(Icons.delete),
+                                  label: const Text('Supprimer'),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.red.shade700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      _DetailRow(
+                        icon: Icons.memory,
+                        label: 'Type capteur',
+                        value: capteur.typeCapteur,
+                        scheme: scheme,
+                      ),
+                      const Divider(),
+                      _DetailRow(
+                        icon: Icons.info_outline,
+                        label: 'Statut',
+                        value: capteur.status,
+                        scheme: scheme,
+                      ),
+                      const Divider(),
+                      _DetailRow(
+                        icon: Icons.calendar_today,
+                        label: 'Date installation',
+                        value: installationDate,
+                        scheme: scheme,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: fillLevel / 100,
+                          minHeight: 10,
+                          backgroundColor: Colors.grey.shade200,
+                          valueColor: AlwaysStoppedAnimation(
+                            _statusColor(fillLevel),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Niveau de remplissage: ${fillLevel.toInt()}% (${_statusText(fillLevel)})',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: _statusColor(fillLevel),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<List<Capteur>> _fetchCapteursForBenne(Benne benne) async {
+    if (benne.capteurs.isNotEmpty) {
+      return benne.capteurs;
+    }
+    if (benne.capteur != null) {
+      return [benne.capteur!];
+    }
+
+    final raw = await CapteurService.getCapteursByBenne(benne.id);
+    final rows = _extractList(raw);
+    return rows
+        .whereType<Map>()
+        .map((e) => Capteur.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
+  }
+
+  List<dynamic> _extractList(dynamic response) {
+    if (response is List) {
+      return response;
+    }
+    if (response is Map) {
+      final map = Map<String, dynamic>.from(response);
+      final data = map['data'];
+      if (data is List) {
+        return data;
+      }
+    }
+    return const [];
+  }
+
+  Future<void> _openAddCapteurDialog(
+    BuildContext context,
+    int benneId, {
+    Capteur? existingCapteur,
+  }) async {
+    const typeOptions = [
+      'niveau',
+      'temperature',
+      'gaz',
+      'humidite',
+      'pression',
+    ];
+    const statusOptions = ['actif', 'inactif', 'panne', 'maintenance'];
+    final formKey = GlobalKey<FormState>();
+    final isEdit = existingCapteur != null;
+    final niveauController = TextEditingController(
+      text: (existingCapteur?.niveauRemplissage ?? 0).toString(),
+    );
+    DateTime selectedDate = existingCapteur?.dateInstallation ?? DateTime.now();
+    String selectedType = typeOptions.contains(existingCapteur?.typeCapteur)
+        ? existingCapteur!.typeCapteur
+        : typeOptions.first;
+    String selectedStatus = statusOptions.contains(existingCapteur?.status)
+        ? existingCapteur!.status
+        : statusOptions.first;
+    bool saving = false;
+
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            Future<void> pickDate() async {
+              final picked = await showDatePicker(
+                context: dialogContext,
+                initialDate: selectedDate,
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (picked != null) {
+                setDialogState(() => selectedDate = picked);
+              }
+            }
+
+            return AlertDialog(
+              title: Text(isEdit ? 'Modifier Capteur' : 'Ajouter Capteur'),
+              content: Form(
+                key: formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedType,
+                        decoration: const InputDecoration(
+                          labelText: 'Type capteur',
+                        ),
+                        items: typeOptions
+                            .map(
+                              (type) => DropdownMenuItem<String>(
+                                value: type,
+                                child: Text(type),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() => selectedType = value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedStatus,
+                        decoration: const InputDecoration(labelText: 'Statut'),
+                        items: statusOptions
+                            .map(
+                              (status) => DropdownMenuItem<String>(
+                                value: status,
+                                child: Text(status),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() => selectedStatus = value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: niveauController,
+                        decoration: const InputDecoration(
+                          labelText: 'Niveau remplissage (%)',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        validator: (v) {
+                          final raw = (v ?? '').trim().replaceAll(',', '.');
+                          if (raw.isEmpty) return 'Requis';
+                          final parsed = double.tryParse(raw);
+                          if (parsed == null) return 'Doit être un nombre';
+                          if (parsed < 0 || parsed > 100) {
+                            return 'Doit être entre 0 et 100';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Date installation'),
+                        subtitle: Text(_formatDate(selectedDate)),
+                        trailing: const Icon(Icons.calendar_month),
+                        onTap: pickDate,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(false),
+                  child: const Text('Annuler'),
+                ),
+                FilledButton(
+                  onPressed: saving
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) return;
+                          final niveau = double.parse(
+                            niveauController.text.trim().replaceAll(',', '.'),
+                          );
+                          setDialogState(() => saving = true);
+                          try {
+                            final payload = {
+                              'type_capteur': selectedType,
+                              'status': selectedStatus,
+                              'date_installation': _formatDate(selectedDate),
+                              'id_benne': benneId,
+                              'niveau_remplissage': niveau,
+                            };
+
+                            if (isEdit) {
+                              await CapteurService.update(
+                                existingCapteur.id,
+                                payload,
+                              );
+                            } else {
+                              await CapteurService.create(payload);
+                            }
+                            if (dialogContext.mounted) {
+                              Navigator.of(dialogContext).pop(true);
+                            }
+                          } catch (e) {
+                            showNadiSnackbar(
+                              title: 'Erreur',
+                              message: e.toString(),
+                              type: NadiSnackbarType.error,
+                            );
+                            if (dialogContext.mounted) {
+                              setDialogState(() => saving = false);
+                            }
+                          }
+                        },
+                  child: saving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(isEdit ? 'Modifier' : 'Ajouter'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    niveauController.dispose();
+
+    if (created == true) {
+      showNadiSnackbar(
+        title: 'Succès',
+        message: isEdit
+            ? 'Capteur modifié avec succès'
+            : 'Capteur ajouté avec succès',
+        type: NadiSnackbarType.success,
+      );
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    String pad(int n) => n.toString().padLeft(2, '0');
+    return '${date.year}-${pad(date.month)}-${pad(date.day)}';
+  }
+
+  Future<void> _deleteCapteurWithConfirm(
+    BuildContext context,
+    Capteur capteur,
+  ) async {
+    final confirm = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Supprimer le capteur'),
+        content: Text('Voulez-vous supprimer le capteur #${capteur.id} ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await CapteurService.delete(capteur.id);
+      if (mounted) setState(() {});
+      showNadiSnackbar(
+        title: 'Succès',
+        message: 'Capteur supprimé avec succès',
+        type: NadiSnackbarType.success,
+      );
+    } catch (e) {
+      showNadiSnackbar(
+        title: 'Erreur',
+        message: e.toString(),
+        type: NadiSnackbarType.error,
+      );
+    }
   }
 
   bool _isChauffeur() {

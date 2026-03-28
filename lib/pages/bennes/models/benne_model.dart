@@ -8,6 +8,7 @@ class Benne {
   final String latitude;
   final String longitude;
   final Capteur? capteur;
+  final List<Capteur> capteurs;
 
   Benne({
     required this.id,
@@ -17,6 +18,7 @@ class Benne {
     required this.latitude,
     required this.longitude,
     this.capteur,
+    this.capteurs = const [],
   });
 
   factory Benne.fromJson(Map<String, dynamic> json) {
@@ -39,14 +41,33 @@ class Benne {
       if (raw is List && raw.isNotEmpty) {
         final first = raw.first;
         if (first is Map<String, dynamic>) return Capteur.fromJson(first);
-        if (first is Map)
+        if (first is Map) {
           return Capteur.fromJson(Map<String, dynamic>.from(first));
+        }
         return null;
       }
       if (raw is Map<String, dynamic>) return Capteur.fromJson(raw);
       if (raw is Map) return Capteur.fromJson(Map<String, dynamic>.from(raw));
       return null;
     }
+
+    List<Capteur> parseCapteurs(dynamic raw) {
+      if (raw == null) return const [];
+      if (raw is List) {
+        return raw
+            .whereType<Map>()
+            .map((item) => Capteur.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+      }
+      if (raw is Map<String, dynamic>) return [Capteur.fromJson(raw)];
+      if (raw is Map) return [Capteur.fromJson(Map<String, dynamic>.from(raw))];
+      return const [];
+    }
+
+    final parsedCapteurs = parseCapteurs(json['capteurs'] ?? json['capteur']);
+    final parsedCapteur = parsedCapteurs.isNotEmpty
+        ? parsedCapteurs.first
+        : parseCapteur(json['capteur'] ?? json['capteurs']);
 
     return Benne(
       id: toInt(json['id_benne'] ?? json['id']),
@@ -55,7 +76,8 @@ class Benne {
       capacite: toDouble(json['capacite']),
       latitude: (json['latitude'] ?? '').toString(),
       longitude: (json['longitude'] ?? '').toString(),
-      capteur: parseCapteur(json['capteur'] ?? json['capteurs']),
+      capteur: parsedCapteur,
+      capteurs: parsedCapteurs,
     );
   }
 
@@ -68,6 +90,7 @@ class Benne {
       'latitude': latitude,
       'longitude': longitude,
       'capteur': capteur?.toJson(),
+      'capteurs': capteurs.map((c) => c.toJson()).toList(),
     };
   }
 }
