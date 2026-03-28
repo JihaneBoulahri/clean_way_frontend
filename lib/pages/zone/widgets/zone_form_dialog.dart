@@ -14,36 +14,50 @@ class ZoneFormDialog extends StatefulWidget {
 }
 
 class _ZoneFormDialogState extends State<ZoneFormDialog> {
+  static const List<String> _typeZoneOptions = [
+    'decharge',
+    'recyclage',
+  ];
+
   final _formKey = GlobalKey<FormState>();
   bool _saving = false;
   late final TextEditingController _nomController;
-  late final TextEditingController _typeController;
   late final TextEditingController _latController;
   late final TextEditingController _longController;
+  String? _selectedTypeZone;
 
   @override
   void initState() {
     super.initState();
     _nomController = TextEditingController(text: widget.zone?.nomZone ?? '');
-    _typeController = TextEditingController(text: widget.zone?.typeZone ?? '');
     _latController = TextEditingController(text: widget.zone?.latitude ?? '');
     _longController = TextEditingController(text: widget.zone?.longitude ?? '');
+    _selectedTypeZone = _normalizeTypeZone(widget.zone?.typeZone);
   }
 
   @override
   void dispose() {
     _nomController.dispose();
-    _typeController.dispose();
     _latController.dispose();
     _longController.dispose();
     super.dispose();
+  }
+
+  String? _normalizeTypeZone(String? rawType) {
+    final value = (rawType ?? '').trim().toLowerCase();
+    if (value.isEmpty) return null;
+    final compact = value.replaceAll('_', '').replaceAll('-', '');
+    if (compact.contains('decharge')) return 'decharge';
+    if (compact.contains('recyclage')) return 'recyclage';
+    if (_typeZoneOptions.contains(value)) return value;
+    return null;
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
     final nomText = _nomController.text.trim();
-    final typeText = _typeController.text.trim();
+    final typeText = (_selectedTypeZone ?? '').trim();
     final latText = _latController.text.trim();
     final longText = _longController.text.trim();
 
@@ -124,9 +138,18 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                controller: _typeController,
+              DropdownButtonFormField<String>(
+                value: _selectedTypeZone,
                 decoration: const InputDecoration(labelText: 'Type zone'),
+                items: _typeZoneOptions
+                    .map(
+                      (type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) => setState(() => _selectedTypeZone = value),
                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
               ),
               const SizedBox(height: 12),

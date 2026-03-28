@@ -3,15 +3,16 @@ import '../../../capteur_model.dart';
 class Benne {
   final int id;
   final String typeBenne;
+  final String status;
   final double capacite;
   final String latitude;
   final String longitude;
   final Capteur? capteur;
 
-
   Benne({
     required this.id,
     required this.typeBenne,
+    required this.status,
     required this.capacite,
     required this.latitude,
     required this.longitude,
@@ -38,7 +39,8 @@ class Benne {
       if (raw is List && raw.isNotEmpty) {
         final first = raw.first;
         if (first is Map<String, dynamic>) return Capteur.fromJson(first);
-        if (first is Map) return Capteur.fromJson(Map<String, dynamic>.from(first));
+        if (first is Map)
+          return Capteur.fromJson(Map<String, dynamic>.from(first));
         return null;
       }
       if (raw is Map<String, dynamic>) return Capteur.fromJson(raw);
@@ -49,6 +51,7 @@ class Benne {
     return Benne(
       id: toInt(json['id_benne'] ?? json['id']),
       typeBenne: (json['type_benne'] ?? json['typeBenne'] ?? '').toString(),
+      status: (json['status'] ?? json['etat'] ?? '').toString(),
       capacite: toDouble(json['capacite']),
       latitude: (json['latitude'] ?? '').toString(),
       longitude: (json['longitude'] ?? '').toString(),
@@ -60,6 +63,7 @@ class Benne {
     return {
       'id_benne': id,
       'type_benne': typeBenne,
+      'status': status,
       'capacite': capacite,
       'latitude': latitude,
       'longitude': longitude,
