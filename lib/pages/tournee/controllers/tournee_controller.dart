@@ -32,7 +32,6 @@ class TourneeController extends GetxController {
     } else if (errorMsg.contains('404') || errorMsg.contains('Not Found')) {
       fetchTournees();
       if (showSnackbar) {
-     
         showNadiSnackbar(
           title: "Info",
           message: "L'élément a été supprimé ailleurs",
@@ -41,7 +40,6 @@ class TourneeController extends GetxController {
       }
     } else {
       if (showSnackbar) {
-      
         showNadiSnackbar(
           title: "Erreur",
           message: errorMsg,
@@ -51,7 +49,7 @@ class TourneeController extends GetxController {
     }
   }
 
-  void fetchTournees() async {
+  Future<void> fetchTournees() async {
     try {
       isLoading(true);
       final data = await _service.getAll();
@@ -67,7 +65,8 @@ class TourneeController extends GetxController {
     try {
       final data = await _service.create(tournee.toJson());
       tournees.add(Tournee.fromJson(data));
-     
+      await fetchTournees();
+
       showNadiSnackbar(
         title: "Succès",
         message: "Tournée ajoutée avec succès",
@@ -84,7 +83,8 @@ class TourneeController extends GetxController {
       int index = tournees.indexWhere((t) => t.id == tournee.id);
       if (index != -1) {
         tournees[index] = Tournee.fromJson(data);
-     
+        await fetchTournees();
+
         showNadiSnackbar(
           title: "Succès",
           message: "Tournée modifiée avec succès",
@@ -100,7 +100,7 @@ class TourneeController extends GetxController {
     try {
       await _service.delete(id);
       tournees.removeWhere((t) => t.id == id);
-     
+
       showNadiSnackbar(
         title: "Succès",
         message: "Tournée supprimée avec succès",

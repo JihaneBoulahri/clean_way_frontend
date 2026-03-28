@@ -6,10 +6,7 @@ import '../../../routes/app_routes.dart';
 class TourneeCard extends StatelessWidget {
   final Tournee tournee;
 
-  const TourneeCard({
-    super.key,
-    required this.tournee,
-  });
+  const TourneeCard({super.key, required this.tournee});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +15,16 @@ class TourneeCard extends StatelessWidget {
     final dateText = tournee.dateTournee.toString().split(' ').first;
     final zoneLabel = (tournee.zone?.nomZone ?? '').trim();
     final camionLabel = (tournee.camion?.immatriculation ?? '').trim();
+    final zoneText = zoneLabel.isNotEmpty
+        ? 'Zone: $zoneLabel'
+        : (tournee.idZone != null
+              ? 'Zone: #${tournee.idZone}'
+              : 'Zone: Non assignee');
+    final camionText = camionLabel.isNotEmpty
+        ? 'Camion: $camionLabel'
+        : (tournee.idCamion != null
+              ? 'Camion: #${tournee.idCamion}'
+              : 'Camion: Non assigne');
 
     return Card(
       margin: EdgeInsets.zero,
@@ -38,11 +45,7 @@ class TourneeCard extends StatelessWidget {
                   color: statusColor.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(18),
                 ),
-                child: Icon(
-                  Icons.route_rounded,
-                  color: statusColor,
-                  size: 28,
-                ),
+                child: Icon(Icons.route_rounded, color: statusColor, size: 28),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -62,16 +65,24 @@ class TourneeCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        _StatusChip(status: _statusLabel(tournee.status), color: statusColor),
+                        _StatusChip(
+                          status: _statusLabel(tournee.status),
+                          color: statusColor,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: scheme.primaryContainer.withValues(alpha: 0.7),
+                            color: scheme.primaryContainer.withValues(
+                              alpha: 0.7,
+                            ),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
@@ -107,7 +118,7 @@ class TourneeCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      zoneLabel.isEmpty ? 'Zone: Non assignee' : 'Zone: $zoneLabel',
+                      zoneText,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -118,7 +129,7 @@ class TourneeCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      camionLabel.isEmpty ? 'Camion: Non assigne' : 'Camion: $camionLabel',
+                      camionText,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

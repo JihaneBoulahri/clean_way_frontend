@@ -47,10 +47,15 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
     );
     _selectedStatus = _normalizeStatus(widget.tournee?.status);
     _idCamionController = TextEditingController(
-      text: widget.tournee?.camion?.id.toString() ?? '',
+      text:
+          (widget.tournee?.idCamion ?? widget.tournee?.camion?.id)
+              ?.toString() ??
+          '',
     );
     _idZoneController = TextEditingController(
-      text: widget.tournee?.zone?.id.toString() ?? '',
+      text:
+          (widget.tournee?.idZone ?? widget.tournee?.zone?.id)?.toString() ??
+          '',
     );
   }
 
@@ -200,6 +205,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.tournee != null;
+    final isCreate = !isEdit;
     return AlertDialog(
       title: Text(isEdit ? 'Modifier la tournée' : 'Ajouter une tournée'),
       content: SingleChildScrollView(
@@ -265,12 +271,14 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _idCamionController,
-                decoration: const InputDecoration(
-                  labelText: 'ID camion (optionnel)',
+                decoration: InputDecoration(
+                  labelText: isCreate ? 'ID camion' : 'ID camion (optionnel)',
                 ),
                 keyboardType: TextInputType.number,
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return null;
+                  if (v == null || v.trim().isEmpty) {
+                    return isCreate ? 'Requis' : null;
+                  }
                   if (int.tryParse(v.trim()) == null)
                     return 'Doit être un entier';
                   return null;
@@ -279,12 +287,14 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _idZoneController,
-                decoration: const InputDecoration(
-                  labelText: 'ID zone (optionnel)',
+                decoration: InputDecoration(
+                  labelText: isCreate ? 'ID zone' : 'ID zone (optionnel)',
                 ),
                 keyboardType: TextInputType.number,
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return null;
+                  if (v == null || v.trim().isEmpty) {
+                    return isCreate ? 'Requis' : null;
+                  }
                   if (int.tryParse(v.trim()) == null)
                     return 'Doit être un entier';
                   return null;
