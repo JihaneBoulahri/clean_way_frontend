@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import '../models/benne_model.dart';
 import '../controllers/benne_controller.dart';
 import '../../../widgets/snackbar_helper.dart';
@@ -68,6 +70,94 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
     return _statusOptions.contains(value) ? value : null;
   }
 
+  String _normalizeCoordinateInput(String input) {
+    return input.trim().replaceAll(',', '.');
+  }
+
+  LatLng? _parseLatLngFromInputs() {
+    final lat = double.tryParse(_normalizeCoordinateInput(_latController.text));
+    final lng = double.tryParse(
+      _normalizeCoordinateInput(_longController.text),
+    );
+    if (lat == null || lng == null) return null;
+    return LatLng(lat, lng);
+  }
+
+  void _applyPickedPoint(LatLng point) {
+    _latController.text = point.latitude.toStringAsFixed(6);
+    _longController.text = point.longitude.toStringAsFixed(6);
+  }
+
+  Future<void> _openMapPicker() async {
+    final initialPoint =
+        _parseLatLngFromInputs() ?? const LatLng(33.573110, -7.589843);
+
+    final pickedPoint = await showDialog<LatLng>(
+      context: context,
+      builder: (context) {
+        var selectedPoint = initialPoint;
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text('Choisir la position sur la carte'),
+              content: SizedBox(
+                width: 420,
+                height: 360,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: FlutterMap(
+                    options: MapOptions(
+                      initialCenter: selectedPoint,
+                      initialZoom: 13,
+                      onTap: (_, point) {
+                        setStateDialog(() => selectedPoint = point);
+                      },
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'clean_way_frontend',
+                      ),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            width: 40,
+                            height: 40,
+                            point: selectedPoint,
+                            child: const Icon(
+                              Icons.location_pin,
+                              size: 36,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Annuler'),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.of(context).pop(selectedPoint),
+                  child: const Text('Utiliser cette position'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (pickedPoint != null && mounted) {
+      setState(() => _applyPickedPoint(pickedPoint));
+    }
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -84,13 +174,16 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
     setState(() => _saving = true);
     final controller = Get.find<BennesController>();
     try {
+      final latitude = _normalizeCoordinateInput(_latController.text);
+      final longitude = _normalizeCoordinateInput(_longController.text);
+
       final payload = Benne(
         id: widget.benne?.id ?? 0,
         typeBenne: _selectedType!,
         status: _selectedStatus!,
         capacite: cap,
-        latitude: _latController.text.trim(),
-        longitude: _longController.text.trim(),
+        latitude: latitude,
+        longitude: longitude,
       );
 
       if (widget.benne == null) {
@@ -163,9 +256,12 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
                   decimal: true,
                 ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Requis';
-                  if (double.tryParse(v.trim()) == null)
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Requis';
+                  }
+                  if (double.tryParse(_normalizeCoordinateInput(v)) == null) {
                     return 'Doit être un nombre';
+                  }
                   return null;
                 },
               ),
@@ -177,11 +273,23 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
                   decimal: true,
                 ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Requis';
-                  if (double.tryParse(v.trim()) == null)
+                  if (v == null || v.trim().isEmpty) {
+                    return 'Requis';
+                  }
+                  if (double.tryParse(_normalizeCoordinateInput(v)) == null) {
                     return 'Doit être un nombre';
+                  }
                   return null;
                 },
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _openMapPicker,
+                  icon: const Icon(Icons.map_outlined),
+                  label: const Text('Choisir la position avec la carte'),
+                ),
               ),
             ],
           ),
