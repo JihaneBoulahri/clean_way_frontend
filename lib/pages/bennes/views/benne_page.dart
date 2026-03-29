@@ -1,11 +1,14 @@
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
+import 'package:clean_way_frontend/core/services/capteur_service.dart';
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import '../../../widgets/snackbar_helper.dart';
 import '../controllers/benne_controller.dart';
+import '../models/benne_model.dart';
 import '../widgets/benne_card.dart';
 import '../widgets/benne_form_dialog.dart';
 
@@ -19,12 +22,29 @@ class BennesPage extends GetView<BennesController> {
       pageName: "Bennes",
       floatingActionButton: isChauffeur
           ? null
-          : FloatingActionButton.extended(
-              onPressed: () => Get.dialog(const BenneFormDialog()),
-              icon: const Icon(Icons.add),
-              label: const Text('Ajouter une benne'),
-              backgroundColor: AppTheme.accentColor,
-              foregroundColor: AppTheme.textLight,
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton.extended(
+                  onPressed: () => Get.dialog(const BenneFormDialog()),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Ajouter une benne'),
+                  backgroundColor: AppTheme.accentColor,
+                  foregroundColor: AppTheme.textLight,
+                ),
+                const SizedBox(height: 12),
+                FloatingActionButton.extended(
+                  onPressed: () => _openAddCapteurDialog(
+                    context,
+                    onAdded: controller.fetchBennes,
+                  ),
+                  icon: const Icon(Icons.sensors),
+                  label: const Text('Ajouter capteur'),
+                  backgroundColor: Colors.teal.shade600,
+                  foregroundColor: Colors.white,
+                ),
+              ],
             ),
       child: Column(
         children: [
@@ -39,9 +59,7 @@ class BennesPage extends GetView<BennesController> {
             child: Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
-                  child: CircularProgressIndicator(
-                    color: AppTheme.accentColor,
-                  ),
+                  child: CircularProgressIndicator(color: AppTheme.accentColor),
                 );
               }
               if (controller.bennes.isEmpty) {
@@ -99,5 +117,221 @@ class BennesPage extends GetView<BennesController> {
       return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
     }
     return false;
+  }
+
+  Future<void> _openAddCapteurDialog(
+    BuildContext context, {
+    int? benneId,
+    VoidCallback? onAdded,
+  }) async {
+    final bennes = List<Benne>.from(Get.find<BennesController>().bennes);
+    if (benneId == null && bennes.isEmpty) {
+      showNadiSnackbar(
+        title: 'Info',
+        message: 'Ajoutez d’abord une benne avant de créer un capteur',
+        type: NadiSnackbarType.info,
+      );
+      return;
+    }
+
+    const typeOptions = [
+      'niveau',
+      'temperature',
+      'gaz',
+      'humidite',
+      'pression',
+    ];
+    const statusOptions = ['actif', 'inactif', 'panne', 'maintenance'];
+    final formKey = GlobalKey<FormState>();
+    final niveauController = TextEditingController(text: '0');
+    DateTime selectedDate = DateTime.now();
+    int selectedBenneId = benneId ?? bennes.first.id;
+    String selectedType = typeOptions.first;
+    String selectedStatus = statusOptions.first;
+    bool saving = false;
+
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            Future<void> pickDate() async {
+              final picked = await showDatePicker(
+                context: dialogContext,
+                initialDate: selectedDate,
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+              );
+              if (picked != null) {
+                setDialogState(() => selectedDate = picked);
+              }
+            }
+
+            return AlertDialog(
+              title: const Text('Ajouter Capteur'),
+              content: Form(
+                key: formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (benneId == null) ...[
+                        DropdownButtonFormField<int>(
+                          initialValue: selectedBenneId,
+                          decoration: const InputDecoration(labelText: 'Benne'),
+                          items: bennes
+                              .map(
+                                (b) => DropdownMenuItem<int>(
+                                  value: b.id,
+                                  child: Text(
+                                    'Benne #${b.id} - ${b.typeBenne}',
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setDialogState(() => selectedBenneId = value);
+                            }
+                          },
+                          validator: (value) => value == null ? 'Requis' : null,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedType,
+                        decoration: const InputDecoration(
+                          labelText: 'Type capteur',
+                        ),
+                        items: typeOptions
+                            .map(
+                              (type) => DropdownMenuItem<String>(
+                                value: type,
+                                child: Text(type),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() => selectedType = value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedStatus,
+                        decoration: const InputDecoration(labelText: 'Statut'),
+                        items: statusOptions
+                            .map(
+                              (status) => DropdownMenuItem<String>(
+                                value: status,
+                                child: Text(status),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() => selectedStatus = value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: niveauController,
+                        decoration: const InputDecoration(
+                          labelText: 'Niveau remplissage (%)',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        validator: (v) {
+                          final raw = (v ?? '').trim().replaceAll(',', '.');
+                          if (raw.isEmpty) return 'Requis';
+                          final parsed = double.tryParse(raw);
+                          if (parsed == null) return 'Doit être un nombre';
+                          if (parsed < 0 || parsed > 100) {
+                            return 'Doit être entre 0 et 100';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Date installation'),
+                        subtitle: Text(_formatDate(selectedDate)),
+                        trailing: const Icon(Icons.calendar_month),
+                        onTap: pickDate,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(false),
+                  child: const Text('Annuler'),
+                ),
+                FilledButton(
+                  onPressed: saving
+                      ? null
+                      : () async {
+                          if (!formKey.currentState!.validate()) return;
+                          final niveau = double.parse(
+                            niveauController.text.trim().replaceAll(',', '.'),
+                          );
+                          setDialogState(() => saving = true);
+                          try {
+                            await CapteurService.create({
+                              'type_capteur': selectedType,
+                              'status': selectedStatus,
+                              'date_installation': _formatDate(selectedDate),
+                              'id_benne': selectedBenneId,
+                              'niveau_remplissage': niveau,
+                            });
+                            if (dialogContext.mounted) {
+                              Navigator.of(dialogContext).pop(true);
+                            }
+                          } catch (e) {
+                            showNadiSnackbar(
+                              title: 'Erreur',
+                              message: e.toString(),
+                              type: NadiSnackbarType.error,
+                            );
+                            if (dialogContext.mounted) {
+                              setDialogState(() => saving = false);
+                            }
+                          }
+                        },
+                  child: saving
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Ajouter'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    niveauController.dispose();
+
+    if (created == true) {
+      showNadiSnackbar(
+        title: 'Succès',
+        message: 'Capteur ajouté avec succès',
+        type: NadiSnackbarType.success,
+      );
+      onAdded?.call();
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    String pad(int n) => n.toString().padLeft(2, '0');
+    return '${date.year}-${pad(date.month)}-${pad(date.day)}';
   }
 }

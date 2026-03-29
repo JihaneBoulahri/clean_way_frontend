@@ -8,7 +8,7 @@ import 'sidebar.dart';
 class AppLayout extends StatefulWidget {
   final Widget child;
   final String pageName;
-  final FloatingActionButton? floatingActionButton;
+  final Widget? floatingActionButton;
 
   const AppLayout({
     super.key,
@@ -29,21 +29,21 @@ class _AppLayoutState extends State<AppLayout> {
   }
 
   void handleNavigation(String route) {
-  if (route == 'logout') {
-    GetStorage().erase();
-    Get.offAllNamed(AppRoutes.login);
-    return;
-  }
-  
-  if (route == AppRoutes.login) {
-    GetStorage().erase();
-    Get.offAllNamed(AppRoutes.login);
-    return;
-  }
+    if (route == 'logout') {
+      GetStorage().erase();
+      Get.offAllNamed(AppRoutes.login);
+      return;
+    }
 
-  toggleSidebar();
-  Get.toNamed(route);
-}
+    if (route == AppRoutes.login) {
+      GetStorage().erase();
+      Get.offAllNamed(AppRoutes.login);
+      return;
+    }
+
+    toggleSidebar();
+    Get.toNamed(route);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,6 @@ class _AppLayoutState extends State<AppLayout> {
       body: SafeArea(
         child: Stack(
           children: [
-
             /// 🔹 Main Content
             Column(
               children: [
@@ -79,9 +78,7 @@ class _AppLayoutState extends State<AppLayout> {
                   pageName: widget.pageName,
                   onMenuPressed: toggleSidebar,
                 ),
-                Expanded(
-                  child: widget.child,
-                ),
+                Expanded(child: widget.child),
               ],
             ),
 
@@ -90,9 +87,7 @@ class _AppLayoutState extends State<AppLayout> {
               Positioned.fill(
                 child: GestureDetector(
                   onTap: toggleSidebar,
-                  child: Container(
-                    color: scheme.scrim.withValues(alpha: 0.28),
-                  ),
+                  child: Container(color: scheme.scrim.withValues(alpha: 0.28)),
                 ),
               ),
 

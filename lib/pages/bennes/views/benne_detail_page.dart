@@ -250,15 +250,6 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                   ),
                 ),
               ),
-              if (!isChauffeur)
-                FilledButton.icon(
-                  onPressed: () async {
-                    await _openAddCapteurDialog(context, benne.id);
-                    if (mounted) setState(() {});
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Ajouter Capteur'),
-                ),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),

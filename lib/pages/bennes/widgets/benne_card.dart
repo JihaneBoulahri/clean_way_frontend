@@ -7,6 +7,7 @@ class BenneCard extends StatelessWidget {
   final Benne benne;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final VoidCallback? onAddCapteur;
   final bool showActions;
 
   const BenneCard({
@@ -14,6 +15,7 @@ class BenneCard extends StatelessWidget {
     required this.benne,
     required this.onDelete,
     required this.onEdit,
+    this.onAddCapteur,
     this.showActions = true,
   });
 
@@ -32,8 +34,9 @@ class BenneCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final fillLevel =
-        (benne.capteur?.niveauRemplissage ?? 0).clamp(0, 100).toDouble();
+    final fillLevel = (benne.capteur?.niveauRemplissage ?? 0)
+        .clamp(0, 100)
+        .toDouble();
     final statusColor = _getStatusColor(fillLevel);
 
     return Card(
@@ -82,13 +85,19 @@ class BenneCard extends StatelessWidget {
                             onSelected: (value) {
                               if (value == 'edit') onEdit();
                               if (value == 'delete') onDelete();
+                              if (value == 'add_capteur') onAddCapteur?.call();
                             },
-                            itemBuilder: (context) => const [
-                              PopupMenuItem(
+                            itemBuilder: (context) => [
+                              if (onAddCapteur != null)
+                                const PopupMenuItem(
+                                  value: 'add_capteur',
+                                  child: Text('Ajouter capteur'),
+                                ),
+                              const PopupMenuItem(
                                 value: 'edit',
                                 child: Text('Modifier'),
                               ),
-                              PopupMenuItem(
+                              const PopupMenuItem(
                                 value: 'delete',
                                 child: Text('Supprimer'),
                               ),
@@ -106,7 +115,9 @@ class BenneCard extends StatelessWidget {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: scheme.primaryContainer.withValues(alpha: 0.7),
+                            color: scheme.primaryContainer.withValues(
+                              alpha: 0.7,
+                            ),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
@@ -138,7 +149,9 @@ class BenneCard extends StatelessWidget {
                             child: LinearProgressIndicator(
                               value: fillLevel / 100,
                               minHeight: 8,
-                              backgroundColor: scheme.outlineVariant.withValues(alpha: 0.35),
+                              backgroundColor: scheme.outlineVariant.withValues(
+                                alpha: 0.35,
+                              ),
                               valueColor: AlwaysStoppedAnimation(statusColor),
                             ),
                           ),
