@@ -17,6 +17,7 @@ import '../pages/tournee/views/tournee_page.dart';
 import '../pages/tournee/controllers/tournee_controller.dart';
 import '../pages/tournee/views/tournee_detail_page.dart';
 import '../pages/tournee/views/tournee_chauffeur_page.dart';
+import '../pages/tournee/views/tournee_chauffeur_history_page.dart';
 import '../pages/zone/views/zone_page.dart';
 import '../pages/zone/controllers/zone_controller.dart';
 import '../pages/zone/views/zone_detail_page.dart';
@@ -111,6 +112,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.tourneeChauffeur,
       page: () => const TourneeChauffeurPage(),
+    ),
+    GetPage(
+      name: AppRoutes.tourneeChauffeurHistory,
+      page: () => const TourneeChauffeurHistoryPage(),
     ),
     GetPage(
       name: AppRoutes.tournees, 

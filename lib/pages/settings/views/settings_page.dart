@@ -201,30 +201,59 @@ class _SettingsPageState extends State<SettingsPage> {
                         backgroundColor: Colors.transparent,
                       ),
                       Divider(height: 1, color: Colors.grey[200]),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        'Couleur d\'accent',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Wrap(
-                        spacing: AppSpacing.md,
-                        children: [0xFFFFFFFF, 0xFF0F172A, 0xFFDC2626, 0xFF065F46, 0xFF1E3A8A]
-                            .map(
-                              (colorValue) => _ColorOption(
-                                colorValue: colorValue,
-                                selected: _accentColor == colorValue,
-                                onTap: () {
-                                  setState(() {
-                                    _accentColor = colorValue;
-                                    box.write('settings:accentColor', _accentColor);
-                                    _applyTheme();
-                                  });
-                                },
-                              ),
-                            )
-                            .toList(),
-                      ),
+                      if (!_darkMode) ...[
+                        const SizedBox(height: AppSpacing.lg),
+                        Text(
+                          'Couleur d\'accent',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final colors = <int>[
+                              0xFFFFFFFF,
+                              0xFF0F172A,
+                              0xFFDC2626,
+                              0xFF065F46,
+                              0xFF1E3A8A,
+                            ];
+                            final count = colors.length;
+                            const minSize = 24.0;
+                            const maxSize = 48.0;
+                            var spacing = AppSpacing.md;
+                            var size = (constraints.maxWidth - spacing * (count - 1)) / count;
+                            if (size < minSize) {
+                              spacing = ((constraints.maxWidth - minSize * count) / (count - 1)).clamp(4.0, AppSpacing.md);
+                              size = (constraints.maxWidth - spacing * (count - 1)) / count;
+                            }
+                            size = size.clamp(minSize, maxSize);
+
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: colors
+                                  .map(
+                                    (colorValue) => SizedBox(
+                                      width: size,
+                                      height: size,
+                                      child: _ColorOption(
+                                        colorValue: colorValue,
+                                        size: size,
+                                        selected: _accentColor == colorValue,
+                                        onTap: () {
+                                          setState(() {
+                                            _accentColor = colorValue;
+                                            box.write('settings:accentColor', _accentColor);
+                                            _applyTheme();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            );
+                          },
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -283,38 +312,44 @@ class _ColorOption extends StatelessWidget {
   final int colorValue;
   final bool selected;
   final VoidCallback onTap;
+  final double size;
 
   const _ColorOption({
     required this.colorValue,
     required this.selected,
     required this.onTap,
+    this.size = 40,
   });
 
   @override
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
+    final effectiveSize = size;
+    final iconSize = (effectiveSize * 0.5).clamp(14.0, 22.0);
+    final borderWidth = selected ? (effectiveSize >= 38 ? 2.0 : 1.5) : 1.0;
+    final shadowBlur = (effectiveSize * 0.15).clamp(4.0, 8.0);
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 50,
-        height: 50,
+        width: effectiveSize,
+        height: effectiveSize,
         decoration: BoxDecoration(
           color: Color(colorValue),
           shape: BoxShape.circle,
           border: Border.all(
             color: selected ? onSurface : Colors.grey[300]!,
-            width: selected ? 3 : 1,
+            width: borderWidth,
           ),
           boxShadow: [
             BoxShadow(
               color: Color(colorValue).withOpacity(0.3),
-              blurRadius: 8,
+              blurRadius: shadowBlur,
               offset: const Offset(0, 2),
             ),
           ],
         ),
         child: selected
-            ? const Icon(Icons.check, color: Colors.white, size: 24)
+            ? Icon(Icons.check, color: Colors.white, size: iconSize)
             : null,
       ),
     );
