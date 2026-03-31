@@ -6,6 +6,7 @@ class AppRoutes {
   static const dashboard = '/dashboard';
   static const tourneeChauffeur = '/tournee-chauffeur';
   static const tourneeChauffeurHistory = '/tournee-chauffeur-history';
+  static const liveMap = '/live-map';
   static const camions = '/camions';
   static const camionDetail = '/camion-detail';
   static const tournees = '/tournees';

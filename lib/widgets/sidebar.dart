@@ -115,6 +115,12 @@ class Sidebar extends StatelessWidget {
                       onTap: () => onItemSelected(AppRoutes.tourneeChauffeur),
                     ),
                     _SidebarItem(
+                      icon: Icons.my_location,
+                      label: 'Live Map',
+                      primaryColor: primaryColor,
+                      onTap: () => onItemSelected(AppRoutes.liveMap),
+                    ),
+                    _SidebarItem(
                       icon: Icons.history,
                       label: 'Historique',
                       primaryColor: primaryColor,
