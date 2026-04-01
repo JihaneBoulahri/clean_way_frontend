@@ -49,30 +49,54 @@ class Tournee {
       return DateTime.tryParse(v.toString());
     }
 
+    String parseStatus(dynamic v) {
+      final raw = parseString(v).trim();
+      if (raw.isNotEmpty) return raw;
+      return 'en cours';
+    }
+
     return Tournee(
-      id: parseInt(json['id_tournee']),
-      dateTournee: parseDate(json['date_tournee']) ?? DateTime.now(),
-      heureDebut: parseString(json['heure_debut']),
+      id: parseInt(json['id_tournee'] ?? json['id'] ?? json['tournee_id']),
+      dateTournee:
+          parseDate(
+            json['date_tournee'] ?? json['date'] ?? json['dateTournee'],
+          ) ??
+          DateTime.now(),
+      heureDebut: parseString(
+        json['heure_debut'] ?? json['heureDebut'] ?? json['start_time'],
+      ),
       heureFin: json['heure_fin'] != null
           ? parseString(json['heure_fin'])
-          : null,
-      status: parseString(json['status']),
-      idCamion: parseNullableInt(json['id_camion']),
-      idZone: parseNullableInt(json['id_zone']),
-      camion: json['camion'] != null
-          ? Camion.fromJson(
-              (json['camion'] is Map)
-                  ? json['camion'] as Map<String, dynamic>
-                  : Map<String, dynamic>.from(json['camion']),
-            )
-          : null,
-      zone: json['zone'] != null
-          ? Zone.fromJson(
-              (json['zone'] is Map)
-                  ? json['zone'] as Map<String, dynamic>
-                  : Map<String, dynamic>.from(json['zone']),
-            )
-          : null,
+          : (json['heureFin'] != null
+                ? parseString(json['heureFin'])
+                : (json['end_time'] != null
+                      ? parseString(json['end_time'])
+                      : null)),
+      status: parseStatus(json['status'] ?? json['etat'] ?? json['state']),
+      idCamion: parseNullableInt(
+        json['id_camion'] ?? json['camion_id'] ?? json['idCamion'],
+      ),
+      idZone: parseNullableInt(
+        json['id_zone'] ?? json['zone_id'] ?? json['idZone'],
+      ),
+      camion: (json['camion'] == null && json['truck'] is Map)
+          ? Camion.fromJson(Map<String, dynamic>.from(json['truck']))
+          : (json['camion'] != null
+                ? Camion.fromJson(
+                    (json['camion'] is Map)
+                        ? json['camion'] as Map<String, dynamic>
+                        : Map<String, dynamic>.from(json['camion']),
+                  )
+                : null),
+      zone: (json['zone'] == null && json['area'] is Map)
+          ? Zone.fromJson(Map<String, dynamic>.from(json['area']))
+          : (json['zone'] != null
+                ? Zone.fromJson(
+                    (json['zone'] is Map)
+                        ? json['zone'] as Map<String, dynamic>
+                        : Map<String, dynamic>.from(json['zone']),
+                  )
+                : null),
     );
   }
 
@@ -85,6 +109,7 @@ class Tournee {
 
     if (id > 0) {
       payload['id_tournee'] = id;
+      payload['id'] = id;
     }
     if ((heureFin ?? '').trim().isNotEmpty) {
       payload['heure_fin'] = heureFin;
