@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../models/tournee_model.dart';
 import '../../chauffeur/controllers/chauffeur_controller.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/tournee_service.dart';
 import '../../../widgets/snackbar_helper.dart';
 
@@ -253,6 +254,10 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         message: "Tournée démarrée",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Tournée démarrée',
+        'Votre tournée ${tournee.id} est maintenant en cours.',
+      );
       setState(() {
         _futureTourneeData = _loadCurrentTourneeData();
       });
@@ -274,6 +279,10 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         message: "Tournée terminée",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Tournée terminée',
+        'La tournée ${tournee.id} a été terminée avec succès.',
+      );
       setState(() {
         _futureTourneeData = _loadCurrentTourneeData();
       });
@@ -294,6 +303,10 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         title: "Succès",
         message: "Tournée annulée",
         type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Tournée annulée',
+        'La tournée ${tournee.id} a été annulée.',
       );
       setState(() {
         _futureTourneeData = _loadCurrentTourneeData();

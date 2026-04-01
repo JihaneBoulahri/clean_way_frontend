@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../chauffeur/controllers/chauffeur_controller.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/tournee_service.dart';
 import '../../../widgets/snackbar_helper.dart';
 import '../models/tournee_model.dart';
@@ -23,6 +24,9 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
     ChauffeurController(),
   );
   final MapController _mapController = MapController();
+  final List<LatLng> _routeStops = [];
+  final List<String> _routeStopLabels = [];
+  int _currentSegment = 0;
   late Future<Tournee?> _futureTournee;
   String _routeMode = 'all';
 
@@ -38,7 +42,17 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
         showSnackbar: false,
       );
       if (tournees.isEmpty) return null;
-      return tournees.first;
+      final tournee = tournees.first;
+      final startPoint = _parseCoordinates(
+        tournee.zone?.latitude,
+        tournee.zone?.longitude,
+      );
+      if (startPoint != null) {
+        _prepareRouteStops(startPoint);
+      } else {
+        _clearRouteStops();
+      }
+      return tournee;
     } catch (e) {
       final message = e.toString();
       if (!message.contains('404')) {
@@ -52,6 +66,74 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
     }
   }
 
+  bool get _hasRouteStops => _routeStops.length > 1;
+
+  void _prepareRouteStops(LatLng origin) {
+    _routeStops.clear();
+    _routeStopLabels.clear();
+    _currentSegment = 0;
+
+    _routeStops.add(origin);
+    _routeStopLabels.add('Zone');
+
+    const offsets = [
+      LatLng(0.0012, -0.0010),
+      LatLng(0.0008, 0.0014),
+      LatLng(-0.0010, 0.0010),
+    ];
+
+    for (var i = 0; i < offsets.length; i++) {
+      final offset = offsets[i];
+      _routeStops.add(LatLng(
+        origin.latitude + offset.latitude,
+        origin.longitude + offset.longitude,
+      ));
+      _routeStopLabels.add('Benne ${i + 1}');
+    }
+  }
+
+  void _clearRouteStops() {
+    _routeStops.clear();
+    _routeStopLabels.clear();
+    _currentSegment = 0;
+  }
+
+  void _passToNextBenne() {
+    if (!_hasRouteStops) {
+      showNadiSnackbar(
+        title: 'Info',
+        message: 'Aucune route de bennes disponible.',
+        type: NadiSnackbarType.info,
+      );
+      return;
+    }
+
+    if (_currentSegment >= _routeStops.length - 2) {
+      showNadiSnackbar(
+        title: 'Info',
+        message: 'Vous êtes déjà sur la dernière benne.',
+        type: NadiSnackbarType.info,
+      );
+      return;
+    }
+
+    setState(() {
+      _currentSegment += 1;
+    });
+    _recenterMap(_routeStops[_currentSegment]);
+  }
+
+  String get _currentStopLabel {
+    if (_routeStopLabels.isEmpty) return '-';
+    return _routeStopLabels[_currentSegment];
+  }
+
+  String get _nextStopLabel {
+    final nextIndex = _currentSegment + 1;
+    if (nextIndex >= _routeStopLabels.length) return '-';
+    return _routeStopLabels[nextIndex];
+  }
+
   Future<void> _startTour(Tournee tournee) async {
     try {
       await _tourneeService.start(tournee.id);
@@ -59,6 +141,10 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
         title: 'Succes',
         message: 'Tournee demarree',
         type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Tournée démarrée',
+        'Votre tournée ${tournee.id} a commencé.',
       );
       setState(() {
         _futureTournee = _loadCurrentTournee();
@@ -80,6 +166,10 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
         message: 'Tournee terminee',
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Tournée terminée',
+        'La tournée ${tournee.id} est maintenant terminée.',
+      );
       setState(() {
         _futureTournee = _loadCurrentTournee();
       });
@@ -100,6 +190,10 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
         message: 'Tournee annulee',
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Tournée annulée',
+        'La tournée ${tournee.id} a été annulée.',
+      );
       setState(() {
         _futureTournee = _loadCurrentTournee();
       });
@@ -110,14 +204,6 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
         type: NadiSnackbarType.error,
       );
     }
-  }
-
-  void _passToNextBenne() {
-    showNadiSnackbar(
-      title: 'Info',
-      message: 'Passage a la benne suivante (demo).',
-      type: NadiSnackbarType.info,
-    );
   }
 
   void _selectRouteMode(String value) {
@@ -222,11 +308,14 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                   width: double.infinity,
                   child: FilledButton.icon(
                     style: compactFilled,
-                    onPressed: isStarted ? _passToNextBenne : null,
+                    onPressed: _hasRouteStops ? _passToNextBenne : null,
                     icon: const Icon(Icons.skip_next, size: 16),
                     label: const Text('Passer a la suivante'),
                   ),
                 ),
+                const SizedBox(height: AppSpacing.sm),
+                _InfoRow(label: 'Etape courante', value: _currentStopLabel),
+                _InfoRow(label: 'Suivant', value: _nextStopLabel),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Infos tournee',
@@ -291,7 +380,16 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                   point: point,
                   mapController: _mapController,
                   routeMode: _routeMode,
-                  onRecenter: null,
+                  routeStops: _routeStops,
+                  routeStopLabels: _routeStopLabels,
+                  currentSegment: _currentSegment,
+                  onRecenter: point == null
+                      ? null
+                      : () => _recenterMap(
+                            _hasRouteStops
+                                ? _routeStops[_currentSegment]
+                                : point,
+                          ),
                   fullBleed: true,
                 ),
               ),
@@ -450,6 +548,9 @@ class _LiveMapPanel extends StatelessWidget {
   final LatLng? point;
   final MapController mapController;
   final String routeMode;
+  final List<LatLng> routeStops;
+  final List<String> routeStopLabels;
+  final int currentSegment;
   final VoidCallback? onRecenter;
   final bool fullBleed;
 
@@ -457,6 +558,9 @@ class _LiveMapPanel extends StatelessWidget {
     required this.point,
     required this.mapController,
     required this.routeMode,
+    required this.routeStops,
+    required this.routeStopLabels,
+    required this.currentSegment,
     required this.onRecenter,
     this.fullBleed = false,
   });
@@ -466,6 +570,9 @@ class _LiveMapPanel extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final radius =
         fullBleed ? BorderRadius.zero : BorderRadius.circular(AppRadius.md);
+    final routePoints = _routePoints();
+    final markers = _routeMarkers(scheme);
+
     return Container(
       decoration: BoxDecoration(
         color: scheme.surface,
@@ -492,29 +599,17 @@ class _LiveMapPanel extends StatelessWidget {
                             'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                         userAgentPackageName: 'clean_way_frontend',
                       ),
-                      PolylineLayer(
-                        polylines: [
-                          Polyline(
-                            points: _routePoints(point!, routeMode),
-                            strokeWidth: 4,
-                            color: scheme.primary.withValues(alpha: 0.6),
-                          ),
-                        ],
-                      ),
-                      MarkerLayer(
-                        markers: [
-                          Marker(
-                            width: 44,
-                            height: 44,
-                            point: point!,
-                            child: Icon(
-                              Icons.location_pin,
-                              size: 40,
-                              color: scheme.primary,
+                      if (routePoints.length > 1)
+                        PolylineLayer(
+                          polylines: [
+                            Polyline(
+                              points: routePoints,
+                              strokeWidth: 4,
+                              color: scheme.primary.withValues(alpha: 0.6),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      MarkerLayer(markers: markers),
                     ],
                   ),
                   Positioned(
@@ -541,19 +636,80 @@ class _LiveMapPanel extends StatelessWidget {
     );
   }
 
-  List<LatLng> _routePoints(LatLng center, String mode) {
-    if (mode == 'partial') {
-      return [
-        center,
-        LatLng(center.latitude + 0.0012, center.longitude + 0.0008),
-      ];
+  List<LatLng> _routePoints() {
+    if (routeStops.length < 2) {
+      return point == null ? [] : [point!];
     }
-    return [
-      LatLng(center.latitude + 0.0015, center.longitude - 0.0012),
-      center,
-      LatLng(center.latitude - 0.001, center.longitude + 0.0018),
-      LatLng(center.latitude + 0.0004, center.longitude + 0.0024),
-    ];
+    if (routeMode == 'all') {
+      return routeStops;
+    }
+    final nextIndex = currentSegment + 1;
+    if (nextIndex < routeStops.length) {
+      return [routeStops[currentSegment], routeStops[nextIndex]];
+    }
+    return [routeStops.last];
+  }
+
+  List<Marker> _routeMarkers(ColorScheme scheme) {
+    final markers = <Marker>[];
+    if (routeStops.isNotEmpty) {
+      final visibleEntries = <MapEntry<int, LatLng>>[];
+      if (routeMode == 'all') {
+        visibleEntries.addAll(routeStops.asMap().entries);
+      } else {
+        if (currentSegment < routeStops.length) {
+          visibleEntries.add(MapEntry(currentSegment, routeStops[currentSegment]));
+        }
+        final nextIndex = currentSegment + 1;
+        if (nextIndex < routeStops.length) {
+          visibleEntries.add(MapEntry(nextIndex, routeStops[nextIndex]));
+        }
+      }
+      for (final entry in visibleEntries) {
+        final label = entry.key < routeStopLabels.length
+            ? routeStopLabels[entry.key]
+            : 'Stop ${entry.key + 1}';
+        markers.add(_buildMarker(entry.value, label, scheme));
+      }
+    } else if (point != null) {
+      markers.add(_buildMarker(point!, 'Zone', scheme));
+    }
+    return markers;
+  }
+
+  Marker _buildMarker(LatLng position, String label, ColorScheme scheme) {
+    return Marker(
+      width: 80,
+      height: 80,
+      point: position,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.location_pin,
+            size: 36,
+            color: scheme.primary,
+          ),
+          const SizedBox(height: 2),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: scheme.surface.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: scheme.outline.withValues(alpha: 0.3)),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                height: 1.1,
+                color: scheme.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

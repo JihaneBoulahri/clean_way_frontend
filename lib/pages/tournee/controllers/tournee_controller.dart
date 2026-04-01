@@ -1,6 +1,7 @@
 import 'package:clean_way_frontend/pages/tournee/models/tournee_model.dart';
 import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:get/get.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/tournee_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart';
@@ -143,6 +144,10 @@ class TourneeController extends GetxController {
         message: "Tournée ajoutée avec succès",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Tournée ajoutée',
+        'Votre tournée ${tournee.id} a été créée avec le statut ${tournee.status}.',
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -160,6 +165,10 @@ class TourneeController extends GetxController {
           title: "Succès",
           message: "Tournée modifiée avec succès",
           type: NadiSnackbarType.success,
+        );
+        await NotificationService.instance.showNotification(
+          'Tournée modifiée',
+          'La tournée ${tournee.id} a été mise à jour.',
         );
       }
     } catch (e) {

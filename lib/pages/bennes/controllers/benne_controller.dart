@@ -1,9 +1,10 @@
 import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:clean_way_frontend/pages/bennes/models/benne_model.dart';
 import 'package:get/get.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/benne_service.dart';
 import '../../../routes/app_routes.dart';
-import '../../../widgets/snackbar_helper.dart'; 
+import '../../../widgets/snackbar_helper.dart';
 
 class BennesController extends GetxController {
   final BenneService _service = BenneService();
@@ -115,6 +116,10 @@ class BennesController extends GetxController {
         message: "Benne ajoutée avec succès",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Benne ajoutée',
+        'La benne a été ajoutée avec succès.',
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -132,6 +137,10 @@ class BennesController extends GetxController {
           message: "Benne modifiée avec succès",
           type: NadiSnackbarType.success,
         );
+        await NotificationService.instance.showNotification(
+          'Benne modifiée',
+          'La benne a été modifiée avec succès.',
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -147,6 +156,10 @@ class BennesController extends GetxController {
         title: "Succès",
         message: "Benne supprimée avec succès",
         type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Benne supprimée',
+        'La benne a été supprimée avec succès.',
       );
     } catch (e) {
       _handleError(e);

@@ -1,5 +1,6 @@
 import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:get/get.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/chauffeur_service.dart';
 import '../../../core/services/user_service.dart';
 import '../models/chauffeur_model.dart';
@@ -168,6 +169,10 @@ class ChauffeurController extends GetxController {
         message: "Chauffeur ajouté avec succès",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Chauffeur ajouté',
+        'Le chauffeur a été ajouté avec succès.',
+      );
     } catch (e) {
       if (_isCniConstraintError(e)) {
         try {
@@ -177,6 +182,10 @@ class ChauffeurController extends GetxController {
             title: "Succès",
             message: "Chauffeur ajouté avec succès",
             type: NadiSnackbarType.success,
+          );
+          await NotificationService.instance.showNotification(
+            'Chauffeur ajouté',
+            'Le chauffeur a été ajouté avec succès.',
           );
           return;
         } catch (fallbackError) {
@@ -207,6 +216,10 @@ class ChauffeurController extends GetxController {
         message: "Chauffeur modifié avec succès",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Chauffeur modifié',
+        'Le chauffeur a été modifié avec succès.',
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -221,6 +234,10 @@ class ChauffeurController extends GetxController {
         title: "Succès",
         message: "Chauffeur supprimé avec succès",
         type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Chauffeur supprimé',
+        'Le chauffeur a été supprimé avec succès.',
       );
     } catch (e) {
       _handleError(e);

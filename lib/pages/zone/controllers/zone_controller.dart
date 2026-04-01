@@ -1,6 +1,7 @@
 import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:clean_way_frontend/pages/zone/models/zone_model.dart';
 import 'package:get/get.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/zone_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/snackbar_helper.dart';
@@ -112,6 +113,10 @@ class ZoneController extends GetxController {
         message: "Zone ajoutée avec succès",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Zone ajoutée',
+        'La zone a été ajoutée avec succès.',
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -131,6 +136,10 @@ class ZoneController extends GetxController {
           message: "Zone modifiée avec succès",
           type: NadiSnackbarType.success,
         );
+        await NotificationService.instance.showNotification(
+          'Zone modifiée',
+          'La zone a été modifiée avec succès.',
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -146,6 +155,10 @@ class ZoneController extends GetxController {
         title: "Succès",
         message: "Zone supprimée avec succès",
         type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Zone supprimée',
+        'La zone a été supprimée avec succès.',
       );
     } catch (e) {
       _handleError(e);

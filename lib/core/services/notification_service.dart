@@ -82,9 +82,15 @@ class NotificationService {
     return true;
   }
 
-  Future<void> showLocalTestNotification() async {
+  Future<void> showNotification(
+    String title,
+    String body, {
+    String? payload,
+    int? id,
+  }) async {
     if (!notificationsEnabled) return;
 
+    final notificationId = id ?? DateTime.now().millisecondsSinceEpoch ~/ 1000;
     const iosDetails = DarwinNotificationDetails();
     final androidDetails = AndroidNotificationDetails(
       _channel.id,
@@ -101,10 +107,18 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      notificationId,
+      title,
+      body,
+      details,
+      payload: payload,
+    );
+  }
+
+  Future<void> showLocalTestNotification() async {
+    await showNotification(
       'Notifications activées',
       'Les notifications locales sont maintenant actives.',
-      details,
     );
   }
 

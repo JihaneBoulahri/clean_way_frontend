@@ -1,5 +1,6 @@
 import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:get/get.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/camion_service.dart';
 import '../models/camion_model.dart';
 import '../../../routes/app_routes.dart';
@@ -109,8 +110,11 @@ class CamionController extends GetxController {
         message: "Camion ajouté avec succès",
         type: NadiSnackbarType.success,
       );
+      await NotificationService.instance.showNotification(
+        'Camion ajouté',
+        'Le camion a été ajouté avec succès.',
+      );
     } catch (e) {
-      print('Erreur lors de l\'ajout: $e');
       _handleError(e);
     }
   }
@@ -127,6 +131,10 @@ class CamionController extends GetxController {
           message: "Camion modifié avec succès",
           type: NadiSnackbarType.success,
         );
+        await NotificationService.instance.showNotification(
+          'Camion modifié',
+          'Le camion a été modifié avec succès.',
+        );
       }
     } catch (e) {
       _handleError(e);
@@ -142,6 +150,10 @@ class CamionController extends GetxController {
         title: "Succès",
         message: "Camion supprimé avec succès",
         type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Camion supprimé',
+        'Le camion a été supprimé avec succès.',
       );
     } catch (e) {
       _handleError(e);
