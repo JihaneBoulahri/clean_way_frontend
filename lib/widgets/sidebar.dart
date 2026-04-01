@@ -49,9 +49,18 @@ class Sidebar extends StatelessWidget {
                 children: [
                   const SizedBox(height: 10),
                   Center(
-                    child: Image.asset(
-                      'images/app_logo.png',
-                      width: 160, // ajuste si besoin
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: scheme.primary.withValues(alpha: 0.06),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Image.asset(
+                        'images/logo_truck.png',
+                        width: 160,
+                        height: 90,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -104,6 +113,19 @@ class Sidebar extends StatelessWidget {
                       label: 'Ma tournée',
                       primaryColor: primaryColor,
                       onTap: () => onItemSelected(AppRoutes.tourneeChauffeur),
+                    ),
+                    _SidebarItem(
+                      icon: Icons.my_location,
+                      label: 'Live Map',
+                      primaryColor: primaryColor,
+                      onTap: () => onItemSelected(AppRoutes.liveMap),
+                    ),
+                    _SidebarItem(
+                      icon: Icons.history,
+                      label: 'Historique',
+                      primaryColor: primaryColor,
+                      onTap: () =>
+                          onItemSelected(AppRoutes.tourneeChauffeurHistory),
                     ),
                     _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.settings)),
                     _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
@@ -192,4 +214,7 @@ class _SidebarItem extends StatelessWidget {
     );
   }
 }
+
+
+
 

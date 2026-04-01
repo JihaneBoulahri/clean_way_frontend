@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
+import 'package:clean_way_frontend/core/constants/filter_constants.dart';
+import 'package:clean_way_frontend/widgets/filter_bottom_sheet.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import '../../../routes/app_routes.dart';
 import '../controllers/camion_controller.dart';
@@ -31,9 +33,13 @@ class CamionPage extends GetView<CamionController> {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: SearchBarField(
-              hint: 'Rechercher par immatriculation, type, statut...',
-              onChanged: (v) => controller.searchQuery.value = v,
+            child: Obx(
+              () => SearchBarField(
+                hint: 'Rechercher par immatriculation, type, statut...',
+                onChanged: (v) => controller.searchQuery.value = v,
+                onFilterTap: () => _openFilters(context),
+                filterActive: controller.hasActiveFilters,
+              ),
             ),
           ),
           Obx(() {
@@ -123,5 +129,34 @@ class CamionPage extends GetView<CamionController> {
       return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
     }
     return false;
+  }
+
+  void _openFilters(BuildContext context) {
+    FilterBottomSheet.show(
+      context: context,
+      title: 'Filtrer les camions',
+      sections: [
+        FilterSection(
+          id: 'type',
+          title: 'Type de camion',
+          options: [FilterDefaults.all, ...controller.typeOptions],
+          selected: controller.filterType.value,
+          defaultValue: FilterDefaults.all,
+        ),
+        FilterSection(
+          id: 'statut',
+          title: 'Statut',
+          options: [FilterDefaults.all, ...controller.statusOptions],
+          selected: controller.filterStatus.value,
+          defaultValue: FilterDefaults.all,
+        ),
+      ],
+      onApply: (values) {
+        controller.applyFilters(
+          type: values['type'] ?? FilterDefaults.all,
+          status: values['statut'] ?? FilterDefaults.all,
+        );
+      },
+    );
   }
 }

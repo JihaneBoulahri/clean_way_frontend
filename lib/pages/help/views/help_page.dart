@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/help_controller.dart';
 
-class HelpPage extends StatelessWidget {
+class HelpPage extends GetView<HelpController> {
   const HelpPage({super.key});
 
   @override
@@ -116,8 +118,8 @@ class HelpPage extends StatelessWidget {
                   _contactCard(context, Icons.phone, 'Call Support', '+212 600 123 456', primaryColor),
                   const SizedBox(height: 24),
 
-                  // Feedback
-                  _buildSectionTitle('Send Feedback', primaryColor),
+                  // Contact Us
+                  _buildSectionTitle('Contact Us', primaryColor),
                   _feedbackCard(context, primaryColor),
                 ],
               ),
@@ -244,22 +246,30 @@ class HelpPage extends StatelessWidget {
       child: Column(
         children: [
           TextFormField(
+            controller: controller.messageController,
             maxLines: 4,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
-              hintText: 'Write your feedback here...',
+              hintText: 'Write your message here...',
               hintStyle: TextStyle(color: onCard.withOpacity(0.6)),
             ),
             style: TextStyle(color: onCard),
           ),
           const SizedBox(height: 12),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          Obx(
+            () => ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+              onPressed: controller.isSending.value
+                  ? null
+                  : controller.sendSupportMessage,
+              child: Text(
+                controller.isSending.value ? 'Sending...' : 'Send',
+                style: TextStyle(color: scheme.onPrimary),
+              ),
             ),
-            onPressed: () {},
-            child: Text('Submit', style: TextStyle(color: scheme.onPrimary)),
           ),
         ],
       ),

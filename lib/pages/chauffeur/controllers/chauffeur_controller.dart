@@ -1,3 +1,4 @@
+import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:get/get.dart';
 import '../../../core/services/chauffeur_service.dart';
 import '../../../core/services/user_service.dart';
@@ -13,11 +14,12 @@ class ChauffeurController extends GetxController {
   var isLoading = false.obs;
   var error = RxnString();
   var searchQuery = ''.obs;
+  var filterAffectation = FilterDefaults.all.obs;
+  var filterPermis = FilterDefaults.all.obs;
 
   ChauffeurController({this.autoFetch = true});
 
   List<Chauffeur> get filteredChauffeurs {
-    if (searchQuery.value.trim().isEmpty) return chauffeurs;
     final q = searchQuery.value.trim().toLowerCase();
     return chauffeurs.where((c) {
       final phone = c.numTelephone.toLowerCase();
@@ -27,14 +29,54 @@ class ChauffeurController extends GetxController {
       final camionId = (c.camionId ?? c.camion?.id)?.toString() ?? '';
       final userId = (c.userId ?? c.user?.id)?.toString() ?? '';
       final userName = c.user?.fullName.toLowerCase() ?? '';
-      return phone.contains(q) ||
+      final matchesSearch = q.isEmpty ||
+          phone.contains(q) ||
           cni.contains(q) ||
           permis.contains(q) ||
           email.contains(q) ||
           camionId.contains(q) ||
           userId.contains(q) ||
           userName.contains(q);
+      final matchesAffectation = filterAffectation.value == FilterDefaults.all ||
+          (filterAffectation.value == FilterDefaults.withCamion && c.camion != null) ||
+          (filterAffectation.value == FilterDefaults.withoutCamion && c.camion == null);
+      final matchesPermis = filterPermis.value == FilterDefaults.all ||
+          c.permis.toLowerCase() == filterPermis.value.toLowerCase();
+      return matchesSearch && matchesAffectation && matchesPermis;
     }).toList();
+  }
+
+  bool get hasActiveFilters =>
+      filterAffectation.value != FilterDefaults.all ||
+      filterPermis.value != FilterDefaults.all;
+
+  List<String> get permisOptions =>
+      _distinctStrings(chauffeurs.map((c) => c.permis));
+
+  void applyFilters({
+    required String affectation,
+    required String permis,
+  }) {
+    filterAffectation.value = affectation;
+    filterPermis.value = permis;
+  }
+
+  void resetFilters() {
+    filterAffectation.value = FilterDefaults.all;
+    filterPermis.value = FilterDefaults.all;
+  }
+
+  List<String> _distinctStrings(Iterable<String> values) {
+    final set = <String>{};
+    for (final value in values) {
+      final trimmed = value.trim();
+      if (trimmed.isNotEmpty) {
+        set.add(trimmed);
+      }
+    }
+    final list = set.toList();
+    list.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return list;
   }
 
   @override

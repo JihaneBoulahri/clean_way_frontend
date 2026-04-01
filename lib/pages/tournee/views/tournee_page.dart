@@ -1,4 +1,6 @@
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
+import 'package:clean_way_frontend/core/constants/filter_constants.dart';
+import 'package:clean_way_frontend/widgets/filter_bottom_sheet.dart';
 import 'package:clean_way_frontend/widgets/search_bar_field.dart';
 import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
@@ -30,9 +32,13 @@ class TourneePage extends GetView<TourneeController> {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: SearchBarField(
-              hint: 'Rechercher une tournée...',
-              onChanged: (v) => controller.searchOrFetch(v),
+            child: Obx(
+              () => SearchBarField(
+                hint: 'Rechercher une tournee...',
+                onChanged: (v) => controller.searchOrFetch(v),
+                onFilterTap: () => _openFilters(context),
+                filterActive: controller.hasActiveFilters,
+              ),
             ),
           ),
           Expanded(
@@ -58,7 +64,14 @@ class TourneePage extends GetView<TourneeController> {
                         ),
                 );
               }
-              final list = controller.tournees;
+              final list = controller.filteredTournees;
+              if (list.isEmpty) {
+                return const EmptyState(
+                  icon: Icons.search_off,
+                  title: 'Aucun resultat',
+                  subtitle: 'Modifiez vos criteres de recherche',
+                );
+              }
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.lg,
@@ -89,6 +102,35 @@ class TourneePage extends GetView<TourneeController> {
       return storedUser['role']?.toString().toLowerCase() == 'chauffeur';
     }
     return false;
+  }
+
+  void _openFilters(BuildContext context) {
+    FilterBottomSheet.show(
+      context: context,
+      title: 'Filtrer les tournees',
+      sections: [
+        FilterSection(
+          id: 'statut',
+          title: 'Statut',
+          options: [FilterDefaults.all, ...controller.statusOptions],
+          selected: controller.filterStatus.value,
+          defaultValue: FilterDefaults.all,
+        ),
+        FilterSection(
+          id: 'periode',
+          title: 'Periode',
+          options: controller.periodOptions,
+          selected: controller.filterPeriod.value,
+          defaultValue: FilterDefaults.all,
+        ),
+      ],
+      onApply: (values) {
+        controller.applyFilters(
+          status: values['statut'] ?? FilterDefaults.all,
+          period: values['periode'] ?? FilterDefaults.all,
+        );
+      },
+    );
   }
 
 }

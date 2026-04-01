@@ -152,6 +152,7 @@ class AuthService {
           "email": email,
           "password": password,
           "password_confirmation": confirmPassword,
+          "role":"chauffeur"
         }),
       );
 

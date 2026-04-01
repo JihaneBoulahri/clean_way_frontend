@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../routes/app_routes.dart';
+import '../core/theme/app_theme.dart';
 import 'navbar.dart';
 import 'sidebar.dart';
 
@@ -51,9 +52,10 @@ class _AppLayoutState extends State<AppLayout> {
     final primaryColor = scheme.primary;
     final screenWidth = MediaQuery.of(context).size.width;
     final isDesktop = screenWidth >= 800;
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
-      floatingActionButton: widget.floatingActionButton,
+      floatingActionButton: null,
 
       drawer: !isDesktop
           ? Drawer(
@@ -81,6 +83,13 @@ class _AppLayoutState extends State<AppLayout> {
                 Expanded(child: widget.child),
               ],
             ),
+
+            if (widget.floatingActionButton != null)
+              PositionedDirectional(
+                end: AppSpacing.lg,
+                bottom: AppSpacing.lg + keyboardInset,
+                child: widget.floatingActionButton!,
+              ),
 
             /// 🔹 Backdrop (click outside to close)
             if (isSidebarOpen)

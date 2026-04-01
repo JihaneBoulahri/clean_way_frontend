@@ -50,9 +50,13 @@ class BennesPage extends GetView<BennesController> {
         children: [
           Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            child: SearchBarField(
-              hint: 'Rechercher par type, capacité, coordonnées...',
-              onChanged: (v) => controller.searchQuery.value = v,
+            child: Obx(
+              () => SearchBarField(
+                hint: 'Rechercher par type, capacite, coordonnees...',
+                onChanged: (v) => controller.searchQuery.value = v,
+                onFilterTap: () => _openFilters(context),
+                filterActive: controller.hasActiveFilters,
+              ),
             ),
           ),
           Expanded(

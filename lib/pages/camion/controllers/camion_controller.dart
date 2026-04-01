@@ -1,3 +1,4 @@
+import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:get/get.dart';
 import '../../../core/services/camion_service.dart';
 import '../models/camion_model.dart';
@@ -10,16 +11,59 @@ class CamionController extends GetxController {
   var isLoading = false.obs;
   var error = RxnString();
   var searchQuery = ''.obs;
+  var filterType = FilterDefaults.all.obs;
+  var filterStatus = FilterDefaults.all.obs;
 
   List<Camion> get filteredCamions {
-    if (searchQuery.value.trim().isEmpty) return camions;
     final q = searchQuery.value.trim().toLowerCase();
     return camions.where((c) {
-      return c.immatriculation.toLowerCase().contains(q) ||
+      final matchesSearch = q.isEmpty ||
+          c.immatriculation.toLowerCase().contains(q) ||
           c.typeCamion.toLowerCase().contains(q) ||
           c.status.toLowerCase().contains(q) ||
           c.capaciteCamion.toString().contains(q);
+      final matchesType = filterType.value == FilterDefaults.all ||
+          c.typeCamion.toLowerCase() == filterType.value.toLowerCase();
+      final matchesStatus = filterStatus.value == FilterDefaults.all ||
+          c.status.toLowerCase() == filterStatus.value.toLowerCase();
+      return matchesSearch && matchesType && matchesStatus;
     }).toList();
+  }
+
+  bool get hasActiveFilters =>
+      filterType.value != FilterDefaults.all ||
+      filterStatus.value != FilterDefaults.all;
+
+  List<String> get typeOptions =>
+      _distinctStrings(camions.map((c) => c.typeCamion));
+
+  List<String> get statusOptions =>
+      _distinctStrings(camions.map((c) => c.status));
+
+  void applyFilters({
+    required String type,
+    required String status,
+  }) {
+    filterType.value = type;
+    filterStatus.value = status;
+  }
+
+  void resetFilters() {
+    filterType.value = FilterDefaults.all;
+    filterStatus.value = FilterDefaults.all;
+  }
+
+  List<String> _distinctStrings(Iterable<String> values) {
+    final set = <String>{};
+    for (final value in values) {
+      final trimmed = value.trim();
+      if (trimmed.isNotEmpty) {
+        set.add(trimmed);
+      }
+    }
+    final list = set.toList();
+    list.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return list;
   }
 
   @override

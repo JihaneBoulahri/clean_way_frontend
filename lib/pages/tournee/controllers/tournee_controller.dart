@@ -1,4 +1,5 @@
 import 'package:clean_way_frontend/pages/tournee/models/tournee_model.dart';
+import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:get/get.dart';
 import '../../../core/services/tournee_service.dart';
 import '../../../routes/app_routes.dart';
@@ -9,6 +10,8 @@ class TourneeController extends GetxController {
   var tournees = <Tournee>[].obs;
   var isLoading = false.obs;
   var searchQuery = ''.obs;
+  var filterStatus = FilterDefaults.all.obs;
+  var filterPeriod = FilterDefaults.all.obs;
 
   void searchOrFetch(String query) {
     searchQuery.value = query;
@@ -23,6 +26,74 @@ class TourneeController extends GetxController {
   void onInit() {
     super.onInit();
     fetchTournees();
+  }
+
+  List<Tournee> get filteredTournees {
+    final now = DateTime.now();
+    return tournees.where((t) {
+      final matchesStatus = filterStatus.value == FilterDefaults.all ||
+          t.status.toLowerCase() == filterStatus.value.toLowerCase();
+      final matchesPeriod = _matchesPeriod(t.dateTournee, now);
+      return matchesStatus && matchesPeriod;
+    }).toList();
+  }
+
+  bool get hasActiveFilters =>
+      filterStatus.value != FilterDefaults.all ||
+      filterPeriod.value != FilterDefaults.all;
+
+  List<String> get statusOptions =>
+      _distinctStrings(tournees.map((t) => t.status));
+
+  List<String> get periodOptions => const [
+        FilterDefaults.all,
+        FilterDefaults.today,
+        FilterDefaults.last7Days,
+        FilterDefaults.last30Days,
+      ];
+
+  void applyFilters({
+    required String status,
+    required String period,
+  }) {
+    filterStatus.value = status;
+    filterPeriod.value = period;
+  }
+
+  void resetFilters() {
+    filterStatus.value = FilterDefaults.all;
+    filterPeriod.value = FilterDefaults.all;
+  }
+
+  bool _matchesPeriod(DateTime date, DateTime now) {
+    if (filterPeriod.value == FilterDefaults.all) return true;
+    if (filterPeriod.value == FilterDefaults.today) {
+      return date.year == now.year &&
+          date.month == now.month &&
+          date.day == now.day;
+    }
+    if (filterPeriod.value == FilterDefaults.last7Days) {
+      final start = now.subtract(const Duration(days: 7));
+      return !date.isBefore(start) && !date.isAfter(now);
+    }
+    if (filterPeriod.value == FilterDefaults.last30Days) {
+      final start = now.subtract(const Duration(days: 30));
+      return !date.isBefore(start) && !date.isAfter(now);
+    }
+    return true;
+  }
+
+  List<String> _distinctStrings(Iterable<String> values) {
+    final set = <String>{};
+    for (final value in values) {
+      final trimmed = value.trim();
+      if (trimmed.isNotEmpty) {
+        set.add(trimmed);
+      }
+    }
+    final list = set.toList();
+    list.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return list;
   }
 
   void _handleError(dynamic e, {bool showSnackbar = true}) {
