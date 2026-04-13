@@ -19,6 +19,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final phoneController = TextEditingController();
+  final cniController = TextEditingController();
+  final permisController = TextEditingController();
+  final camionIdController = TextEditingController();
 
   bool showPassword = false;
   bool showConfirm = false;
@@ -38,6 +42,10 @@ class _RegisterPageState extends State<RegisterPage> {
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
+    phoneController.dispose();
+    cniController.dispose();
+    permisController.dispose();
+    camionIdController.dispose();
     super.dispose();
   }
 
@@ -206,6 +214,64 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
+                  SizedBox(height: screenHeight * 0.02),
+
+                  /// PHONE
+                  TextField(
+                    controller: phoneController,
+                    decoration: InputDecoration(
+                      labelText: "Numéro de téléphone",
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    keyboardType: TextInputType.phone,
+                  ),
+
+                  SizedBox(height: screenHeight * 0.02),
+
+                  /// CNI
+                  TextField(
+                    controller: cniController,
+                    decoration: InputDecoration(
+                      labelText: "CNI",
+                      prefixIcon: const Icon(Icons.credit_card),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: screenHeight * 0.02),
+
+                  /// PERMIS
+                  TextField(
+                    controller: permisController,
+                    decoration: InputDecoration(
+                      labelText: "Permis",
+                      prefixIcon: const Icon(Icons.card_membership),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: screenHeight * 0.02),
+
+                  /// ID CAMION
+                  TextField(
+                    controller: camionIdController,
+                    decoration: InputDecoration(
+                      labelText: "ID camion",
+                      prefixIcon: const Icon(Icons.local_shipping_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+
                   const SizedBox(height: 24),
 
                   /// REGISTER BUTTON
@@ -229,12 +295,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                 password: passwordController.text,
                                 confirmPassword:
                                     confirmPasswordController.text,
+                                numTelephone: phoneController.text,
+                                cni: cniController.text,
+                                permis: permisController.text,
+                                camionId: camionIdController.text,
                               );
                             },
                             child: const Text(
                               "Sign Up",
-                              style: TextStyle(
-                                  fontSize: 18, color: Colors.white),
+                              style: TextStyle(fontSize: 18, color: Colors.white),
                             ),
                           ),
                         )),
@@ -261,7 +330,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

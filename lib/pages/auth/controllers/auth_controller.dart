@@ -47,6 +47,10 @@ class AuthController extends GetxController {
     required String email,
     required String password,
     required String confirmPassword,
+    required String numTelephone,
+    required String cni,
+    required String permis,
+    required String camionId,
   }) async {
     final nomValue = nom.trim();
     final prenomValue = prenom.trim();
@@ -109,6 +113,51 @@ class AuthController extends GetxController {
       return;
     }
 
+    final phoneValue = numTelephone.trim();
+    final cniValue = cni.trim();
+    final permisValue = permis.trim();
+    final camionIdValue = camionId.trim();
+
+    if (phoneValue.isEmpty) {
+      errorMessage.value = "Le téléphone est requis";
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Le téléphone est requis",
+        type: NadiSnackbarType.error,
+      );
+      return;
+    }
+
+    if (cniValue.isEmpty) {
+      errorMessage.value = "Le CNI est requis";
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Le CNI est requis",
+        type: NadiSnackbarType.error,
+      );
+      return;
+    }
+
+    if (permisValue.isEmpty) {
+      errorMessage.value = "Le permis est requis";
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "Le permis est requis",
+        type: NadiSnackbarType.error,
+      );
+      return;
+    }
+
+    if (camionIdValue.isEmpty) {
+      errorMessage.value = "L'ID camion est requis";
+      showNadiSnackbar(
+        title: "Erreur",
+        message: "L'ID camion est requis",
+        type: NadiSnackbarType.error,
+      );
+      return;
+    }
+
     try {
       isLoading.value = true;
       errorMessage.value = '';
@@ -120,6 +169,10 @@ class AuthController extends GetxController {
         email: emailValue,
         password: passwordValue,
         confirmPassword: confirmPasswordValue,
+        numTelephone: phoneValue,
+        cni: cniValue,
+        permis: permisValue,
+        camionId: camionIdValue,
       );
 
       if (result['success'] == true) {
