@@ -138,6 +138,10 @@ class AuthService {
     required String email,
     required String password,
     required String confirmPassword,
+    required String numTelephone,
+    required String cni,
+    required String permis,
+    required String camionId,
   }) async {
     try {
       final res = await http.post(
@@ -152,7 +156,11 @@ class AuthService {
           "email": email,
           "password": password,
           "password_confirmation": confirmPassword,
-          "role":"chauffeur"
+          "role": "chauffeur",
+          "num_telephone": numTelephone,
+          "cni": cni,
+          "permis": permis,
+          "id_camion": int.tryParse(camionId) ?? camionId,
         }),
       );
 
