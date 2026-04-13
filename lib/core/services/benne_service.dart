@@ -95,6 +95,17 @@ class BenneService {
     return _handleResponse(response);
   }
 
+  //get bennes by ids
+  Future<List<dynamic>> getBennesByIds(List<int> ids) async {
+    if (ids.isEmpty) return [];
+    final idsParam = ids.join(',');
+    final response = await http.get(
+      Uri.parse('${BenneEndpoints.base}?ids=$idsParam'),
+      headers: _headers,
+    );
+    return _handleResponse(response);
+  }
+
   //vider benne
   Future viderBenne(int id) async {
     final response = await http.post(

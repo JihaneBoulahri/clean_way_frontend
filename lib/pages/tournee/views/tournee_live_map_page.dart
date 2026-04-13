@@ -8,8 +8,10 @@ import 'package:latlong2/latlong.dart';
 import '../../chauffeur/controllers/chauffeur_controller.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/services/tournee_service.dart';
+import '../../../core/services/benne_service.dart';
 import '../../../widgets/snackbar_helper.dart';
 import '../models/tournee_model.dart';
+import '../../bennes/models/benne_model.dart';
 
 class TourneeLiveMapPage extends StatefulWidget {
   const TourneeLiveMapPage({super.key});
@@ -20,6 +22,7 @@ class TourneeLiveMapPage extends StatefulWidget {
 
 class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
   final TourneeService _tourneeService = TourneeService();
+  final BenneService _benneService = BenneService();
   final ChauffeurController _chauffeurController = Get.put(
     ChauffeurController(),
   );
@@ -43,15 +46,7 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
       );
       if (tournees.isEmpty) return null;
       final tournee = tournees.first;
-      final startPoint = _parseCoordinates(
-        tournee.zone?.latitude,
-        tournee.zone?.longitude,
-      );
-      if (startPoint != null) {
-        _prepareRouteStops(startPoint);
-      } else {
-        _clearRouteStops();
-      }
+      await _prepareRouteStops(tournee);
       return tournee;
     } catch (e) {
       final message = e.toString();
@@ -68,34 +63,67 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
 
   bool get _hasRouteStops => _routeStops.length > 1;
 
-  void _prepareRouteStops(LatLng origin) {
+  Future<void> _prepareRouteStops(Tournee tournee) async {
     _routeStops.clear();
     _routeStopLabels.clear();
     _currentSegment = 0;
 
-    _routeStops.add(origin);
-    _routeStopLabels.add('Zone');
-
-    const offsets = [
-      LatLng(0.0012, -0.0010),
-      LatLng(0.0008, 0.0014),
-      LatLng(-0.0010, 0.0010),
-    ];
-
-    for (var i = 0; i < offsets.length; i++) {
-      final offset = offsets[i];
-      _routeStops.add(LatLng(
-        origin.latitude + offset.latitude,
-        origin.longitude + offset.longitude,
-      ));
-      _routeStopLabels.add('Benne ${i + 1}');
+    final startPoint = _parseCoordinates(
+      tournee.zone?.latitude,
+      tournee.zone?.longitude,
+    );
+    if (startPoint != null) {
+      _routeStops.add(startPoint);
+      _routeStopLabels.add('Zone');
     }
-  }
 
-  void _clearRouteStops() {
-    _routeStops.clear();
-    _routeStopLabels.clear();
-    _currentSegment = 0;
+    if (tournee.benneIds.isNotEmpty) {
+      try {
+        final bennesData = await _benneService.getBennesByIds(tournee.benneIds);
+        for (final benneJson in bennesData) {
+          final benne = Benne.fromJson(benneJson);
+          final point = _parseCoordinates(benne.latitude, benne.longitude);
+          if (point != null) {
+            _routeStops.add(point);
+            _routeStopLabels.add('Benne ${benne.id}');
+          }
+        }
+      } catch (e) {
+        // If fetching bennes fails, fall back to simulated stops
+        if (startPoint != null) {
+          const offsets = [
+            LatLng(0.0012, -0.0010),
+            LatLng(0.0008, 0.0014),
+            LatLng(-0.0010, 0.0010),
+          ];
+          for (var i = 0; i < offsets.length; i++) {
+            final offset = offsets[i];
+            _routeStops.add(LatLng(
+              startPoint.latitude + offset.latitude,
+              startPoint.longitude + offset.longitude,
+            ));
+            _routeStopLabels.add('Benne ${i + 1}');
+          }
+        }
+      }
+    } else {
+      // No benne IDs, fall back to simulated stops
+      if (startPoint != null) {
+        const offsets = [
+          LatLng(0.0012, -0.0010),
+          LatLng(0.0008, 0.0014),
+          LatLng(-0.0010, 0.0010),
+        ];
+        for (var i = 0; i < offsets.length; i++) {
+          final offset = offsets[i];
+          _routeStops.add(LatLng(
+            startPoint.latitude + offset.latitude,
+            startPoint.longitude + offset.longitude,
+          ));
+          _routeStopLabels.add('Benne ${i + 1}');
+        }
+      }
+    }
   }
 
   void _passToNextBenne() {

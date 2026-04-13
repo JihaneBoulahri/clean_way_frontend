@@ -11,6 +11,7 @@ class Tournee {
   final int? idZone;
   final Camion? camion;
   final Zone? zone;
+  final List<int> benneIds;
 
   Tournee({
     required this.id,
@@ -22,6 +23,7 @@ class Tournee {
     this.idZone,
     this.camion,
     this.zone,
+    this.benneIds = const [],
   });
 
   factory Tournee.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,14 @@ class Tournee {
       final raw = parseString(v).trim();
       if (raw.isNotEmpty) return raw;
       return 'en cours';
+    }
+
+    List<int> parseBenneIds(dynamic v) {
+      if (v == null) return [];
+      if (v is List) {
+        return v.map((e) => parseInt(e)).where((e) => e > 0).toList();
+      }
+      return [];
     }
 
     return Tournee(
@@ -97,6 +107,7 @@ class Tournee {
                         : Map<String, dynamic>.from(json['zone']),
                   )
                 : null),
+      benneIds: parseBenneIds(json['benne_ids'] ?? json['bennes'] ?? json['ids_benne']),
     );
   }
 
