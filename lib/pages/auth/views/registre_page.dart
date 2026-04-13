@@ -77,31 +77,36 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            child: Container(
-              width: screenWidth * 0.9,
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 16,
-                    offset: Offset(0, 8),
-                  )
-                ],
-              ),
+            padding: const EdgeInsets.all(20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 32,
+                  horizontal: 24,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 16,
+                      offset: Offset(0, 8),
+                    )
+                  ],
+                ),
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
 
                   /// TITLE
                   Text(
                     "Create Account",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: screenWidth * 0.06,
+                      fontSize: screenWidth < 400 ? 22 : 26,
                       fontWeight: FontWeight.bold,
                       color: primaryGreen,
                     ),
@@ -113,12 +118,12 @@ class _RegisterPageState extends State<RegisterPage> {
                     "Register to start using the app",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: screenWidth * 0.04,
+                      fontSize: screenWidth < 400 ? 14 : 16,
                       color: Colors.grey[700],
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
 
                   /// NOM
                   TextField(
@@ -132,7 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// PRENOM
                   TextField(
@@ -146,7 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// EMAIL
                   TextField(
@@ -160,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// PASSWORD
                   TextField(
@@ -187,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// CONFIRM PASSWORD
                   TextField(
@@ -214,7 +219,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// PHONE
                   TextField(
@@ -229,7 +234,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.phone,
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// CNI
                   TextField(
@@ -243,7 +248,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// PERMIS
                   TextField(
@@ -257,7 +262,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// ID CAMION
                   TextField(
@@ -279,7 +284,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ? const Center(child: CircularProgressIndicator())
                       : SizedBox(
                           width: double.infinity,
-                          height: screenHeight * 0.06,
+                          height: 50,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: primaryGreen,
@@ -308,7 +313,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                         )),
 
-                  SizedBox(height: screenHeight * 0.02),
+                  const SizedBox(height: 16),
 
                   /// LOGIN LINK
                   TextButton(
@@ -331,7 +336,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
