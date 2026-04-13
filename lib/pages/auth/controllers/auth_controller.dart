@@ -131,18 +131,18 @@ class AuthController extends GetxController {
         Map<String, dynamic> userData = {};
 
         if (data is Map) {
-          if (data.containsKey('token') && data.containsKey('data')) {
-            token = data['token'];
+          if (data.containsKey('data')) {
             userData = Map<String, dynamic>.from(data['data'] ?? {});
           } else {
             userData = Map<String, dynamic>.from(data);
-            token = data['token'];
           }
+          token = _extractToken(_asMap(data), userData);
         }
 
         // Save to storage
-        if (token != null) {
-          await box.write('token', token);
+        final normalizedToken = token?.trim();
+        if (normalizedToken != null && normalizedToken.isNotEmpty) {
+          await box.write('token', normalizedToken);
         }
         if (userData.isNotEmpty) {
           await box.write('user', userData);
@@ -177,4 +177,30 @@ class AuthController extends GetxController {
     }
   }
 
+  Map<String, dynamic> _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return <String, dynamic>{};
+  }
+
+  String? _extractToken(
+    Map<String, dynamic> root,
+    Map<String, dynamic> payload,
+  ) {
+    const keys = ['token', 'access_token', 'api_token', 'auth_token'];
+    for (final key in keys) {
+      final value = root[key] ?? payload[key];
+      final token = value?.toString().trim();
+      if (token != null && token.isNotEmpty) return token;
+    }
+
+    final nested = _asMap(payload['data']);
+    for (final key in keys) {
+      final value = nested[key];
+      final token = value?.toString().trim();
+      if (token != null && token.isNotEmpty) return token;
+    }
+
+    return null;
+  }
 }

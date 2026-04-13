@@ -365,9 +365,8 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: EmptyState(
                   icon: Icons.directions_bus_outlined,
-                  title: 'Aucune tournée assignée',
-                  subtitle:
-                      'Aucune tournée optimisée ne vous est actuellement assignée.\nVeuillez contacter l\'administration si le problème persiste.',
+                  title: "vous n'avez aucune tournee pour le moment",
+                  subtitle: '',
                 ),
               ),
             );
