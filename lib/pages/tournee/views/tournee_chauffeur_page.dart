@@ -5,6 +5,7 @@ import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../models/tournee_model.dart';
@@ -12,6 +13,7 @@ import '../../chauffeur/controllers/chauffeur_controller.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/services/tournee_service.dart';
 import '../../../widgets/snackbar_helper.dart';
+import '../controllers/tournee_controller.dart';
 
 class TourneeChauffeurPage extends StatefulWidget {
   const TourneeChauffeurPage({super.key});
@@ -320,6 +322,59 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     }
   }
 
+  Future<void> _startNewTournee() async {
+    try {
+      // Get current chauffeur
+      final storedUser = GetStorage().read('user');
+      if (storedUser is! Map || storedUser['id'] == null) {
+        showNadiSnackbar(
+          title: 'Erreur',
+          message: 'Utilisateur non connecté.',
+          type: NadiSnackbarType.error,
+        );
+        return;
+      }
+      final userId = storedUser['id'] as int;
+      final chauffeur = await _chauffeurController.getChauffeurDetails(userId);
+      if (chauffeur == null || chauffeur.camion == null) {
+        showNadiSnackbar(
+          title: 'Erreur',
+          message: 'Aucun camion assigné. Contactez l\'administration.',
+          type: NadiSnackbarType.error,
+        );
+        return;
+      }
+
+      // Create new tournee
+      final now = DateTime.now();
+      final tourneeController = Get.find<TourneeController>();
+      await tourneeController.addTournee(
+        Tournee(
+          id: 0,
+          dateTournee: now,
+          heureDebut: '',
+          heureFin: null,
+          status: 'planifiee',
+          camion: chauffeur.camion,
+          zone: null, // Will be assigned by backend or admin
+        ),
+      );
+
+      // Refresh and get the newly created tournee
+      final tournees = await _chauffeurController.fetchMyTournees(showSnackbar: false);
+      if (tournees.isNotEmpty) {
+        final newTournee = tournees.last; // Assuming the last one is the new one
+        await _startTour(newTournee);
+      }
+    } catch (e) {
+      showNadiSnackbar(
+        title: 'Erreur',
+        message: 'Échec de création de tournée: ${e.toString()}',
+        type: NadiSnackbarType.error,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppLayout(
@@ -367,7 +422,12 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                   icon: Icons.directions_bus_outlined,
                   title: 'Aucune tournée assignée',
                   subtitle:
-                      'Aucune tournée optimisée ne vous est actuellement assignée.\nVeuillez contacter l\'administration si le problème persiste.',
+                      'Commencez une nouvelle tournée ou contactez l\'administration.',
+                  action: ElevatedButton.icon(
+                    onPressed: _startNewTournee,
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Démarrer une tournée'),
+                  ),
                 ),
               ),
             );
