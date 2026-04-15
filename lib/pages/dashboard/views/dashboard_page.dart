@@ -473,7 +473,12 @@ class _OperationsInsights extends StatelessWidget {
     final camionsDisponibles = _toInt(stats['camions_disponibles']);
     final camionsCollecte = _toInt(stats['camions_en_collecte']);
     final camionsHs = _toInt(stats['camions_hors_service']);
-    final criticalBins = _toInt(stats['bennes_critique']);
+    
+    // Tournées aujourd'hui
+    final tourneesEnCoursAujourdhui = _toInt(stats['tournees_en_cours_aujourdhui']);
+    final tourneesTermineesAujourdhui = _toInt(stats['tournees_terminees_aujourdhui']);
+    final tourneesPlanifieesAujourdhui = _toInt(stats['tournees_planifiees_aujourdhui']);
+    final tourneesRatteeAujourdhui = _toInt(stats['tournees_rattées_aujourdhui']);
 
     final rawWeek = stats['tournees_7_derniers_jours'];
     final weekly = (rawWeek is List ? rawWeek : const [])
@@ -526,6 +531,34 @@ class _OperationsInsights extends StatelessWidget {
                   tone: camionsHs > 0
                       ? const Color(0xFFF59E0B)
                       : const Color(0xFF2563EB),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _InsightTile(
+                  icon: Icons.route_outlined,
+                  title: 'Tournees auj.',
+                  value: '$tourneesTermineesAujourdhui terminées',
+                  subtitle: '$tourneesEnCoursAujourdhui en cours',
+                  tone: tourneesTermineesAujourdhui > 0
+                      ? const Color(0xFF16A34A)
+                      : const Color(0xFF2563EB),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _InsightTile(
+                  icon: Icons.cancel_outlined,
+                  title: 'Tournees rattées',
+                  value: '$tourneesRatteeAujourdhui annulées',
+                  subtitle: '$tourneesPlanifieesAujourdhui planifiées',
+                  tone: tourneesRatteeAujourdhui > 0
+                      ? const Color(0xFFDC2626)
+                      : const Color(0xFF16A34A),
                 ),
               ),
             ],
