@@ -118,6 +118,10 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                         scheme: scheme,
                       ),
                       const Divider(),
+                      _DetailRow(icon: Icons.info_outline,
+                       label: 'statut',
+                       value: benne.status,
+                        scheme: scheme),
                       _DetailRow(
                         icon: Icons.inventory_2,
                         label: 'Capacite',

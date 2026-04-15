@@ -25,8 +25,6 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
   final _formKey = GlobalKey<FormState>();
   bool _saving = false;
   late final TextEditingController _dateController;
-  late final TextEditingController _heureDebutController;
-  late final TextEditingController _heureFinController;
   late final TextEditingController _idCamionController;
   late final TextEditingController _idZoneController;
   String? _selectedStatus;
@@ -38,12 +36,6 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
       text: widget.tournee != null
           ? widget.tournee!.dateTournee.toIso8601String().split('T').first
           : '',
-    );
-    _heureDebutController = TextEditingController(
-      text: widget.tournee?.heureDebut ?? '',
-    );
-    _heureFinController = TextEditingController(
-      text: widget.tournee?.heureFin ?? '',
     );
     _selectedStatus = _normalizeStatus(widget.tournee?.status);
     _idCamionController = TextEditingController(
@@ -62,8 +54,6 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
   @override
   void dispose() {
     _dateController.dispose();
-    _heureDebutController.dispose();
-    _heureFinController.dispose();
     _idCamionController.dispose();
     _idZoneController.dispose();
     super.dispose();
@@ -81,16 +71,6 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
     if (compact.contains('term') || compact.contains('fini')) return 'terminee';
     if (_statusOptions.contains(value)) return value;
     return null;
-  }
-
-  static final _timeRegex = RegExp(r'^([01]?\d|2[0-3]):[0-5]\d(:[0-5]\d)?$');
-
-  String _formatTime(String input) {
-    final parts = input.trim().split(':');
-    if (parts.length >= 2) {
-      return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
-    }
-    return input.trim();
   }
 
   Future<void> _save() async {
@@ -129,8 +109,6 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
     }
 
     final controller = Get.find<TourneeController>();
-    final debut = _formatTime(_heureDebutController.text);
-    final fin = _formatTime(_heureFinController.text);
     setState(() => _saving = true);
     try {
       if (widget.tournee == null) {
@@ -138,8 +116,8 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
           Tournee(
             id: 0,
             dateTournee: date,
-            heureDebut: debut,
-            heureFin: fin,
+            heureDebut: '',
+            heureFin: null,
             status: _selectedStatus!,
             camion: idCamion != null
                 ? Camion(
@@ -166,8 +144,8 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
           Tournee(
             id: widget.tournee!.id,
             dateTournee: date,
-            heureDebut: debut,
-            heureFin: fin,
+            heureDebut: widget.tournee!.heureDebut,
+            heureFin: widget.tournee!.heureFin,
             status: _selectedStatus!,
             camion: idCamion != null
                 ? Camion(
@@ -227,32 +205,6 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
                 },
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                controller: _heureDebutController,
-                decoration: const InputDecoration(
-                  labelText: 'Heure début (HH:mm)',
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Requis';
-                  if (!_timeRegex.hasMatch(v.trim()))
-                    return 'Format invalide (HH:mm)';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _heureFinController,
-                decoration: const InputDecoration(
-                  labelText: 'Heure fin (HH:mm)',
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Requis';
-                  if (!_timeRegex.hasMatch(v.trim()))
-                    return 'Format invalide (HH:mm)';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: _selectedStatus,
                 decoration: const InputDecoration(labelText: 'Statut'),
@@ -279,8 +231,9 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
                   if (v == null || v.trim().isEmpty) {
                     return isCreate ? 'Requis' : null;
                   }
-                  if (int.tryParse(v.trim()) == null)
+                  if (int.tryParse(v.trim()) == null) {
                     return 'Doit être un entier';
+                  }
                   return null;
                 },
               ),
@@ -295,8 +248,9 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
                   if (v == null || v.trim().isEmpty) {
                     return isCreate ? 'Requis' : null;
                   }
-                  if (int.tryParse(v.trim()) == null)
+                  if (int.tryParse(v.trim()) == null) {
                     return 'Doit être un entier';
+                  }
                   return null;
                 },
               ),
