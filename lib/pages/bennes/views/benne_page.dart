@@ -28,21 +28,21 @@ class BennesPage extends GetView<BennesController> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                FloatingActionButton.extended(
+                FloatingActionButton(
                   onPressed: () => Get.dialog(const BenneFormDialog()),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Ajouter une benne'),
+                 
+                  child: const Icon(Icons.add),
                   backgroundColor: AppTheme.accentColor,
                   foregroundColor: AppTheme.textLight,
                 ),
                 const SizedBox(height: 12),
-                FloatingActionButton.extended(
+                FloatingActionButton(
                   onPressed: () => _openAddCapteurDialog(
                     context,
                     onAdded: controller.fetchBennes,
                   ),
-                  icon: const Icon(Icons.sensors),
-                  label: const Text('Ajouter capteur'),
+                 
+                  child: const Icon(Icons.sensors),
                   backgroundColor: Colors.teal.shade600,
                   foregroundColor: Colors.white,
                 ),
@@ -75,10 +75,9 @@ class BennesPage extends GetView<BennesController> {
                   subtitle: 'Commencez par ajouter votre première benne',
                   action: isChauffeur
                       ? null
-                      : ElevatedButton.icon(
+                      : ElevatedButton(
                           onPressed: () => Get.dialog(const BenneFormDialog()),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Ajouter'),
+                          child: const Icon(Icons.add),
                         ),
                 );
               }
@@ -317,7 +316,7 @@ class BennesPage extends GetView<BennesController> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(false),
-                  child: const Text('Annuler'),
+                  child: const Icon(Icons.close),
                 ),
                 FilledButton(
                   onPressed: saving
@@ -356,7 +355,7 @@ class BennesPage extends GetView<BennesController> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Ajouter'),
+                      : const Icon(Icons.add),
                 ),
               ],
             );

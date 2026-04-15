@@ -54,9 +54,7 @@ class _TourneeChauffeurHistoryPageState
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: AppTheme.accentColor,
-              ),
+              child: CircularProgressIndicator(color: AppTheme.accentColor),
             );
           }
 
@@ -68,14 +66,13 @@ class _TourneeChauffeurHistoryPageState
                 title: 'Erreur',
                 subtitle:
                     'Impossible de charger l\'historique.\n${snapshot.error}',
-                action: ElevatedButton.icon(
+                action: ElevatedButton(
                   onPressed: () {
                     setState(() {
                       _futureHistory = _loadHistory();
                     });
                   },
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Reessayer'),
+                  child: const Icon(Icons.refresh),
                 ),
               ),
             );
@@ -104,9 +101,7 @@ class _TourneeChauffeurHistoryPageState
               final tournee = history[index];
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                child: TourneeCard(
-                  tournee: tournee,
-                ),
+                child: TourneeCard(tournee: tournee),
               );
             },
           );

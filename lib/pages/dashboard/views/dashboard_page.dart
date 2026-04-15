@@ -86,7 +86,8 @@ class _HeroBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final user = _readUserName();
-    final totalAssets = _toInt(stats['total_zones']) +
+    final totalAssets =
+        _toInt(stats['total_zones']) +
         _toInt(stats['total_bennes']) +
         _toInt(stats['total_camions']) +
         _toInt(stats['total_chauffeurs']);
@@ -143,9 +144,9 @@ class _HeroBanner extends StatelessWidget {
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerLeft,
-              child: ElevatedButton.icon(
+              child: ElevatedButton(
                 onPressed: isOptimising ? null : onOptimiser,
-                icon: isOptimising
+                child: isOptimising
                     ? SizedBox(
                         width: 16,
                         height: 16,
@@ -155,12 +156,16 @@ class _HeroBanner extends StatelessWidget {
                         ),
                       )
                     : const Icon(Icons.auto_graph_rounded, size: 18),
-                label: Text(isOptimising ? 'Optimisation...' : 'Optimiser les tournees'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: scheme.onPrimary,
                   foregroundColor: scheme.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
@@ -187,7 +192,9 @@ class _PerformancePanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.55)),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.55),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,8 +217,8 @@ class _PerformancePanel extends StatelessWidget {
                   color: fullRate >= 70
                       ? const Color(0xFFDC2626)
                       : fullRate >= 40
-                          ? const Color(0xFFF59E0B)
-                          : const Color(0xFF16A34A),
+                      ? const Color(0xFFF59E0B)
+                      : const Color(0xFF16A34A),
                 ),
               ),
               const SizedBox(width: 12),
@@ -299,12 +306,42 @@ class _StatsWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cards = <_Kpi>[
-      _Kpi(Icons.map_outlined, 'Zones', _toInt(stats['total_zones']), const Color(0xFF0EA5E9)),
-      _Kpi(Icons.delete_outline, 'Bennes', _toInt(stats['total_bennes']), const Color(0xFF16A34A)),
-      _Kpi(Icons.local_shipping_outlined, 'Camions', _toInt(stats['total_camions']), const Color(0xFFF97316)),
-      _Kpi(Icons.person_outline, 'Chauffeurs', _toInt(stats['total_chauffeurs']), const Color(0xFF7C3AED)),
-      _Kpi(Icons.route_outlined, 'Tournees', _toInt(stats['total_tournees']), const Color(0xFFDC2626)),
-      _Kpi(Icons.today_outlined, 'Aujourdhui', _toInt(stats['tournees_aujourdhui']), const Color(0xFF2563EB)),
+      _Kpi(
+        Icons.map_outlined,
+        'Zones',
+        _toInt(stats['total_zones']),
+        const Color(0xFF0EA5E9),
+      ),
+      _Kpi(
+        Icons.delete_outline,
+        'Bennes',
+        _toInt(stats['total_bennes']),
+        const Color(0xFF16A34A),
+      ),
+      _Kpi(
+        Icons.local_shipping_outlined,
+        'Camions',
+        _toInt(stats['total_camions']),
+        const Color(0xFFF97316),
+      ),
+      _Kpi(
+        Icons.person_outline,
+        'Chauffeurs',
+        _toInt(stats['total_chauffeurs']),
+        const Color(0xFF7C3AED),
+      ),
+      _Kpi(
+        Icons.route_outlined,
+        'Tournees',
+        _toInt(stats['total_tournees']),
+        const Color(0xFFDC2626),
+      ),
+      _Kpi(
+        Icons.today_outlined,
+        'Aujourdhui',
+        _toInt(stats['tournees_aujourdhui']),
+        const Color(0xFF2563EB),
+      ),
     ];
 
     return LayoutBuilder(
@@ -314,7 +351,12 @@ class _StatsWrap extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: cards
-              .map((e) => SizedBox(width: width, child: _MiniStatCard(item: e)))
+              .map(
+                (e) => SizedBox(
+                  width: width,
+                  child: _MiniStatCard(item: e),
+                ),
+              )
               .toList(),
         );
       },
@@ -405,7 +447,9 @@ class _OperationsInsights extends StatelessWidget {
 
     final rawWeek = stats['tournees_7_derniers_jours'];
     final weekly = (rawWeek is List ? rawWeek : const [])
-        .map((e) => e is Map ? Map<String, dynamic>.from(e) : <String, dynamic>{})
+        .map(
+          (e) => e is Map ? Map<String, dynamic>.from(e) : <String, dynamic>{},
+        )
         .toList();
 
     return Container(
@@ -413,7 +457,9 @@ class _OperationsInsights extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.55)),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.55),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -519,10 +565,7 @@ class _InsightTile extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: TextStyle(
-              color: scheme.onSurfaceVariant,
-              fontSize: 11,
-            ),
+            style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 11),
           ),
         ],
       ),
@@ -539,10 +582,12 @@ class _WeeklyToursBars extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final parsed = data
-        .map((e) => _DayTours(
-              date: e['date']?.toString() ?? '',
-              total: _toInt(e['total']),
-            ))
+        .map(
+          (e) => _DayTours(
+            date: e['date']?.toString() ?? '',
+            total: _toInt(e['total']),
+          ),
+        )
         .toList();
 
     final max = parsed.isEmpty
@@ -613,7 +658,9 @@ class _WeeklyToursBars extends StatelessWidget {
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 350),
                                   curve: Curves.easeOutCubic,
-                                  height: ((e.total / max) * 92).clamp(6, 92).toDouble(),
+                                  height: ((e.total / max) * 92)
+                                      .clamp(6, 92)
+                                      .toDouble(),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     gradient: const LinearGradient(

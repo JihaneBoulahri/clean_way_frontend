@@ -43,7 +43,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                 IconButton(
                   onPressed: () => Get.back(),
                   icon: Icon(Icons.arrow_back, color: scheme.primary),
-                  tooltip: 'Retour',
+             
                   style: IconButton.styleFrom(
                     backgroundColor: scheme.surface,
                     side: BorderSide(
@@ -74,7 +74,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                           }
                         },
                         icon: const Icon(Icons.edit),
-                        tooltip: 'Modifier',
+                    
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.blue.shade100,
                           foregroundColor: Colors.blue.shade700,
@@ -85,7 +85,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                         onPressed: () =>
                             _showDeleteDialog(context, zone, controller),
                         icon: const Icon(Icons.delete),
-                        tooltip: 'Supprimer',
+                  
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.red.shade100,
                           foregroundColor: Colors.red.shade700,
@@ -190,7 +190,10 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
           'Êtes-vous sûr de vouloir supprimer la zone "${zone.nomZone}" ?',
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Icon(Icons.close),
+          ),
           ElevatedButton(
             onPressed: () async {
               await controller.deleteZone(zone.id);
@@ -201,7 +204,7 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Supprimer'),
+            child: const Icon(Icons.delete),
           ),
         ],
       ),

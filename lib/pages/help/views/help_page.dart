@@ -27,10 +27,7 @@ class HelpPage extends GetView<HelpController> {
                 } else {
                   imagePath = 'images/moroccan_tile_bg_pc.jpeg';
                 }
-                return Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                );
+                return Image.asset(imagePath, fit: BoxFit.cover);
               },
             ),
           ),
@@ -39,7 +36,9 @@ class HelpPage extends GetView<HelpController> {
           Positioned.fill(
             child: Container(
               color: Colors.black.withValues(
-                alpha: Theme.of(context).brightness == Brightness.dark ? 0.42 : 0.12,
+                alpha: Theme.of(context).brightness == Brightness.dark
+                    ? 0.42
+                    : 0.12,
               ),
             ),
           ),
@@ -54,7 +53,11 @@ class HelpPage extends GetView<HelpController> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
@@ -77,7 +80,11 @@ class HelpPage extends GetView<HelpController> {
                     ),
                     child: Column(
                       children: [
-                        Icon(Icons.help_outline, size: 48, color: scheme.onPrimary),
+                        Icon(
+                          Icons.help_outline,
+                          size: 48,
+                          color: scheme.onPrimary,
+                        ),
                         SizedBox(height: 12),
                         Text(
                           'Need Help?',
@@ -91,7 +98,10 @@ class HelpPage extends GetView<HelpController> {
                         Text(
                           'Find FAQs, contact support, or send your feedback here.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: scheme.onPrimary.withOpacity(0.7), fontSize: 16),
+                          style: TextStyle(
+                            color: scheme.onPrimary.withOpacity(0.7),
+                            fontSize: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -100,12 +110,14 @@ class HelpPage extends GetView<HelpController> {
 
                   // FAQs section
                   _buildSectionTitle('FAQs', primaryColor),
-                  _faqCard(context,
+                  _faqCard(
+                    context,
                     'How do I add a new tour?',
                     'Go to the Tours page, click Add, fill in required fields, then save.',
                     primaryColor,
                   ),
-                  _faqCard(context,
+                  _faqCard(
+                    context,
                     'What if I forget a required field?',
                     'Make sure required fields like Date, Start Time, and Status are filled.',
                     primaryColor,
@@ -114,8 +126,20 @@ class HelpPage extends GetView<HelpController> {
 
                   // Contact Support
                   _buildSectionTitle('Contact Support', primaryColor),
-                  _contactCard(context, Icons.email, 'Email Us', 'support@example.com', primaryColor),
-                  _contactCard(context, Icons.phone, 'Call Support', '+212 600 123 456', primaryColor),
+                  _contactCard(
+                    context,
+                    Icons.email,
+                    'Email Us',
+                    'support@example.com',
+                    primaryColor,
+                  ),
+                  _contactCard(
+                    context,
+                    Icons.phone,
+                    'Call Support',
+                    '+212 600 123 456',
+                    primaryColor,
+                  ),
                   const SizedBox(height: 24),
 
                   // Contact Us
@@ -147,7 +171,12 @@ class HelpPage extends GetView<HelpController> {
     );
   }
 
-  Widget _faqCard(BuildContext context, String question, String answer, Color primaryColor) {
+  Widget _faqCard(
+    BuildContext context,
+    String question,
+    String answer,
+    Color primaryColor,
+  ) {
     // use cardColor for background and scheme colors for text
     final scheme = Theme.of(context).colorScheme;
     final cardColor = scheme.surface;
@@ -161,11 +190,7 @@ class HelpPage extends GetView<HelpController> {
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(
-            color: shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: shadow, blurRadius: 8, offset: const Offset(0, 4)),
         ],
       ),
       child: ExpansionTile(
@@ -183,7 +208,13 @@ class HelpPage extends GetView<HelpController> {
     );
   }
 
-  Widget _contactCard(BuildContext context, IconData icon, String title, String info, Color primaryColor) {
+  Widget _contactCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String info,
+    Color primaryColor,
+  ) {
     final scheme = Theme.of(context).colorScheme;
     final cardColor = scheme.surface;
     final onCard = scheme.onSurface;
@@ -196,11 +227,7 @@ class HelpPage extends GetView<HelpController> {
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(
-            color: shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: shadow, blurRadius: 8, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -210,13 +237,18 @@ class HelpPage extends GetView<HelpController> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title,
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  )),
-              Text(info, style: TextStyle(color: onCard.withOpacity(0.7), fontSize: 14)),
+              Text(
+                title,
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                info,
+                style: TextStyle(color: onCard.withOpacity(0.7), fontSize: 14),
+              ),
             ],
           ),
         ],
@@ -236,11 +268,7 @@ class HelpPage extends GetView<HelpController> {
         color: cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(
-            color: shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: shadow, blurRadius: 8, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -260,15 +288,23 @@ class HelpPage extends GetView<HelpController> {
             () => ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               onPressed: controller.isSending.value
                   ? null
                   : controller.sendSupportMessage,
-              child: Text(
-                controller.isSending.value ? 'Sending...' : 'Send',
-                style: TextStyle(color: scheme.onPrimary),
-              ),
+              child: controller.isSending.value
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: scheme.onPrimary,
+                      ),
+                    )
+                  : Icon(Icons.send, color: scheme.onPrimary),
             ),
           ),
         ],

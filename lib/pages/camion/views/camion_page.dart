@@ -22,10 +22,10 @@ class CamionPage extends GetView<CamionController> {
       pageName: "Camions",
       floatingActionButton: isChauffeur
           ? null
-          : FloatingActionButton.extended(
+          : FloatingActionButton(
               onPressed: () => Get.dialog(const CamionFormDialog()),
-              icon: const Icon(Icons.add),
-              label: const Text('Ajouter un camion'),
+   
+              child: const Icon(Icons.add),
               backgroundColor: AppTheme.accentColor,
               foregroundColor: AppTheme.textLight,
             ),
@@ -46,9 +46,7 @@ class CamionPage extends GetView<CamionController> {
             if (controller.isLoading.value) {
               return const Expanded(
                 child: Center(
-                  child: CircularProgressIndicator(
-                    color: AppTheme.accentColor,
-                  ),
+                  child: CircularProgressIndicator(color: AppTheme.accentColor),
                 ),
               );
             }
@@ -61,16 +59,14 @@ class CamionPage extends GetView<CamionController> {
                   subtitle: controller.error.value ?? 'Échec du chargement',
                   action: Column(
                     children: [
-                      ElevatedButton.icon(
+                      ElevatedButton(
                         onPressed: () => controller.fetchCamions(),
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Réessayer'),
+                        child: const Icon(Icons.refresh),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextButton.icon(
+                      TextButton(
                         onPressed: () => Get.offAllNamed(AppRoutes.login),
-                        icon: const Icon(Icons.logout),
-                        label: const Text('Retour'),
+                        child: const Icon(Icons.logout),
                       ),
                     ],
                   ),
@@ -84,14 +80,13 @@ class CamionPage extends GetView<CamionController> {
                 child: EmptyState(
                   icon: Icons.local_shipping,
                   title: 'Aucun camion',
-                  subtitle: controller.camions.isEmpty 
+                  subtitle: controller.camions.isEmpty
                       ? 'Commencez par ajouter votre premier camion'
                       : 'Aucun résultat trouvé',
                   action: (!isChauffeur && controller.camions.isEmpty)
-                      ? ElevatedButton.icon(
+                      ? ElevatedButton(
                           onPressed: () => Get.dialog(const CamionFormDialog()),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Ajouter'),
+                          child: const Icon(Icons.add),
                         )
                       : null,
                 ),
@@ -110,9 +105,7 @@ class CamionPage extends GetView<CamionController> {
                   final camion = list[i];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                    child: CamionCard(
-                      camion: camion,
-                    ),
+                    child: CamionCard(camion: camion),
                   );
                 },
               ),

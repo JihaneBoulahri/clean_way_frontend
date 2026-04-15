@@ -233,7 +233,7 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: const Icon(Icons.close),
         ),
         FilledButton(
           onPressed: _saving ? null : _save,
@@ -243,7 +243,7 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(isEdit ? 'Modifier' : 'Ajouter'),
+              : Icon(isEdit ? Icons.check : Icons.add),
         ),
       ],
     );

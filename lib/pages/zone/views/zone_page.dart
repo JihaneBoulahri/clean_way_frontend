@@ -22,10 +22,10 @@ class ZonePage extends GetView<ZoneController> {
       pageName: "Zones",
       floatingActionButton: isChauffeur
           ? null
-          : FloatingActionButton.extended(
+          : FloatingActionButton(
               onPressed: () => Get.dialog(const ZoneFormDialog()),
-              icon: const Icon(Icons.add),
-              label: const Text('Ajouter une zone'),
+       
+              child: const Icon(Icons.add),
               backgroundColor: AppTheme.accentColor,
               foregroundColor: AppTheme.textLight,
             ),
@@ -58,16 +58,14 @@ class ZonePage extends GetView<ZoneController> {
                   action: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ElevatedButton.icon(
+                      ElevatedButton(
                         onPressed: () => controller.fetchZones(),
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Reessayer'),
+                        child: const Icon(Icons.refresh),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextButton.icon(
+                      TextButton(
                         onPressed: () => Get.offAllNamed(AppRoutes.login),
-                        icon: const Icon(Icons.logout),
-                        label: const Text('Retour'),
+                        child: const Icon(Icons.logout),
                       ),
                     ],
                   ),
@@ -78,11 +76,11 @@ class ZonePage extends GetView<ZoneController> {
                 return EmptyState(
                   icon: Icons.delete_sweep_outlined,
                   title: 'Aucune zone',
-                  subtitle: 'Commencez par ajouter votre premiere zone de depot',
-                  action: ElevatedButton.icon(
+                  subtitle:
+                      'Commencez par ajouter votre premiere zone de depot',
+                  action: ElevatedButton(
                     onPressed: () => Get.dialog(const ZoneFormDialog()),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Ajouter'),
+                    child: const Icon(Icons.add),
                   ),
                 );
               }
@@ -139,9 +137,7 @@ class ZonePage extends GetView<ZoneController> {
         ),
       ],
       onApply: (values) {
-        controller.applyFilters(
-          type: values['type'] ?? FilterDefaults.all,
-        );
+        controller.applyFilters(type: values['type'] ?? FilterDefaults.all);
       },
     );
   }

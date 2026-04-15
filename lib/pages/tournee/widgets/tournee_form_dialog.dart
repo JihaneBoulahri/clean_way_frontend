@@ -261,7 +261,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: const Icon(Icons.close),
         ),
         FilledButton(
           onPressed: _saving ? null : _save,
@@ -271,7 +271,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(isEdit ? 'Modifier' : 'Ajouter'),
+              : Icon(isEdit ? Icons.check : Icons.add),
         ),
       ],
     );

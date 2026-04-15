@@ -48,7 +48,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                     IconButton(
                       onPressed: () => Get.back(),
                       icon: Icon(Icons.arrow_back, color: scheme.primary),
-                      tooltip: 'Retour',
+                     
                       style: IconButton.styleFrom(
                         backgroundColor: scheme.surface,
                         side: BorderSide(
@@ -77,7 +77,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                               setState(() {});
                             },
                             icon: const Icon(Icons.edit),
-                            tooltip: 'Modifier',
+                           
                             style: IconButton.styleFrom(
                               backgroundColor: Colors.blue.shade100,
                               foregroundColor: Colors.blue.shade700,
@@ -88,7 +88,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                             onPressed: () =>
                                 _showDeleteDialog(context, benne, controller),
                             icon: const Icon(Icons.delete),
-                            tooltip: 'Supprimer',
+                           
                             style: IconButton.styleFrom(
                               backgroundColor: Colors.red.shade100,
                               foregroundColor: Colors.red.shade700,
@@ -118,10 +118,12 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                         scheme: scheme,
                       ),
                       const Divider(),
-                      _DetailRow(icon: Icons.info_outline,
-                       label: 'statut',
-                       value: benne.status,
-                        scheme: scheme),
+                      _DetailRow(
+                        icon: Icons.info_outline,
+                        label: 'statut',
+                        value: benne.status,
+                        scheme: scheme,
+                      ),
                       _DetailRow(
                         icon: Icons.inventory_2,
                         label: 'Capacite',
@@ -200,7 +202,10 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
         title: const Text('Confirmer la suppression'),
         content: Text('Voulez-vous supprimer la benne #${benne.id} ?'),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Icon(Icons.close),
+          ),
           ElevatedButton(
             onPressed: () async {
               await controller.deleteBenne(benne.id);
@@ -211,7 +216,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Supprimer'),
+            child: const Icon(Icons.delete),
           ),
         ],
       ),
@@ -308,7 +313,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                           if (!isChauffeur)
                             Row(
                               children: [
-                                OutlinedButton.icon(
+                                OutlinedButton(
                                   onPressed: () async {
                                     await _openAddCapteurDialog(
                                       context,
@@ -317,17 +322,15 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                                     );
                                     if (mounted) setState(() {});
                                   },
-                                  icon: const Icon(Icons.edit),
-                                  label: const Text('Modifier'),
+                                  child: const Icon(Icons.edit),
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
-                                OutlinedButton.icon(
+                                OutlinedButton(
                                   onPressed: () => _deleteCapteurWithConfirm(
                                     context,
                                     capteur,
                                   ),
-                                  icon: const Icon(Icons.delete),
-                                  label: const Text('Supprimer'),
+                                  child: const Icon(Icons.delete),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.red.shade700,
                                   ),
@@ -542,7 +545,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(false),
-                  child: const Text('Annuler'),
+                  child: const Icon(Icons.close),
                 ),
                 FilledButton(
                   onPressed: saving
@@ -590,7 +593,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                           height: 16,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(isEdit ? 'Modifier' : 'Ajouter'),
+                      : Icon(isEdit ? Icons.check : Icons.add),
                 ),
               ],
             );
@@ -628,7 +631,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Annuler'),
+            child: const Icon(Icons.close),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -636,7 +639,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Supprimer'),
+            child: const Icon(Icons.delete),
           ),
         ],
       ),

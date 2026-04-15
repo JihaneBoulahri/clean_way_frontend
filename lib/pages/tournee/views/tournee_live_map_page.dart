@@ -98,10 +98,12 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
           ];
           for (var i = 0; i < offsets.length; i++) {
             final offset = offsets[i];
-            _routeStops.add(LatLng(
-              startPoint.latitude + offset.latitude,
-              startPoint.longitude + offset.longitude,
-            ));
+            _routeStops.add(
+              LatLng(
+                startPoint.latitude + offset.latitude,
+                startPoint.longitude + offset.longitude,
+              ),
+            );
             _routeStopLabels.add('Benne ${i + 1}');
           }
         }
@@ -116,10 +118,12 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
         ];
         for (var i = 0; i < offsets.length; i++) {
           final offset = offsets[i];
-          _routeStops.add(LatLng(
-            startPoint.latitude + offset.latitude,
-            startPoint.longitude + offset.longitude,
-          ));
+          _routeStops.add(
+            LatLng(
+              startPoint.latitude + offset.latitude,
+              startPoint.longitude + offset.longitude,
+            ),
+          );
           _routeStopLabels.add('Benne ${i + 1}');
         }
       }
@@ -269,14 +273,13 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    ElevatedButton.icon(
+                    ElevatedButton(
                       onPressed: () {
                         setState(() {
                           _futureTournee = _loadCurrentTournee();
                         });
                       },
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Reessayer'),
+                      child: const Icon(Icons.refresh),
                     ),
                   ],
                 ),
@@ -304,9 +307,10 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
             );
           }
 
-          final normalizedStatus = tournee.status
-              .toLowerCase()
-              .replaceAll(RegExp(r'[^a-z0-9]'), '');
+          final normalizedStatus = tournee.status.toLowerCase().replaceAll(
+            RegExp(r'[^a-z0-9]'),
+            '',
+          );
           final isStarted =
               normalizedStatus == 'encours' || normalizedStatus == 'terminee';
           final isFinished = normalizedStatus == 'terminee';
@@ -319,12 +323,18 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
           final scheme = Theme.of(context).colorScheme;
           final compactFilled = FilledButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
             visualDensity: VisualDensity.compact,
           );
           final compactOutlined = OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
             visualDensity: VisualDensity.compact,
           );
 
@@ -334,11 +344,10 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
               children: [
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton.icon(
+                  child: FilledButton(
                     style: compactFilled,
                     onPressed: _hasRouteStops ? _passToNextBenne : null,
-                    icon: const Icon(Icons.skip_next, size: 16),
-                    label: const Text('Passer a la suivante'),
+                    child: const Icon(Icons.skip_next, size: 16),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -347,9 +356,9 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Infos tournee',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 _InfoRow(label: 'ID', value: '${tournee.id}'),
@@ -368,24 +377,26 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
               children: [
                 Text(
                   'Select',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 _RouteSelectButton(
                   value: _routeMode,
                   onSelected: _selectRouteMode,
-                  textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 SizedBox(
                   width: double.infinity,
-                  child: OutlinedButton.icon(
+                  child: OutlinedButton(
                     style: compactOutlined,
                     onPressed: point == null ? null : () => _recenterMap(point),
-                    icon: const Icon(Icons.center_focus_strong, size: 16),
-                    label: const Text('Centrer'),
+                    child: const Icon(Icons.center_focus_strong, size: 16),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
@@ -414,10 +425,8 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                   onRecenter: point == null
                       ? null
                       : () => _recenterMap(
-                            _hasRouteStops
-                                ? _routeStops[_currentSegment]
-                                : point,
-                          ),
+                          _hasRouteStops ? _routeStops[_currentSegment] : point,
+                        ),
                   fullBleed: true,
                 ),
               ),
@@ -535,10 +544,7 @@ class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _InfoRow({
-    required this.label,
-    required this.value,
-  });
+  const _InfoRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -561,9 +567,9 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontSize: 12,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(fontSize: 12),
             ),
           ),
         ],
@@ -596,8 +602,9 @@ class _LiveMapPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final radius =
-        fullBleed ? BorderRadius.zero : BorderRadius.circular(AppRadius.md);
+    final radius = fullBleed
+        ? BorderRadius.zero
+        : BorderRadius.circular(AppRadius.md);
     final routePoints = _routePoints();
     final markers = _routeMarkers(scheme);
 
@@ -617,10 +624,7 @@ class _LiveMapPanel extends StatelessWidget {
                 children: [
                   FlutterMap(
                     mapController: mapController,
-                    options: MapOptions(
-                      initialCenter: point!,
-                      initialZoom: 14,
-                    ),
+                    options: MapOptions(initialCenter: point!, initialZoom: 14),
                     children: [
                       TileLayer(
                         urlTemplate:
@@ -643,10 +647,7 @@ class _LiveMapPanel extends StatelessWidget {
                   Positioned(
                     top: 12,
                     left: 12,
-                    child: _Badge(
-                      label: 'LIVE',
-                      color: AppTheme.accentColor,
-                    ),
+                    child: _Badge(label: 'LIVE', color: AppTheme.accentColor),
                   ),
                   if (onRecenter != null)
                     Positioned(
@@ -686,7 +687,9 @@ class _LiveMapPanel extends StatelessWidget {
         visibleEntries.addAll(routeStops.asMap().entries);
       } else {
         if (currentSegment < routeStops.length) {
-          visibleEntries.add(MapEntry(currentSegment, routeStops[currentSegment]));
+          visibleEntries.add(
+            MapEntry(currentSegment, routeStops[currentSegment]),
+          );
         }
         final nextIndex = currentSegment + 1;
         if (nextIndex < routeStops.length) {
@@ -713,11 +716,7 @@ class _LiveMapPanel extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.location_pin,
-            size: 36,
-            color: scheme.primary,
-          ),
+          Icon(Icons.location_pin, size: 36, color: scheme.primary),
           const SizedBox(height: 2),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -766,11 +765,10 @@ class _BottomActions extends StatelessWidget {
       return SizedBox(
         width: double.infinity,
         height: 42,
-        child: FilledButton.icon(
+        child: FilledButton(
           style: filledStyle,
           onPressed: onStart,
-          icon: const Icon(Icons.play_arrow, size: 16),
-          label: const Text('Demarrer'),
+          child: const Icon(Icons.play_arrow, size: 16),
         ),
       );
     }
@@ -778,20 +776,18 @@ class _BottomActions extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: FilledButton.icon(
+          child: FilledButton(
             style: filledStyle,
             onPressed: isFinished ? null : onFinish,
-            icon: const Icon(Icons.stop, size: 16),
-            label: const Text('Terminer'),
+            child: const Icon(Icons.stop, size: 16),
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
-          child: OutlinedButton.icon(
+          child: OutlinedButton(
             style: outlinedStyle,
             onPressed: isFinished ? null : onCancel,
-            icon: const Icon(Icons.cancel_outlined, size: 16),
-            label: const Text('Annuler'),
+            child: const Icon(Icons.cancel_outlined, size: 16),
           ),
         ),
       ],
@@ -803,10 +799,7 @@ class _Badge extends StatelessWidget {
   final String label;
   final Color color;
 
-  const _Badge({
-    required this.label,
-    required this.color,
-  });
+  const _Badge({required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {

@@ -361,9 +361,12 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
       );
 
       // Refresh and get the newly created tournee
-      final tournees = await _chauffeurController.fetchMyTournees(showSnackbar: false);
+      final tournees = await _chauffeurController.fetchMyTournees(
+        showSnackbar: false,
+      );
       if (tournees.isNotEmpty) {
-        final newTournee = tournees.last; // Assuming the last one is the new one
+        final newTournee =
+            tournees.last; // Assuming the last one is the new one
         await _startTour(newTournee);
       }
     } catch (e) {
@@ -397,14 +400,13 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                   title: 'Erreur',
                   subtitle:
                       'Impossible de charger votre tournée.\n${snapshot.error}',
-                  action: ElevatedButton.icon(
+                  action: ElevatedButton(
                     onPressed: () {
                       setState(() {
                         _futureTourneeData = _loadCurrentTourneeData();
                       });
                     },
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Réessayer'),
+                    child: const Icon(Icons.refresh),
                   ),
                 ),
               ),
@@ -423,10 +425,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                   title: 'Aucune tournée assignée',
                   subtitle:
                       'Commencez une nouvelle tournée ou contactez l\'administration.',
-                  action: ElevatedButton.icon(
+                  action: ElevatedButton(
                     onPressed: _startNewTournee,
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Démarrer une tournée'),
+                    child: const Icon(Icons.play_arrow),
                   ),
                 ),
               ),
@@ -514,30 +515,27 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                 Row(
                   children: [
                     Expanded(
-                      child: FilledButton.icon(
+                      child: FilledButton(
                         onPressed: isStarted ? null : () => _startTour(tournee),
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text('Démarrer'),
+                        child: const Icon(Icons.play_arrow),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
-                      child: OutlinedButton.icon(
+                      child: OutlinedButton(
                         onPressed: isFinished
                             ? null
                             : () => _finishTour(tournee),
-                        icon: const Icon(Icons.stop),
-                        label: const Text('Terminer'),
+                        child: const Icon(Icons.stop),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
-                      child: TextButton.icon(
+                      child: TextButton(
                         onPressed: isFinished
                             ? null
                             : () => _cancelTour(tournee),
-                        icon: const Icon(Icons.cancel_outlined),
-                        label: const Text('Annuler'),
+                        child: const Icon(Icons.cancel_outlined),
                       ),
                     ),
                   ],

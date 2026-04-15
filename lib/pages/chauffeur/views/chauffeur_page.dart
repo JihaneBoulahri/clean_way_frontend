@@ -1,8 +1,6 @@
 import 'package:clean_way_frontend/widgets/app_layout.dart';
-import 'package:clean_way_frontend/core/theme/app_theme.dart';
-import 'package:clean_way_frontend/core/constants/filter_constants.dart';
-import 'package:clean_way_frontend/widgets/filter_bottom_sheet.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
+import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -22,10 +20,10 @@ class ChauffeurPage extends GetView<ChauffeurController> {
       pageName: "Chauffeurs",
       floatingActionButton: isChauffeur
           ? null
-          : FloatingActionButton.extended(
+          : FloatingActionButton(
               onPressed: () => Get.dialog(ChauffeurFormDialog()),
-              icon: const Icon(Icons.add),
-              label: const Text('Ajouter un chauffeur'),
+      
+              child: const Icon(Icons.add),
               backgroundColor: AppTheme.accentColor,
               foregroundColor: AppTheme.textLight,
             ),
@@ -53,16 +51,14 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                   subtitle: controller.error.value ?? 'Une erreur est survenue',
                   action: Column(
                     children: [
-                      ElevatedButton.icon(
+                      ElevatedButton(
                         onPressed: () => controller.fetchChauffeurs(),
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Réessayer'),
+                        child: const Icon(Icons.refresh),
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      TextButton.icon(
+                      TextButton(
                         onPressed: () => Get.offAllNamed(AppRoutes.login),
-                        icon: const Icon(Icons.logout),
-                        label: const Text('Retour'),
+                        child: const Icon(Icons.logout),
                       ),
                     ],
                   ),
@@ -76,10 +72,9 @@ class ChauffeurPage extends GetView<ChauffeurController> {
                   subtitle: 'Commencez par ajouter votre premier chauffeur',
                   action: isChauffeur
                       ? null
-                      : ElevatedButton.icon(
+                      : ElevatedButton(
                           onPressed: () => Get.dialog(ChauffeurFormDialog()),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Ajouter'),
+                          child: const Icon(Icons.add),
                         ),
                 );
               }

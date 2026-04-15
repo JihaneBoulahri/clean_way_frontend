@@ -140,11 +140,11 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Annuler'),
+                  child: const Icon(Icons.close),
                 ),
                 FilledButton(
                   onPressed: () => Navigator.of(context).pop(selectedPoint),
-                  child: const Text('Utiliser cette position'),
+                  child: const Icon(Icons.check),
                 ),
               ],
             );
@@ -285,10 +285,9 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton.icon(
+                child: OutlinedButton(
                   onPressed: _openMapPicker,
-                  icon: const Icon(Icons.map_outlined),
-                  label: const Text('Choisir la position avec la carte'),
+                  child: const Icon(Icons.map_outlined),
                 ),
               ),
             ],
@@ -298,7 +297,7 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: const Icon(Icons.close),
         ),
         FilledButton(
           onPressed: _saving ? null : _save,
@@ -308,7 +307,7 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(isEdit ? 'Modifier' : 'Ajouter'),
+              : Icon(isEdit ? Icons.check : Icons.add),
         ),
       ],
     );

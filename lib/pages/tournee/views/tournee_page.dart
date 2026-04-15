@@ -21,10 +21,10 @@ class TourneePage extends GetView<TourneeController> {
       pageName: "Tournées",
       floatingActionButton: isChauffeur
           ? null
-          : FloatingActionButton.extended(
+          : FloatingActionButton(
               onPressed: () => Get.dialog(const TourneeFormDialog()),
-              icon: const Icon(Icons.add),
-              label: const Text('Nouvelle tournée'),
+           
+              child: const Icon(Icons.add),
               backgroundColor: AppTheme.accentColor,
               foregroundColor: AppTheme.textLight,
             ),
@@ -45,9 +45,7 @@ class TourneePage extends GetView<TourneeController> {
             child: Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
-                  child: CircularProgressIndicator(
-                    color: AppTheme.accentColor,
-                  ),
+                  child: CircularProgressIndicator(color: AppTheme.accentColor),
                 );
               }
               if (controller.tournees.isEmpty) {
@@ -57,10 +55,10 @@ class TourneePage extends GetView<TourneeController> {
                   subtitle: 'Commencez par créer votre première tournée',
                   action: isChauffeur
                       ? null
-                      : ElevatedButton.icon(
-                          onPressed: () => Get.dialog(const TourneeFormDialog()),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Créer'),
+                      : ElevatedButton(
+                          onPressed: () =>
+                              Get.dialog(const TourneeFormDialog()),
+                          child: const Icon(Icons.add),
                         ),
                 );
               }
@@ -83,9 +81,7 @@ class TourneePage extends GetView<TourneeController> {
                   final tournee = list[i];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                    child: TourneeCard(
-                      tournee: tournee,
-                    ),
+                    child: TourneeCard(tournee: tournee),
                   );
                 },
               );
@@ -132,5 +128,4 @@ class TourneePage extends GetView<TourneeController> {
       },
     );
   }
-
 }

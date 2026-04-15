@@ -134,7 +134,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.close),
-                    tooltip: 'Fermer',
+             
                   ),
                 ],
               ),

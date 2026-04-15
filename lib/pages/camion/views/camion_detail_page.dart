@@ -23,9 +23,7 @@ class CamionDetailPage extends StatelessWidget {
         future: controller.getCamionDetails(camionArg.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           final camion = snapshot.data ?? camionArg;
@@ -41,161 +39,186 @@ class CamionDetailPage extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () => Get.back(),
-                  icon: Icon(Icons.arrow_back, color: scheme.primary),
-                  tooltip: 'Retour',
-                  style: IconButton.styleFrom(
-                    backgroundColor: scheme.surface,
-                    side: BorderSide(color: scheme.outline.withOpacity(0.2)),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Text(
-                    camion.immatriculation,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: scheme.primary,
-                    ),
-                  ),
-                ),
-                if (!isChauffeur)
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Get.dialog(CamionFormDialog(camion: camion)),
-                        icon: const Icon(Icons.edit),
-                        tooltip: 'Modifier',
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.blue.shade100,
-                          foregroundColor: Colors.blue.shade700,
+                      icon: Icon(Icons.arrow_back, color: scheme.primary),
+                     
+                      style: IconButton.styleFrom(
+                        backgroundColor: scheme.surface,
+                        side: BorderSide(
+                          color: scheme.outline.withOpacity(0.2),
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      IconButton(
-                        onPressed: () => _showDeleteDialog(context, camion, controller),
-                        icon: const Icon(Icons.delete),
-                        tooltip: 'Supprimer',
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.red.shade100,
-                          foregroundColor: Colors.red.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
-            // Details card with icons
-            ModernCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _DetailRow(
-                    icon: Icons.directions_car,
-                    label: 'Immatriculation',
-                    value: camion.immatriculation,
-                    scheme: scheme,
-                  ),
-                  const Divider(),
-                  _DetailRow(
-                    icon: Icons.category,
-                    label: 'Type',
-                    value: camion.typeCamion,
-                    scheme: scheme,
-                  ),
-                  const Divider(),
-                  _DetailRow(
-                    icon: Icons.storage,
-                    label: 'Capacité',
-                    value: '${camion.capaciteCamion} m³',
-                    scheme: scheme,
-                  ),
-                  const Divider(),
-                  if (camion.dateMiseEnService != null)
-                    _DetailRow(
-                      icon: Icons.calendar_today,
-                      label: 'Date de mise en service',
-                      value: _formatDate(camion.dateMiseEnService!),
-                      scheme: scheme,
                     ),
-                  if (camion.dateMiseEnService != null) const Divider(),
-                  _DetailRow(
-                    icon: Icons.info,
-                    label: 'Statut',
-                    value: camion.status,
-                    scheme: scheme,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
-            // Map section
-            ModernCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.map, color: scheme.primary),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        'Localisation',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: scheme.primary,
-                        ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Text(
+                        camion.immatriculation,
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: scheme.primary,
+                            ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Container(
-                    height: 250,
-                    decoration: BoxDecoration(
-                      color: scheme.surfaceVariant,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(color: scheme.outline.withOpacity(0.3)),
                     ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    if (!isChauffeur)
+                      Row(
                         children: [
-                          Icon(Icons.map_outlined, size: 64, color: scheme.onSurfaceVariant),
-                          const SizedBox(height: AppSpacing.md),
-                          Text(
-                            'Carte non disponible',
-                            style: TextStyle(color: scheme.onSurfaceVariant),
+                          IconButton(
+                            onPressed: () =>
+                                Get.dialog(CamionFormDialog(camion: camion)),
+                            icon: const Icon(Icons.edit),
+                           
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.blue.shade100,
+                              foregroundColor: Colors.blue.shade700,
+                            ),
                           ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            'Aucune donnée de localisation',
-                            style: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.7), fontSize: 12),
+                          const SizedBox(width: AppSpacing.sm),
+                          IconButton(
+                            onPressed: () =>
+                                _showDeleteDialog(context, camion, controller),
+                            icon: const Icon(Icons.delete),
+                        
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.red.shade100,
+                              foregroundColor: Colors.red.shade700,
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Details card with icons
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _DetailRow(
+                        icon: Icons.directions_car,
+                        label: 'Immatriculation',
+                        value: camion.immatriculation,
+                        scheme: scheme,
+                      ),
+                      const Divider(),
+                      _DetailRow(
+                        icon: Icons.category,
+                        label: 'Type',
+                        value: camion.typeCamion,
+                        scheme: scheme,
+                      ),
+                      const Divider(),
+                      _DetailRow(
+                        icon: Icons.storage,
+                        label: 'Capacité',
+                        value: '${camion.capaciteCamion} m³',
+                        scheme: scheme,
+                      ),
+                      const Divider(),
+                      if (camion.dateMiseEnService != null)
+                        _DetailRow(
+                          icon: Icons.calendar_today,
+                          label: 'Date de mise en service',
+                          value: _formatDate(camion.dateMiseEnService!),
+                          scheme: scheme,
+                        ),
+                      if (camion.dateMiseEnService != null) const Divider(),
+                      _DetailRow(
+                        icon: Icons.info,
+                        label: 'Statut',
+                        value: camion.status,
+                        scheme: scheme,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Map section
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.map, color: scheme.primary),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            'Localisation',
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: scheme.primary,
+                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Container(
+                        height: 250,
+                        decoration: BoxDecoration(
+                          color: scheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(
+                            color: scheme.outline.withOpacity(0.3),
+                          ),
+                        ),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.map_outlined,
+                                size: 64,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Text(
+                                'Carte non disponible',
+                                style: TextStyle(
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                'Aucune donnée de localisation',
+                                style: TextStyle(
+                                  color: scheme.onSurfaceVariant.withOpacity(
+                                    0.7,
+                                  ),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      );
+          );
         },
       ),
     );
   }
 
-  void _showDeleteDialog(BuildContext context, Camion camion, CamionController controller) {
+  void _showDeleteDialog(
+    BuildContext context,
+    Camion camion,
+    CamionController controller,
+  ) {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
-        content: Text('Êtes-vous sûr de vouloir supprimer le camion "${camion.immatriculation}" ?'),
+        content: Text(
+          'Êtes-vous sûr de vouloir supprimer le camion "${camion.immatriculation}" ?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Annuler'),
+            child: const Icon(Icons.close),
           ),
           ElevatedButton(
             onPressed: () {
@@ -207,7 +230,7 @@ class CamionDetailPage extends StatelessWidget {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Supprimer'),
+            child: const Icon(Icons.delete),
           ),
         ],
       ),
@@ -263,9 +286,9 @@ class _DetailRow extends StatelessWidget {
             flex: 3,
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: scheme.onSurface,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: scheme.onSurface),
             ),
           ),
         ],

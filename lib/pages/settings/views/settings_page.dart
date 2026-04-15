@@ -6,7 +6,7 @@ import 'package:clean_way_frontend/widgets/modern_widgets.dart';
 import 'package:clean_way_frontend/core/services/notification_service.dart';
 import 'package:clean_way_frontend/core/services/user_service.dart';
 import '../../../widgets/app_layout.dart';
-import '../../../widgets/snackbar_helper.dart'; 
+import '../../../widgets/snackbar_helper.dart';
 
 Map<String, dynamic> _readUserMap(GetStorage box) {
   final raw = box.read('user');
@@ -44,14 +44,21 @@ class _SettingsPageState extends State<SettingsPage> {
 
   void _applyTheme() {
     final brightness = _darkMode ? Brightness.dark : Brightness.light;
-    final scheme = ColorScheme.fromSeed(seedColor: Color(_accentColor), brightness: brightness);
-    final theme = ThemeData.from(colorScheme: scheme).copyWith(useMaterial3: true);
+    final scheme = ColorScheme.fromSeed(
+      seedColor: Color(_accentColor),
+      brightness: brightness,
+    );
+    final theme = ThemeData.from(
+      colorScheme: scheme,
+    ).copyWith(useMaterial3: true);
     Get.changeTheme(theme);
     Get.changeThemeMode(_darkMode ? ThemeMode.dark : ThemeMode.light);
   }
 
   Future<void> _toggleNotifications(bool enabled) async {
-    final applied = await NotificationService.instance.setNotificationsEnabled(enabled);
+    final applied = await NotificationService.instance.setNotificationsEnabled(
+      enabled,
+    );
     if (!mounted) return;
 
     setState(() {
@@ -64,7 +71,9 @@ class _SettingsPageState extends State<SettingsPage> {
       }
       showNadiSnackbar(
         title: "Succès",
-        message: enabled ? "Notifications activées" : "Notifications désactivées",
+        message: enabled
+            ? "Notifications activées"
+            : "Notifications désactivées",
         type: NadiSnackbarType.success,
       );
     } else {
@@ -82,8 +91,10 @@ class _SettingsPageState extends State<SettingsPage> {
     final userMap = _readUserMap(box);
     final nom = userMap['nom']?.toString().trim() ?? '';
     final prenom = userMap['prenom']?.toString().trim() ?? '';
-    final userName = nom.isNotEmpty ? nom : (prenom.isNotEmpty ? prenom : 'Utilisateur');
-    
+    final userName = nom.isNotEmpty
+        ? nom
+        : (prenom.isNotEmpty ? prenom : 'Utilisateur');
+
     // Afficher 1 lettre du prénom + 1 lettre du nom
     String initials = '';
     if (prenom.isNotEmpty && nom.isNotEmpty) {
@@ -112,17 +123,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   imagePath = 'images/moroccan_tile_bg_pc.jpeg';
                 }
 
-                return Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                );
+                return Image.asset(imagePath, fit: BoxFit.cover);
               },
             ),
           ),
           Positioned.fill(
             child: Container(
               color: Colors.black.withValues(
-                alpha: Theme.of(context).brightness == Brightness.dark ? 0.42 : 0.12,
+                alpha: Theme.of(context).brightness == Brightness.dark
+                    ? 0.42
+                    : 0.12,
               ),
             ),
           ),
@@ -159,13 +169,14 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: AppSpacing.md),
                       SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton.icon(
+                        child: ElevatedButton(
                           onPressed: () async {
-                            final res = await Get.dialog<bool>(_EditProfileDialog(box: box));
+                            final res = await Get.dialog<bool>(
+                              _EditProfileDialog(box: box),
+                            );
                             if (res == true) setState(() {});
                           },
-                          icon: const Icon(Icons.edit),
-                          label: const Text('Modifier le profil'),
+                          child: const Icon(Icons.edit),
                         ),
                       ),
                     ],
@@ -221,10 +232,18 @@ class _SettingsPageState extends State<SettingsPage> {
                             const minSize = 24.0;
                             const maxSize = 48.0;
                             var spacing = AppSpacing.md;
-                            var size = (constraints.maxWidth - spacing * (count - 1)) / count;
+                            var size =
+                                (constraints.maxWidth - spacing * (count - 1)) /
+                                count;
                             if (size < minSize) {
-                              spacing = ((constraints.maxWidth - minSize * count) / (count - 1)).clamp(4.0, AppSpacing.md);
-                              size = (constraints.maxWidth - spacing * (count - 1)) / count;
+                              spacing =
+                                  ((constraints.maxWidth - minSize * count) /
+                                          (count - 1))
+                                      .clamp(4.0, AppSpacing.md);
+                              size =
+                                  (constraints.maxWidth -
+                                      spacing * (count - 1)) /
+                                  count;
                             }
                             size = size.clamp(minSize, maxSize);
 
@@ -242,7 +261,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                         onTap: () {
                                           setState(() {
                                             _accentColor = colorValue;
-                                            box.write('settings:accentColor', _accentColor);
+                                            box.write(
+                                              'settings:accentColor',
+                                              _accentColor,
+                                            );
                                             _applyTheme();
                                           });
                                         },
@@ -264,7 +286,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 ModernCard(
                   child: ModernListTile(
                     leading: Icon(
-                      _notifications ? Icons.notifications_active : Icons.notifications_off,
+                      _notifications
+                          ? Icons.notifications_active
+                          : Icons.notifications_off,
                       color: scheme.primary,
                     ),
                     title: 'Notifications',
@@ -300,9 +324,9 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -378,10 +402,18 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
   void initState() {
     super.initState();
     final userMap = _readUserMap(widget.box);
-    _nameController = TextEditingController(text: userMap['nom']?.toString() ?? '');
-    _prenomController = TextEditingController(text: userMap['prenom']?.toString() ?? '');
-    _emailController = TextEditingController(text: userMap['email']?.toString() ?? '');
-    _phoneController = TextEditingController(text: userMap['telephone']?.toString() ?? '');
+    _nameController = TextEditingController(
+      text: userMap['nom']?.toString() ?? '',
+    );
+    _prenomController = TextEditingController(
+      text: userMap['prenom']?.toString() ?? '',
+    );
+    _emailController = TextEditingController(
+      text: userMap['email']?.toString() ?? '',
+    );
+    _phoneController = TextEditingController(
+      text: userMap['telephone']?.toString() ?? '',
+    );
     _passwordController = TextEditingController();
   }
 
@@ -425,7 +457,7 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
         await UserService.update(id, payload);
       }
       widget.box.write('user', updated);
-     
+
       showNadiSnackbar(
         title: "Succès",
         message: "Profil mis à jour",
@@ -433,7 +465,6 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
       );
       Navigator.of(context).pop(true);
     } catch (e) {
-     
       showNadiSnackbar(
         title: "Erreur",
         message: e.toString(),
@@ -513,8 +544,11 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
                   labelText: 'Mot de passe',
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
-                    onPressed: () => setState(() => _hidePassword = !_hidePassword),
-                    icon: Icon(_hidePassword ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () =>
+                        setState(() => _hidePassword = !_hidePassword),
+                    icon: Icon(
+                      _hidePassword ? Icons.visibility : Icons.visibility_off,
+                    ),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -528,11 +562,17 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Annuler'),
+          child: const Icon(Icons.close),
         ),
         ElevatedButton(
           onPressed: _isSaving ? null : _save,
-          child: Text(_isSaving ? 'Enregistrement...' : 'Enregistrer'),
+          child: _isSaving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.check),
         ),
       ],
     );

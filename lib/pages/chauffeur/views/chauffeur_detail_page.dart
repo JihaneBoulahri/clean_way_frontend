@@ -50,7 +50,7 @@ class ChauffeurDetailPage extends StatelessWidget {
                     IconButton(
                       onPressed: () => Get.back(),
                       icon: Icon(Icons.arrow_back, color: scheme.primary),
-                      tooltip: 'Retour',
+                
                       style: IconButton.styleFrom(
                         backgroundColor: scheme.surface,
                         side: BorderSide(
@@ -77,7 +77,7 @@ class ChauffeurDetailPage extends StatelessWidget {
                               ChauffeurFormDialog(chauffeur: chauffeur),
                             ),
                             icon: const Icon(Icons.edit),
-                            tooltip: 'Modifier',
+                          
                             style: IconButton.styleFrom(
                               backgroundColor: Colors.blue.shade100,
                               foregroundColor: Colors.blue.shade700,
@@ -91,7 +91,7 @@ class ChauffeurDetailPage extends StatelessWidget {
                               controller,
                             ),
                             icon: const Icon(Icons.delete),
-                            tooltip: 'Supprimer',
+                      
                             style: IconButton.styleFrom(
                               backgroundColor: Colors.red.shade100,
                               foregroundColor: Colors.red.shade700,
@@ -328,7 +328,10 @@ class ChauffeurDetailPage extends StatelessWidget {
         title: const Text('Confirmer la suppression'),
         content: Text('Êtes-vous sûr de vouloir supprimer ce chauffeur ?'),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Annuler')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Icon(Icons.close),
+          ),
           ElevatedButton(
             onPressed: () {
               controller.deleteChauffeur(chauffeur.id);
@@ -339,7 +342,7 @@ class ChauffeurDetailPage extends StatelessWidget {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Supprimer'),
+            child: const Icon(Icons.delete),
           ),
         ],
       ),
