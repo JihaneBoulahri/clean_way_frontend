@@ -30,6 +30,44 @@ class LoginController extends GetxController {
     return null;
   }
 
+  String _sanitizeErrorMessage(
+    String? message, {
+    required String fallback,
+  }) {
+    final text = (message ?? '').trim();
+    if (text.isEmpty) return fallback;
+
+    final normalized = text.toLowerCase();
+    const noisyFragments = [
+      'sqlstate',
+      'integrity constraint violation',
+      'pdoexception',
+      'queryexception',
+      'mysql',
+      'postgres',
+      'sqlite',
+      'syntax error',
+      'stack trace',
+      'connection:',
+      'internal server error',
+      'server error',
+      'call to undefined',
+      'undefined variable',
+      'failed to open stream',
+      'duplicate entry',
+      'cannot be null',
+      'not null constraint',
+      'data too long',
+      'foreign key constraint fails',
+    ];
+
+    if (noisyFragments.any(normalized.contains)) {
+      return fallback;
+    }
+
+    return text;
+  }
+
   // Toggle password visibility
   void togglePassword() {
     isPasswordHidden.value = !isPasswordHidden.value;
@@ -108,7 +146,10 @@ class LoginController extends GetxController {
         // MODIFIÉ
         showNadiSnackbar(
           title: "Erreur",
-          message: result['message'] ?? "Échec de la connexion",
+          message: _sanitizeErrorMessage(
+            result['message']?.toString(),
+            fallback: "Connexion impossible. Verifiez vos informations.",
+          ),
           type: NadiSnackbarType.error,
         );
       }
@@ -140,7 +181,10 @@ class LoginController extends GetxController {
         // MODIFIÉ
         showNadiSnackbar(
           title: "Erreur",
-          message: result['message'] ?? "Échec de la déconnexion",
+          message: _sanitizeErrorMessage(
+            result['message']?.toString(),
+            fallback: "Deconnexion impossible. Reessayez.",
+          ),
           type: NadiSnackbarType.error,
         );
       } else {

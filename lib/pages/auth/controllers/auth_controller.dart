@@ -40,6 +40,44 @@ class AuthController extends GetxController {
     return null;
   }
 
+  String _sanitizeErrorMessage(
+    String? message, {
+    required String fallback,
+  }) {
+    final text = (message ?? '').trim();
+    if (text.isEmpty) return fallback;
+
+    final normalized = text.toLowerCase();
+    const noisyFragments = [
+      'sqlstate',
+      'integrity constraint violation',
+      'pdoexception',
+      'queryexception',
+      'mysql',
+      'postgres',
+      'sqlite',
+      'syntax error',
+      'stack trace',
+      'connection:',
+      'internal server error',
+      'server error',
+      'call to undefined',
+      'undefined variable',
+      'failed to open stream',
+      'duplicate entry',
+      'cannot be null',
+      'not null constraint',
+      'data too long',
+      'foreign key constraint fails',
+    ];
+
+    if (noisyFragments.any(normalized.contains)) {
+      return fallback;
+    }
+
+    return text;
+  }
+
   // Register function
   Future<void> register({
     required String nom,
@@ -209,7 +247,10 @@ class AuthController extends GetxController {
         );
         Get.offAllNamed(AppRoutes.dashboard);
       } else {
-        final message = result['message'] ?? "Registration failed";
+        final message = _sanitizeErrorMessage(
+          result['message']?.toString(),
+          fallback: "Inscription impossible. Verifiez vos informations.",
+        );
         errorMessage.value = message;
         showNadiSnackbar(
           title: "Erreur",
