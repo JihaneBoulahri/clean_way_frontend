@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../controllers/dashboard_controller.dart';
+import '../../../routes/app_routes.dart';
 
 class DashboardPage extends GetView<DashboardController> {
   const DashboardPage({super.key});
@@ -303,6 +304,26 @@ class _StatsWrap extends StatelessWidget {
 
   const _StatsWrap({required this.stats});
 
+  void _navigateToPage(String label) {
+    switch (label.toLowerCase()) {
+      case 'zones':
+        Get.toNamed(AppRoutes.zones);
+        break;
+      case 'bennes':
+        Get.toNamed(AppRoutes.bennes);
+        break;
+      case 'camions':
+        Get.toNamed(AppRoutes.camions);
+        break;
+      case 'chauffeurs':
+        Get.toNamed(AppRoutes.chauffeurs);
+        break;
+      case 'tournees':
+        Get.toNamed(AppRoutes.tournees);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final cards = <_Kpi>[
@@ -354,7 +375,12 @@ class _StatsWrap extends StatelessWidget {
               .map(
                 (e) => SizedBox(
                   width: width,
-                  child: _MiniStatCard(item: e),
+                  child: _MiniStatCard(
+                    item: e,
+                    onTap: e.label.toLowerCase() == 'aujourdhui'
+                        ? null
+                        : () => _navigateToPage(e.label),
+                  ),
                 ),
               )
               .toList(),
@@ -375,55 +401,59 @@ class _Kpi {
 
 class _MiniStatCard extends StatelessWidget {
   final _Kpi item;
+  final VoidCallback? onTap;
 
-  const _MiniStatCard({required this.item});
+  const _MiniStatCard({required this.item, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: item.color.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: item.color.withValues(alpha: 0.16),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(item.icon, color: item.color, size: 18),
             ),
-            child: Icon(item.icon, color: item.color, size: 18),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.label,
-                  style: TextStyle(
-                    color: scheme.onSurfaceVariant,
-                    fontSize: 12,
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.label,
+                    style: TextStyle(
+                      color: scheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  item.value.toString(),
-                  style: TextStyle(
-                    color: scheme.onSurface,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
+                  const SizedBox(height: 2),
+                  Text(
+                    item.value.toString(),
+                    style: TextStyle(
+                      color: scheme.onSurface,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
