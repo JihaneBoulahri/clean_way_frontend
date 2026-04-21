@@ -19,4 +19,7 @@ class AppRoutes {
   static const zoneDetail = '/zone-detail';
   static const settings = '/settings';
   static const help = '/help';
+  static const notifications = '/notifications';
+  static const profile = '/profile';
+  static const onlineUsers = '/online-users';
 }

@@ -128,6 +128,8 @@ class Sidebar extends StatelessWidget {
                           onItemSelected(AppRoutes.tourneeChauffeurHistory),
                     ),
                     _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.settings)),
+                    _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.notifications)),
+                    _SidebarItem(icon: Icons.person_outlined, label: 'Profil', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.profile)),
                     _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
                   ] else ...[
                     _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.dashboard)),
@@ -136,8 +138,11 @@ class Sidebar extends StatelessWidget {
                     _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.bennes)),
           
                     _SidebarItem(icon: Icons.person_outline, label: 'Chauffeurs', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.chauffeurs)),
+                    _SidebarItem(icon: Icons.people_outlined, label: 'Utilisateurs actifs', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.onlineUsers)),
                     _SidebarItem(icon: Icons.today_outlined, label: 'Tournées', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.tournees)),
                     _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.settings)),
+                    _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.notifications)),
+                    _SidebarItem(icon: Icons.person_outlined, label: 'Profil', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.profile)),
                     _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
                   ],
                 ],
