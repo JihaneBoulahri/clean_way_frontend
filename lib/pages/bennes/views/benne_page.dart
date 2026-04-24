@@ -230,7 +230,7 @@ class BennesPage extends GetView<BennesController> {
                                 (b) => DropdownMenuItem<int>(
                                   value: b.id,
                                   child: Text(
-                                    'Benne #${b.id} - ${b.typeBenne}',
+                                    'Benne ${b.id} - ${b.typeBenne}',
                                   ),
                                 ),
                               )

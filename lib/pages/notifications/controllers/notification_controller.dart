@@ -76,11 +76,9 @@ class NotificationController extends GetxController {
         notifications.assignAll(_filterNotificationsForRole(notifications));
       }
 
-
       final liveNotifications = await _fetchLiveNotifications();
       
       if (liveNotifications.isNotEmpty) {
-     
         for (final notif in liveNotifications) {
           if (!_shownToastIds.contains(notif.id)) {
             await _notificationService.showNotification(
@@ -93,8 +91,10 @@ class NotificationController extends GetxController {
         }
         _saveShownToastIds();
 
-        // Update history
-        notifications.value = liveNotifications;
+        final mergedNotifications = _mergeNotifications(notifications.toList(), liveNotifications);
+        notifications.value = isChauffeur
+            ? _filterNotificationsForRole(mergedNotifications)
+            : mergedNotifications;
         await _saveHistory();
       }
     } catch (e) {
@@ -123,15 +123,10 @@ class NotificationController extends GetxController {
         }
         _saveShownToastIds();
 
-        final existingIds = notifications.map((n) => n.id).toSet();
-        final newNotifications = liveNotifications
-            .where((notif) => !existingIds.contains(notif.id))
-            .toList();
-
-        notifications.addAll(newNotifications);
-        if (isChauffeur) {
-          notifications.assignAll(_filterNotificationsForRole(notifications));
-        }
+        final mergedNotifications = _mergeNotifications(notifications.toList(), liveNotifications);
+        notifications.value = isChauffeur
+            ? _filterNotificationsForRole(mergedNotifications)
+            : mergedNotifications;
         await _saveHistory();
       }
     } catch (e) {
@@ -139,6 +134,28 @@ class NotificationController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  List<NotificationModel> _mergeNotifications(
+    List<NotificationModel> current,
+    List<NotificationModel> incoming,
+  ) {
+    final merged = <int, NotificationModel>{
+      for (final notification in current) notification.id: notification,
+    };
+
+    for (final notification in incoming) {
+      final existing = merged[notification.id];
+      if (existing != null) {
+        merged[notification.id] = notification.copyWith(read: existing.read);
+      } else {
+        merged[notification.id] = notification;
+      }
+    }
+
+    final sorted = merged.values.toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return sorted;
   }
 
   Future<void> markAsRead(int id) async {

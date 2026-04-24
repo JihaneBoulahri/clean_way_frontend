@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../core/services/user_service.dart';
 import '../../../pages/auth/models/user_model.dart';
 
 class OnlineUsersController extends GetxController {
+  final GetStorage _storage = GetStorage();
+  int? _currentUserId;
+
   var users = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
   var error = RxnString();
@@ -15,14 +19,13 @@ class OnlineUsersController extends GetxController {
       final fullName = user['fullName'].toString().toLowerCase();
       final email = user['email'].toString().toLowerCase();
       final role = user['role'].toString().toLowerCase();
-      final isOnline = user['isOnline'] as bool;
+      final isOnline = user['isOnline'] as bool? ?? false;
 
       final matchesSearch = q.isEmpty ||
           fullName.contains(q) ||
           email.contains(q) ||
           role.contains(q);
 
-      
       final matchesStatus = isOnline;
 
       return matchesSearch && matchesStatus;
@@ -32,7 +35,20 @@ class OnlineUsersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _loadCurrentUserId();
     fetchOnlineUsers();
+  }
+
+  void _loadCurrentUserId() {
+    final rawUser = _storage.read('user');
+    if (rawUser is Map) {
+      final idValue = rawUser['id'];
+      if (idValue is int) {
+        _currentUserId = idValue;
+      } else if (idValue is String) {
+        _currentUserId = int.tryParse(idValue);
+      }
+    }
   }
 
   Future<void> fetchOnlineUsers() async {
@@ -46,17 +62,19 @@ class OnlineUsersController extends GetxController {
       final onlineUsers = usersList.map((userData) {
         final mapData = Map<String, dynamic>.from(userData);
         final user = User.fromJson(mapData);
+        final isOnline = _parseOnlineStatus(mapData, user.id);
+
         return {
           'id': user.id,
           'fullName': user.fullName,
           'email': user.email,
           'role': user.role,
           'initials': user.initials,
-          'isOnline': _simulateOnlineStatus(user.id),
+          'isOnline': isOnline,
           'isReady': _simulateReadyStatus(user.id),
           'lastSeen': _simulateLastSeen(user.id),
         };
-      }).toList();
+      }).where((user) => user['isOnline'] == true).toList();
 
       users.value = onlineUsers;
     } catch (e) {
@@ -87,15 +105,29 @@ class OnlineUsersController extends GetxController {
     return [];
   }
 
-  
-  bool _simulateOnlineStatus(int userId) {
-    
-    return userId % 3 == 0 || userId % 5 == 0;
+  bool _parseOnlineStatus(Map<String, dynamic> userData, int userId) {
+    final onlineValue = userData['isOnline'] ?? userData['is_online'] ?? userData['connected'];
+    if (onlineValue is bool) {
+      return onlineValue;
+    }
+    if (onlineValue is String) {
+      final value = onlineValue.toLowerCase().trim();
+      return value == 'true' || value == 'online' || value == 'connected' || value == 'active';
+    }
+    if (onlineValue is num) {
+      return onlineValue.toInt() != 0;
+    }
+
+    final status = userData['status']?.toString().toLowerCase();
+    if (status == 'online' || status == 'connected' || status == 'active') {
+      return true;
+    }
+
+    // Si l'API ne donne pas de statut en ligne, afficher uniquement l'utilisateur connecté
+    return _currentUserId != null && _currentUserId == userId;
   }
 
-  
   bool _simulateReadyStatus(int userId) {
-   
     return userId % 4 == 0 || userId % 7 == 0;
   }
 

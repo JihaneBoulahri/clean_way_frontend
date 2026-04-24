@@ -59,7 +59,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                     const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Text(
-                        'Benne #${benne.id}',
+                        'Benne ${benne.id}',
                         style: Theme.of(context).textTheme.headlineMedium
                             ?.copyWith(
                               fontWeight: FontWeight.bold,
@@ -138,7 +138,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                   title: 'Carte de la benne',
                   latitude: benne.latitude,
                   longitude: benne.longitude,
-                  markerTitle: 'Benne #${benne.id}',
+                  markerTitle: 'Benne ${benne.id}',
                   markerSubtitle: '${benne.latitude}, ${benne.longitude}',
                 ),
                 const SizedBox(height: AppSpacing.xl),
@@ -200,7 +200,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
     Get.dialog(
       AlertDialog(
         title: const Text('Confirmer la suppression'),
-        content: Text('Voulez-vous supprimer la benne #${benne.id} ?'),
+        content: Text('Voulez-vous supprimer la benne ${benne.id} ?'),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
@@ -302,7 +302,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              'Capteur #${capteur.id}',
+                              'Capteur ${capteur.id}',
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
                                     fontWeight: FontWeight.w700,
@@ -627,7 +627,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
     final confirm = await Get.dialog<bool>(
       AlertDialog(
         title: const Text('Supprimer le capteur'),
-        content: Text('Voulez-vous supprimer le capteur #${capteur.id} ?'),
+        content: Text('Voulez-vous supprimer le capteur ${capteur.id} ?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),

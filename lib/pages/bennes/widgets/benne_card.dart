@@ -73,7 +73,7 @@ class BenneCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            'Benne #${benne.id}',
+                            'Benne ${benne.id}',
                             style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,

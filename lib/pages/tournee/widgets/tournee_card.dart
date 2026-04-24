@@ -18,7 +18,7 @@ class TourneeCard extends StatelessWidget {
     final zoneText = zoneLabel.isNotEmpty
         ? 'Zone: $zoneLabel'
         : (tournee.idZone != null
-              ? 'Zone: #${tournee.idZone}'
+              ? 'Zone: ${tournee.idZone}'
               : 'Zone: Non assignee');
     final camionText = camionLabel.isNotEmpty
         ? 'Camion: $camionLabel'
