@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../constants/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get_storage/get_storage.dart';
 
 class AuthService {
   static bool _isGenericValidationMessage(String value) {
@@ -17,11 +18,39 @@ class AuthService {
     return genericFragments.any(normalized.contains);
   }
 
+  static bool _isBackendNoiseMessage(String value) {
+    final normalized = value.trim().toLowerCase();
+    const noisyFragments = [
+      'sqlstate',
+      'integrity constraint violation',
+      'pdoexception',
+      'queryexception',
+      'mysql',
+      'postgres',
+      'sqlite',
+      'syntax error',
+      'stack trace',
+      'connection:',
+      'internal server error',
+      'server error',
+      'call to undefined',
+      'undefined variable',
+      'failed to open stream',
+      'duplicate entry',
+      'cannot be null',
+      'not null constraint',
+      'data too long',
+      'foreign key constraint fails',
+    ];
+    return noisyFragments.any(normalized.contains);
+  }
+
   static String? _firstStringFrom(dynamic value, {bool allowGeneric = true}) {
     if (value is String) {
       final text = value.trim();
       if (text.isEmpty) return null;
       if (!allowGeneric && _isGenericValidationMessage(text)) return null;
+      if (_isBackendNoiseMessage(text)) return null;
       return text;
     }
 
@@ -96,6 +125,16 @@ class AuthService {
 
     final plainText = responseBody.trim();
     if (plainText.isNotEmpty && !_isGenericValidationMessage(plainText)) {
+      final normalized = plainText.toLowerCase();
+      final looksTechnical =
+          plainText.startsWith('<') ||
+          normalized.contains('exception') ||
+          normalized.contains('stack trace') ||
+          normalized.contains('sqlstate') ||
+          normalized.contains('internal server error') ||
+          normalized.contains('bad gateway') ||
+          normalized.contains('service unavailable');
+      if (looksTechnical) return fallback;
       return plainText;
     }
 
@@ -124,10 +163,16 @@ class AuthService {
 
       return {
         "success": false,
-        "message": _extractErrorMessage(res.body, fallback: "Login failed"),
+        "message": _extractErrorMessage(
+          res.body,
+          fallback: "Connexion impossible. Verifiez vos informations.",
+        ),
       };
-    } catch (e) {
-      return {"success": false, "message": e.toString()};
+    } catch (_) {
+      return {
+        "success": false,
+        "message": "Connexion impossible. Verifiez votre connexion.",
+      };
     }
   }
 
@@ -173,30 +218,38 @@ class AuthService {
         "success": false,
         "message": _extractErrorMessage(
           res.body,
-          fallback: "Registration failed",
+          fallback: "Inscription impossible. Verifiez vos informations.",
         ),
       };
-    } catch (e) {
-      return {"success": false, "message": e.toString()};
+    } catch (_) {
+      return {
+        "success": false,
+        "message": "Inscription impossible. Verifiez votre connexion.",
+      };
     }
   }
 
   //logout
   static Future<Map<String, dynamic>> logout() async {
     try {
+      final box = GetStorage();
       final storage = const FlutterSecureStorage();
-      final token = await storage.read(key: "token");
+      final storedToken = box.read('token')?.toString().trim();
+      final token = (storedToken != null && storedToken.isNotEmpty)
+          ? storedToken
+          : await storage.read(key: "token");
 
       final res = await http.post(
         Uri.parse(AuthEndpoints.logout),
         headers: {
-          "Authorization": "Bearer $token",
+          if (token != null && token.isNotEmpty) "Authorization": "Bearer $token",
           "Accept": "application/json",
         },
       );
 
       if (res.statusCode == 200) {
         // supprimer le token du téléphone
+        await box.remove('token');
         await storage.delete(key: "token");
 
         return {"success": true, "message": "Logout successful"};
@@ -210,8 +263,8 @@ class AuthService {
       }
 
       return {"success": false, "message": "Logout failed"};
-    } catch (e) {
-      return {"success": false, "message": e.toString()};
+    } catch (_) {
+      return {"success": false, "message": "Logout failed"};
     }
   }
 

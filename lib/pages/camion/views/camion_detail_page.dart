@@ -89,52 +89,120 @@ class CamionDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xl),
 
-                // Details card with icons
-                ModernCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            // Details card with icons
+            ModernCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _DetailRow(
+                    icon: Icons.directions_car,
+                    label: 'Immatriculation',
+                    value: camion.immatriculation,
+                    scheme: scheme,
+                  ),
+                  const Divider(),
+                  _DetailRow(
+                    icon: Icons.category,
+                    label: 'Type',
+                    value: camion.typeCamion,
+                    scheme: scheme,
+                  ),
+                  const Divider(),
+                  _DetailRow(
+                    icon: Icons.storage,
+                    label: 'Capacité',
+                    value: '${camion.capaciteCamion} m³',
+                    scheme: scheme,
+                  ),
+                  const Divider(),
+                  if (camion.dateMiseEnService != null)
+                    _DetailRow(
+                      icon: Icons.calendar_today,
+                      label: 'Date de mise en service',
+                      value: _formatDate(camion.dateMiseEnService!),
+                      scheme: scheme,
+                    ),
+                  if (camion.dateMiseEnService != null) const Divider(),
+                  _DetailRow(
+                    icon: Icons.info,
+                    label: 'Statut',
+                    value: camion.status,
+                    scheme: scheme,
+                  ),
+                  const Divider(),
+                  if (camion.zone != null) ...[
+                    _DetailRow(
+                      icon: Icons.map_outlined,
+                      label: 'Zone',
+                      value: camion.zone!.nomZone.isNotEmpty
+                          ? camion.zone!.nomZone
+                          : '#${camion.zone!.id}',
+                      scheme: scheme,
+                    ),
+                    const Divider(),
+                  ],
+                  _DetailRow(
+                    icon: Icons.location_city,
+                    label: 'Ville',
+                    value: camion.villeNom ?? (camion.zone?.idVille != null ? '#${camion.zone!.idVille}' : 'Non renseignee'),
+                    scheme: scheme,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+
+            // Map section
+            ModernCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      _DetailRow(
-                        icon: Icons.directions_car,
-                        label: 'Immatriculation',
-                        value: camion.immatriculation,
-                        scheme: scheme,
-                      ),
-                      const Divider(),
-                      _DetailRow(
-                        icon: Icons.category,
-                        label: 'Type',
-                        value: camion.typeCamion,
-                        scheme: scheme,
-                      ),
-                      const Divider(),
-                      _DetailRow(
-                        icon: Icons.storage,
-                        label: 'Capacité',
-                        value: '${camion.capaciteCamion} m³',
-                        scheme: scheme,
-                      ),
-                      const Divider(),
-                      if (camion.dateMiseEnService != null)
-                        _DetailRow(
-                          icon: Icons.calendar_today,
-                          label: 'Date de mise en service',
-                          value: _formatDate(camion.dateMiseEnService!),
-                          scheme: scheme,
+                      Icon(Icons.map, color: scheme.primary),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        'Localisation',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: scheme.primary,
                         ),
-                      if (camion.dateMiseEnService != null) const Divider(),
-                      _DetailRow(
-                        icon: Icons.info,
-                        label: 'Statut',
-                        value: camion.status,
-                        scheme: scheme,
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    height: 250,
+                    decoration: BoxDecoration(
+                      color: scheme.surfaceVariant,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(color: scheme.outline.withOpacity(0.3)),
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.map_outlined, size: 64, color: scheme.onSurfaceVariant),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'Carte non disponible',
+                            style: TextStyle(color: scheme.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            'Aucune donnée de localisation',
+                            style: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.7), fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          );
+          ],
+        ),
+      );
         },
       ),
     );

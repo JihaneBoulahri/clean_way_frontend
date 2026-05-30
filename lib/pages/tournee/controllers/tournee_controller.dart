@@ -136,7 +136,9 @@ class TourneeController extends GetxController {
   Future<void> addTournee(Tournee tournee) async {
     try {
       final data = await _service.create(tournee.toJson());
-      tournees.add(Tournee.fromJson(data));
+      if (data != null) {
+        tournees.add(Tournee.fromJson(data));
+      }
       await fetchTournees();
 
       showNadiSnackbar(
@@ -156,21 +158,23 @@ class TourneeController extends GetxController {
   Future<void> updateTournee(Tournee tournee) async {
     try {
       final data = await _service.update(tournee.id, tournee.toJson());
-      int index = tournees.indexWhere((t) => t.id == tournee.id);
-      if (index != -1) {
+      final index = tournees.indexWhere((t) => t.id == tournee.id);
+      if (data == null) {
+        await fetchTournees();
+      } else if (index != -1) {
         tournees[index] = Tournee.fromJson(data);
         await fetchTournees();
-
-        showNadiSnackbar(
-          title: "Succès",
-          message: "Tournée modifiée avec succès",
-          type: NadiSnackbarType.success,
-        );
-        await NotificationService.instance.showNotification(
-          'Tournée modifiée',
-          'La tournée ${tournee.id} a été mise à jour.',
-        );
       }
+
+      showNadiSnackbar(
+        title: "Succès",
+        message: "Tournée modifiée avec succès",
+        type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Tournée modifiée',
+        'La tournée ${tournee.id} a été mise à jour.',
+      );
     } catch (e) {
       _handleError(e);
     }

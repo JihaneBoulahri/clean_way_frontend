@@ -16,6 +16,7 @@ class CamionCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final statusColor = _statusColor(camion.status);
     final serviceDate = camion.dateMiseEnService?.toString().split(' ').first;
+    final cityName = camion.villeNom;
 
     return Card(
       margin: EdgeInsets.zero,
@@ -101,6 +102,19 @@ class CamionCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
+                    Text(
+                      cityName == null || cityName.trim().isEmpty
+                          ? 'Ville: Non renseignee'
+                          : 'Ville: $cityName',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
                     Text(
                       serviceDate == null
                           ? 'Mise en service: Non renseignee'

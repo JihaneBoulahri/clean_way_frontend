@@ -30,7 +30,11 @@ class OptimizationService {
     }
 
     // Show error but don't auto-redirect; let controller handle it
-    throw Exception("Server error (${res.statusCode}): ${res.body.isNotEmpty ? res.body.substring(0, 200) : 'No response'}");
+    final body = res.body;
+    final preview = body.isEmpty
+        ? 'No response'
+        : body.substring(0, body.length > 200 ? 200 : body.length);
+    throw Exception("Server error (${res.statusCode}): $preview");
   }
 
   /// Fetch optimized routes

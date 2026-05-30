@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:get_storage/get_storage.dart';
+import 'package:http/http.dart' as http;
+
 import '../constants/api_constants.dart';
 
-class CamionService {
+class VilleService {
   final _box = GetStorage();
 
-  /// Base headers with token
   Map<String, String> get _headers {
     final token = _box.read('token')?.toString().trim();
     return {
@@ -14,6 +15,24 @@ class CamionService {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     };
+  }
+
+  dynamic _handleResponse(http.Response res) {
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      if (res.body.trim().isEmpty) return null;
+      final decoded = jsonDecode(res.body);
+      if (decoded is List) return decoded;
+      if (decoded is Map) {
+        if (decoded['data'] is List) return decoded['data'];
+        if (decoded['data'] is Map) return decoded['data'];
+        if (decoded.containsKey('data')) return decoded['data'];
+      }
+      return decoded;
+    }
+
+    throw Exception(
+      'Server error (${res.statusCode}): ${res.body.isNotEmpty ? res.body.substring(0, res.body.length > 200 ? 200 : res.body.length) : 'No response'}',
+    );
   }
 
   Future<http.Response> _putOrPatch(Uri uri, Map<String, dynamic> data) async {
@@ -33,83 +52,47 @@ class CamionService {
     );
   }
 
-  /// Handle common response logic
-  dynamic _handleResponse(http.Response res) {
-    if (res.statusCode >= 200 && res.statusCode < 300) {
-      if (res.body.trim().isEmpty) return null;
-      final decoded = jsonDecode(res.body);
-      if (decoded is List) return decoded;
-      if (decoded is Map) {
-        if (decoded['data'] is List) return decoded['data'];
-        if (decoded['data'] is Map) return decoded['data'];
-        // If API returns wrapped object under 'data' key, return it; otherwise return whole map
-        if (decoded.containsKey('data')) return decoded['data'];
-      }
-      return decoded;
-    }
-
-    // Show error but don't auto-redirect; let controller handle it
-    throw Exception("Server error (${res.statusCode}): ${res.body.isNotEmpty ? res.body.substring(0, 200) : 'No response'}");
-  }
-
-  /// Get all camions
   Future<List<dynamic>> getAll() async {
     final res = await http.get(
-      Uri.parse('${CamionEndpoints.base}?include=zone'),
+      Uri.parse(VilleEndpoints.base),
       headers: _headers,
     );
-
-    return _handleResponse(res);
+    final decoded = _handleResponse(res);
+    if (decoded is List) return decoded;
+    if (decoded is Map && decoded['data'] is List) return decoded['data'];
+    return const [];
   }
 
-  /// Get camion by id
   Future<dynamic> getById(int id) async {
     final res = await http.get(
-      Uri.parse(CamionEndpoints.detail(id)),
+      Uri.parse(VilleEndpoints.detail(id)),
       headers: _headers,
     );
-
     return _handleResponse(res);
   }
 
-  /// Get camion with full relations
-  Future<dynamic> getWithRelations(int id) async {
-    final res = await http.get(
-      Uri.parse('${CamionEndpoints.detail(id)}?include=chauffeur,zone'),
-      headers: _headers,
-    );
-
-    return _handleResponse(res);
-  }
-
-  /// Create camion
   Future<dynamic> create(Map<String, dynamic> data) async {
     final res = await http.post(
-      Uri.parse(CamionEndpoints.base),
+      Uri.parse(VilleEndpoints.base),
       headers: _headers,
       body: jsonEncode(data),
     );
-
     return _handleResponse(res);
   }
 
-  /// Update camion
   Future<dynamic> update(int id, Map<String, dynamic> data) async {
     final res = await _putOrPatch(
-      Uri.parse(CamionEndpoints.detail(id)),
+      Uri.parse(VilleEndpoints.detail(id)),
       data,
     );
-
     return _handleResponse(res);
   }
 
-  /// Delete camion
-  Future<void> delete(int id) async {
+  Future<dynamic> delete(int id) async {
     final res = await http.delete(
-      Uri.parse(CamionEndpoints.detail(id)),
+      Uri.parse(VilleEndpoints.detail(id)),
       headers: _headers,
     );
-
-    _handleResponse(res);
+    return _handleResponse(res);
   }
 }

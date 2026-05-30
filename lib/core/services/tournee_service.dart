@@ -8,9 +8,9 @@ class TourneeService {
 
   /// Base headers with token
   Map<String, String> get _headers {
-    final token = _box.read('token');
+    final token = _box.read('token')?.toString().trim();
     return {
-      'Authorization': 'Bearer $token',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     };
@@ -18,7 +18,8 @@ class TourneeService {
 
   /// Handle common response logic
   dynamic _handleResponse(http.Response res) {
-    if (res.statusCode == 200 || res.statusCode == 201) {
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      if (res.body.trim().isEmpty) return null;
       final decoded = jsonDecode(res.body);
       if (decoded is List) return decoded;
       if (decoded is Map) {
@@ -32,6 +33,23 @@ class TourneeService {
     // Show error but don't auto-redirect; let controller handle it
     throw Exception(
       "Server error (${res.statusCode}):\n${res.body.isNotEmpty ? (res.body.length > 200 ? '${res.body.substring(0, 200)}...' : res.body) : 'No response'}",
+    );
+  }
+
+  Future<http.Response> _putOrPatch(Uri uri, Map<String, dynamic> data) async {
+    final putRes = await http.put(
+      uri,
+      headers: _headers,
+      body: jsonEncode(data),
+    );
+    if (putRes.statusCode != 404 && putRes.statusCode != 405) {
+      return putRes;
+    }
+
+    return http.patch(
+      uri,
+      headers: _headers,
+      body: jsonEncode(data),
     );
   }
 
@@ -197,7 +215,7 @@ class TourneeService {
   //get all tournees
   Future<List<dynamic>> getAll() async {
     final res = await http.get(
-      Uri.parse(TourneeEndpoints.base),
+      Uri.parse('${TourneeEndpoints.base}?include=camion,zone'),
       headers: _headers,
     );
     return _handleResponse(res);
@@ -215,26 +233,26 @@ class TourneeService {
 
   //update tournee
   Future update(int id, Map data) async {
-    final res = await http.put(
+    final res = await _putOrPatch(
       Uri.parse(TourneeEndpoints.detail(id)),
-      headers: _headers,
-      body: jsonEncode(data),
+      Map<String, dynamic>.from(data),
     );
     return _handleResponse(res);
   }
 
   //delete tournee
   Future delete(int id) async {
-    await http.delete(
+    final res = await http.delete(
       Uri.parse(TourneeEndpoints.detail(id)),
       headers: _headers,
     );
+    _handleResponse(res);
   }
 
   //get tournee by id
   Future getById(int id) async {
     final res = await http.get(
-      Uri.parse(TourneeEndpoints.detail(id)),
+      Uri.parse('${TourneeEndpoints.detail(id)}?include=camion,zone'),
       headers: _headers,
     );
     return _handleResponse(res);
@@ -252,7 +270,7 @@ class TourneeService {
   //get history
   Future<List<dynamic>> getHistory() async {
     final res = await http.get(
-      Uri.parse(TourneeEndpoints.history),
+      Uri.parse('${TourneeEndpoints.history}?include=camion,zone'),
       headers: _headers,
     );
     return _handleResponse(res);
@@ -261,7 +279,7 @@ class TourneeService {
   //search tournees
   Future<List<dynamic>> search(String query) async {
     final res = await http.get(
-      Uri.parse("${TourneeEndpoints.search}?q=$query"),
+      Uri.parse("${TourneeEndpoints.search}?q=$query&include=camion,zone"),
       headers: _headers,
     );
     return _handleResponse(res);

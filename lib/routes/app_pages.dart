@@ -22,6 +22,8 @@ import '../pages/tournee/views/tournee_live_map_page.dart';
 import '../pages/zone/views/zone_page.dart';
 import '../pages/zone/controllers/zone_controller.dart';
 import '../pages/zone/views/zone_detail_page.dart';
+import '../pages/ville/views/ville_page.dart';
+import '../pages/ville/controllers/ville_controller.dart';
 import '../pages/chauffeur/views/chauffeur_page.dart';
 import '../pages/chauffeur/controllers/chauffeur_controller.dart';
 import '../pages/chauffeur/views/chauffeur_detail_page.dart';
@@ -100,6 +102,13 @@ class AppPages {
       page: () => const BennesPage(),
       binding: BindingsBuilder((){
         Get.lazyPut(() => BennesController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.villes,
+      page: () => const VillePage(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => VilleController());
       }),
     ),
     GetPage(

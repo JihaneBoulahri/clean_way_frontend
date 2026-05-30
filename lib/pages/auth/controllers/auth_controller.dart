@@ -40,6 +40,44 @@ class AuthController extends GetxController {
     return null;
   }
 
+  String _sanitizeErrorMessage(
+    String? message, {
+    required String fallback,
+  }) {
+    final text = (message ?? '').trim();
+    if (text.isEmpty) return fallback;
+
+    final normalized = text.toLowerCase();
+    const noisyFragments = [
+      'sqlstate',
+      'integrity constraint violation',
+      'pdoexception',
+      'queryexception',
+      'mysql',
+      'postgres',
+      'sqlite',
+      'syntax error',
+      'stack trace',
+      'connection:',
+      'internal server error',
+      'server error',
+      'call to undefined',
+      'undefined variable',
+      'failed to open stream',
+      'duplicate entry',
+      'cannot be null',
+      'not null constraint',
+      'data too long',
+      'foreign key constraint fails',
+    ];
+
+    if (noisyFragments.any(normalized.contains)) {
+      return fallback;
+    }
+
+    return text;
+  }
+
   // Register function
   Future<void> register({
     required String nom,
@@ -184,18 +222,18 @@ class AuthController extends GetxController {
         Map<String, dynamic> userData = {};
 
         if (data is Map) {
-          if (data.containsKey('token') && data.containsKey('data')) {
-            token = data['token'];
+          if (data.containsKey('data')) {
             userData = Map<String, dynamic>.from(data['data'] ?? {});
           } else {
             userData = Map<String, dynamic>.from(data);
-            token = data['token'];
           }
+          token = _extractToken(_asMap(data), userData);
         }
 
         // Save to storage
-        if (token != null) {
-          await box.write('token', token);
+        final normalizedToken = token?.trim();
+        if (normalizedToken != null && normalizedToken.isNotEmpty) {
+          await box.write('token', normalizedToken);
         }
         if (userData.isNotEmpty) {
           await box.write('user', userData);
@@ -209,7 +247,10 @@ class AuthController extends GetxController {
         );
         Get.offAllNamed(AppRoutes.dashboard);
       } else {
-        final message = result['message'] ?? "Registration failed";
+        final message = _sanitizeErrorMessage(
+          result['message']?.toString(),
+          fallback: "Inscription impossible. Verifiez vos informations.",
+        );
         errorMessage.value = message;
         showNadiSnackbar(
           title: "Erreur",
@@ -230,4 +271,30 @@ class AuthController extends GetxController {
     }
   }
 
+  Map<String, dynamic> _asMap(dynamic value) {
+    if (value is Map<String, dynamic>) return value;
+    if (value is Map) return Map<String, dynamic>.from(value);
+    return <String, dynamic>{};
+  }
+
+  String? _extractToken(
+    Map<String, dynamic> root,
+    Map<String, dynamic> payload,
+  ) {
+    const keys = ['token', 'access_token', 'api_token', 'auth_token'];
+    for (final key in keys) {
+      final value = root[key] ?? payload[key];
+      final token = value?.toString().trim();
+      if (token != null && token.isNotEmpty) return token;
+    }
+
+    final nested = _asMap(payload['data']);
+    for (final key in keys) {
+      final value = nested[key];
+      final token = value?.toString().trim();
+      if (token != null && token.isNotEmpty) return token;
+    }
+
+    return null;
+  }
 }

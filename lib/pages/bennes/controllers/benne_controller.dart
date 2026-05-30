@@ -109,7 +109,11 @@ class BennesController extends GetxController {
   Future<void> addBenne(Benne benne) async {
     try {
       final data = await _service.createBenne(benne.toJson());
-      bennes.add(Benne.fromJson(data));
+      if (data == null) {
+        fetchBennes();
+      } else {
+        bennes.add(Benne.fromJson(data));
+      }
       
       showNadiSnackbar(
         title: "Succès",
@@ -129,7 +133,9 @@ class BennesController extends GetxController {
     try {
       final data = await _service.updateBenne(benne.id, benne.toJson());
       int index = bennes.indexWhere((b) => b.id == benne.id);
-      if (index != -1) {
+      if (data == null) {
+        fetchBennes();
+      } else if (index != -1) {
         bennes[index] = Benne.fromJson(data);
        
         showNadiSnackbar(

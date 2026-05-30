@@ -8,9 +8,9 @@ class ZoneService {
 
   /// Base headers with token
   Map<String, String> get _headers {
-    final token = _box.read('token');
+    final token = _box.read('token')?.toString().trim();
     return {
-      'Authorization': 'Bearer $token',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     };
@@ -59,13 +59,14 @@ class ZoneService {
       if (type.isNotEmpty) 'type_zone': type,
       if (lat.isNotEmpty) 'latitude': lat,
       if (lng.isNotEmpty) 'longitude': lng,
-      // Aliases to tolerate backend field variations.
-      if (nom.isNotEmpty) 'nom': nom,
-      if (type.isNotEmpty) 'type': type,
-      if (lat.isNotEmpty) 'lat': lat,
-      if (lng.isNotEmpty) 'lng': lng,
-      if (lng.isNotEmpty) 'long': lng,
     };
+
+    final villeId = int.tryParse(
+      _firstString(map, const ['id_ville', 'idVille', 'ville_id']),
+    );
+    if (villeId != null) {
+      payload['id_ville'] = villeId;
+    }
 
     final id = map['id_zone'] ?? map['id'];
     final parsedId = int.tryParse(id?.toString() ?? '');
@@ -74,6 +75,23 @@ class ZoneService {
     }
 
     return payload;
+  }
+
+  Future<http.Response> _putOrPatch(Uri uri, Map<String, dynamic> data) async {
+    final putRes = await http.put(
+      uri,
+      headers: _headers,
+      body: jsonEncode(data),
+    );
+    if (putRes.statusCode != 404 && putRes.statusCode != 405) {
+      return putRes;
+    }
+
+    return http.patch(
+      uri,
+      headers: _headers,
+      body: jsonEncode(data),
+    );
   }
 
   String _extractErrorMessage(String body) {
@@ -101,7 +119,8 @@ class ZoneService {
 
   /// Handle common response logic
   dynamic _handleResponse(http.Response res) {
-    if (res.statusCode == 200 || res.statusCode == 201) {
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      if (res.body.trim().isEmpty) return null;
       final decoded = jsonDecode(res.body);
       if (decoded is List) return decoded;
       if (decoded is Map) {
@@ -119,7 +138,7 @@ class ZoneService {
   //get all zones
   Future<List<dynamic>> getAll() async {
     final res = await http.get(
-      Uri.parse(ZoneEndpoints.base),
+      Uri.parse('${ZoneEndpoints.base}?include=ville'),
       headers: _headers,
     );
     return _handleResponse(res);
@@ -162,10 +181,9 @@ class ZoneService {
   //update zone
   Future update(int id, Map data) async {
     final payload = _buildZonePayload(data);
-    final res = await http.put(
+    final res = await _putOrPatch(
       Uri.parse(ZoneEndpoints.detail(id)),
-      headers: _headers,
-      body: jsonEncode(payload),
+      payload,
     );
     return _handleResponse(res);
   }
@@ -182,7 +200,7 @@ class ZoneService {
   //get zone by id
   Future getById(int id) async {
     final res = await http.get(
-      Uri.parse(ZoneEndpoints.detail(id)),
+      Uri.parse('${ZoneEndpoints.detail(id)}?include=ville'),
       headers: _headers,
     );
     return _handleResponse(res);

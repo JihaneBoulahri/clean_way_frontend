@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../models/camion_model.dart';
-import '../controllers/camion_controller.dart';
+
+import '../../../core/services/zone_service.dart';
 import '../../../widgets/snackbar_helper.dart';
+import '../../zone/models/zone_model.dart';
+import '../controllers/camion_controller.dart';
+import '../models/camion_model.dart';
 
 class CamionFormDialog extends StatefulWidget {
   final Camion? camion;
@@ -26,12 +29,20 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
   ];
 
   final _formKey = GlobalKey<FormState>();
+  final _zoneService = ZoneService();
+
   bool _saving = false;
+  bool _loadingZones = true;
+  String? _zonesError;
+
   late final TextEditingController _immatController;
   late final TextEditingController _capaciteController;
   late final TextEditingController _dateController;
+
+  List<Zone> _zones = [];
   String? _selectedStatus;
   String? _selectedType;
+  int? _selectedZoneId;
 
   @override
   void initState() {
@@ -49,6 +60,8 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     );
     _selectedStatus = _normalizeStatus(widget.camion?.status);
     _selectedType = _normalizeType(widget.camion?.typeCamion);
+    _selectedZoneId = widget.camion?.idZone ?? widget.camion?.zone?.id;
+    _loadZones();
   }
 
   @override
@@ -57,6 +70,37 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     _capaciteController.dispose();
     _dateController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadZones() async {
+    try {
+      final data = await _zoneService.getAll();
+      final zones = data.map((json) => Zone.fromJson(json)).toList();
+      final currentZone = widget.camion?.zone;
+      if (currentZone != null &&
+          zones.every((zone) => zone.id != currentZone.id)) {
+        zones.insert(0, currentZone);
+      }
+
+      if (mounted) {
+        setState(() {
+          _zones = zones;
+          if (_selectedZoneId != null &&
+              _zones.every((zone) => zone.id != _selectedZoneId)) {
+            _selectedZoneId = currentZone?.id;
+          }
+          _loadingZones = false;
+          _zonesError = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loadingZones = false;
+          _zonesError = e.toString();
+        });
+      }
+    }
   }
 
   String? _normalizeStatus(String? rawStatus) {
@@ -87,7 +131,7 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     if (compact.contains('compacteur')) {
       return 'compacteur';
     }
-    if (compact.contains('leger') || compact.contains('légé')) {
+    if (compact.contains('leger') || compact.contains('léger')) {
       return 'leger';
     }
     return _typeOptions.contains(compact) ? compact : null;
@@ -108,21 +152,44 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     }
   }
 
+  Zone? _selectedZone() {
+    if (_selectedZoneId == null) return null;
+    for (final zone in _zones) {
+      if (zone.id == _selectedZoneId) return zone;
+    }
+    if (widget.camion?.zone?.id == _selectedZoneId) return widget.camion?.zone;
+    return null;
+  }
+
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final cap = double.tryParse(_capaciteController.text);
     if (cap == null || cap <= 0) {
       showNadiSnackbar(
-        title: "Erreur",
-        message: "Capacité invalide",
+        title: 'Erreur',
+        message: 'Capacite invalide',
         type: NadiSnackbarType.error,
       );
       return;
     }
 
-    DateTime? date;
-    if (_dateController.text.trim().isNotEmpty) {
-      date = DateTime.tryParse(_dateController.text.trim());
+    if (_dateController.text.trim().isEmpty) {
+      showNadiSnackbar(
+        title: 'Erreur',
+        message: 'La date de mise en service est requise',
+        type: NadiSnackbarType.error,
+      );
+      return;
+    }
+
+    final date = DateTime.tryParse(_dateController.text.trim());
+    if (date == null) {
+      showNadiSnackbar(
+        title: 'Erreur',
+        message: 'Date invalide',
+        type: NadiSnackbarType.error,
+      );
+      return;
     }
 
     setState(() => _saving = true);
@@ -135,6 +202,8 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
         capaciteCamion: cap,
         dateMiseEnService: date,
         status: _selectedStatus!,
+        idZone: _selectedZoneId,
+        zone: _selectedZone(),
       );
 
       if (widget.camion == null) {
@@ -143,15 +212,25 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
         await controller.updateCamion(payload);
       }
 
-      if (mounted) Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop(payload);
     } finally {
-      setState(() => _saving = false);
+      if (mounted) setState(() => _saving = false);
     }
+  }
+
+  int? _selectedZoneValue() {
+    if (_selectedZoneId == null) return null;
+    if (_zones.any((zone) => zone.id == _selectedZoneId)) {
+      return _selectedZoneId;
+    }
+    return widget.camion?.zone?.id == _selectedZoneId ? _selectedZoneId : null;
   }
 
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.camion != null;
+    final selectedZoneId = _selectedZoneValue();
+
     return AlertDialog(
       title: Text(isEdit ? 'Modifier le camion' : 'Ajouter un camion'),
       content: SingleChildScrollView(
@@ -160,6 +239,21 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (_loadingZones)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: LinearProgressIndicator(),
+                ),
+              if (_zonesError != null && _zones.isEmpty) ...[
+                Text(
+                  'Impossible de charger les zones',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
               TextFormField(
                 controller: _immatController,
                 decoration: const InputDecoration(labelText: 'Immatriculation'),
@@ -185,7 +279,7 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _capaciteController,
-                decoration: const InputDecoration(labelText: 'Capacité (m³)'),
+                decoration: const InputDecoration(labelText: 'Capacite (m3)'),
                 keyboardType: TextInputType.number,
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Requis' : null,
@@ -202,6 +296,8 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
                       ),
                       readOnly: true,
                       onTap: _selectDate,
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty) ? 'Requis' : null,
                     ),
                   ),
                   IconButton(
@@ -225,6 +321,27 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
                 onChanged: (value) => setState(() => _selectedStatus = value),
                 validator: (v) =>
                     (v == null || v.trim().isEmpty) ? 'Requis' : null,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<int?>(
+                initialValue: selectedZoneId,
+                decoration: const InputDecoration(labelText: 'Zone (optionnel)'),
+                items: [
+                  const DropdownMenuItem<int?>(
+                    value: null,
+                    child: Text('Aucune zone'),
+                  ),
+                  ..._zones.map(
+                    (zone) => DropdownMenuItem<int?>(
+                      value: zone.id,
+                      child: Text(
+                        '#${zone.id} - ${zone.nomZone}${zone.villeNom != null ? ' (${zone.villeNom})' : ''}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _selectedZoneId = value),
               ),
             ],
           ),

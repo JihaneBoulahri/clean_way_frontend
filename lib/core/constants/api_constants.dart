@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://192.168.1.6:8000/api';
 }
 /* =========================== */
 /*            EMAIL            */
@@ -121,4 +121,14 @@ class ZoneEndpoints {
   static const String base = "${ApiConstants.baseUrl}/zones";
 
   static String detail(int id) => "${ApiConstants.baseUrl}/zones/$id";
+}
+
+/* =========================== */
+/*            VILLES           */
+/* =========================== */
+
+class VilleEndpoints {
+  static const String base = "${ApiConstants.baseUrl}/villes";
+
+  static String detail(int id) => "${ApiConstants.baseUrl}/villes/$id";
 }
