@@ -96,6 +96,17 @@ class ZoneCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
+                      'Ville: ${zone.villeNom ?? (zone.idVille != null ? '#${zone.idVille}' : 'Non renseignee')}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
                       'Latitude: ${zone.latitude.isEmpty ? 'Non renseignee' : zone.latitude}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

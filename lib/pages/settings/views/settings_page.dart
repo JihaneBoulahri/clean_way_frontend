@@ -82,8 +82,15 @@ class _SettingsPageState extends State<SettingsPage> {
     final userMap = _readUserMap(box);
     final nom = userMap['nom']?.toString().trim() ?? '';
     final prenom = userMap['prenom']?.toString().trim() ?? '';
-    final userName = nom.isNotEmpty ? nom : (prenom.isNotEmpty ? prenom : 'Utilisateur');
-    
+    final role = userMap['role']?.toString().trim() ?? 'Utilisateur';
+    final telephone = userMap['telephone']?.toString().trim() ?? 'Non renseigné';
+    final userId = userMap['id']?.toString() ?? '—';
+    final userName = prenom.isNotEmpty || nom.isNotEmpty
+        ? '$prenom $nom'.trim()
+        : 'Utilisateur';
+    final emailVerifiedAt = userMap['email_verified_at']?.toString();
+    final emailVerified = emailVerifiedAt != null && emailVerifiedAt.isNotEmpty ? 'Vérifié' : 'Non vérifié';
+
     // Afficher 1 lettre du prénom + 1 lettre du nom
     String initials = '';
     if (prenom.isNotEmpty && nom.isNotEmpty) {
@@ -134,41 +141,89 @@ class _SettingsPageState extends State<SettingsPage> {
                 // Profile Section
                 _SectionHeader(title: 'Profil'),
                 ModernCard(
-                  child: Column(
-                    children: [
-                      Center(
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundColor: scheme.primary,
-                          child: Text(
-                            initials,
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textLight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Center(
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundColor: scheme.primary,
+                            child: Text(
+                              initials,
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textLight,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      Text(
-                        userName,
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () async {
-                            final res = await Get.dialog<bool>(_EditProfileDialog(box: box));
-                            if (res == true) setState(() {});
-                          },
-                          icon: const Icon(Icons.edit),
-                          label: const Text('Modifier le profil'),
+                        const SizedBox(height: AppSpacing.lg),
+                        Text(
+                          userName,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: AppSpacing.sm),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                              vertical: AppSpacing.sm,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _roleBadgeColor(role).withOpacity(0.16),
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
+                            ),
+                            child: Text(
+                              _capitalize(role),
+                              style: TextStyle(
+                                color: _roleBadgeColor(role),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        _ProfileInfoRow(
+                          icon: Icons.email_outlined,
+                          label: 'Email',
+                          value: userMap['email']?.toString() ?? 'Non renseigné',
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _ProfileInfoRow(
+                          icon: Icons.phone_outlined,
+                          label: 'Téléphone',
+                          value: telephone,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _ProfileInfoRow(
+                          icon: Icons.badge_outlined,
+                          label: 'ID utilisateur',
+                          value: userId,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        _ProfileInfoRow(
+                          icon: Icons.verified_user_outlined,
+                          label: 'Email vérifié',
+                          value: emailVerified,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              final res = await Get.dialog<bool>(_EditProfileDialog(box: box));
+                              if (res == true) setState(() {});
+                            },
+                            icon: const Icon(Icons.edit),
+                            label: const Text('Modifier le profil'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xl),
@@ -306,6 +361,62 @@ class _SectionHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ProfileInfoRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _ProfileInfoRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: scheme.primary),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurface.withOpacity(0.72),
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+String _capitalize(String text) {
+  if (text.isEmpty) return text;
+  return text[0].toUpperCase() + text.substring(1);
+}
+
+Color _roleBadgeColor(String role) {
+  final lower = role.toLowerCase();
+  if (lower.contains('admin')) return const Color(0xFF4F46E5);
+  if (lower.contains('chauffeur')) return const Color(0xFF0E9F6E);
+  return const Color(0xFF2563EB);
 }
 
 class _ColorOption extends StatelessWidget {

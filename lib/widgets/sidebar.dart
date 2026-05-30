@@ -131,6 +131,7 @@ class Sidebar extends StatelessWidget {
                     _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
                   ] else ...[
                     _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.dashboard)),
+                    _SidebarItem(icon: Icons.location_city_outlined, label: 'Villes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.villes)),
                     _SidebarItem(icon: Icons.local_shipping_outlined, label: 'Camions', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.camions)),
                     _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.zones)),
                     _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.bennes)),

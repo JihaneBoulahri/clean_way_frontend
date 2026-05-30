@@ -35,7 +35,7 @@ class CamionPage extends GetView<CamionController> {
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Obx(
               () => SearchBarField(
-                hint: 'Rechercher par immatriculation, type, statut...',
+                hint: 'Rechercher par immatriculation, type, statut, ville...',
                 onChanged: (v) => controller.searchQuery.value = v,
                 onFilterTap: () => _openFilters(context),
                 filterActive: controller.hasActiveFilters,

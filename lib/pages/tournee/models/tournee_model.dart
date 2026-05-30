@@ -48,6 +48,12 @@ class Tournee {
 
     DateTime? parseDate(dynamic v) {
       if (v == null) return null;
+      if (v is Map) {
+        final raw = v['raw'] ?? v['value'] ?? v['date'];
+        if (raw != null) {
+          return DateTime.tryParse(raw.toString());
+        }
+      }
       return DateTime.tryParse(v.toString());
     }
 
@@ -137,4 +143,6 @@ class Tournee {
 
     return payload;
   }
+
+  String? get villeNom => zone?.villeNom ?? camion?.villeNom;
 }

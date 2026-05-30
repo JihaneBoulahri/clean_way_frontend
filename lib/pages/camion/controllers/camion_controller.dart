@@ -1,13 +1,15 @@
 import 'package:clean_way_frontend/core/constants/filter_constants.dart';
 import 'package:get/get.dart';
-import '../../../core/services/notification_service.dart';
+
 import '../../../core/services/camion_service.dart';
-import '../models/camion_model.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../routes/app_routes.dart';
-import '../../../widgets/snackbar_helper.dart'; 
+import '../../../widgets/snackbar_helper.dart';
+import '../models/camion_model.dart';
 
 class CamionController extends GetxController {
   final CamionService _service = CamionService();
+
   var camions = <Camion>[].obs;
   var isLoading = false.obs;
   var error = RxnString();
@@ -22,7 +24,9 @@ class CamionController extends GetxController {
           c.immatriculation.toLowerCase().contains(q) ||
           c.typeCamion.toLowerCase().contains(q) ||
           c.status.toLowerCase().contains(q) ||
-          c.capaciteCamion.toString().contains(q);
+          c.capaciteCamion.toString().contains(q) ||
+          (c.zone?.nomZone.toLowerCase().contains(q) ?? false) ||
+          (c.zone?.ville?.nomVille.toLowerCase().contains(q) ?? false);
       final matchesType = filterType.value == FilterDefaults.all ||
           c.typeCamion.toLowerCase() == filterType.value.toLowerCase();
       final matchesStatus = filterStatus.value == FilterDefaults.all ||
@@ -77,9 +81,8 @@ class CamionController extends GetxController {
     if (e.toString().contains('401') || e.toString().contains('Unauthorized')) {
       Get.offAllNamed(AppRoutes.login);
     } else {
-      
       showNadiSnackbar(
-        title: "Erreur",
+        title: 'Erreur',
         message: e.toString(),
         type: NadiSnackbarType.error,
       );
@@ -103,16 +106,20 @@ class CamionController extends GetxController {
   Future<void> addCamion(Camion camion) async {
     try {
       final data = await _service.create(camion.toJson());
-      camions.add(Camion.fromJson(data));
-      // MODIFIÉ
+      if (data == null) {
+        await fetchCamions();
+      } else {
+        camions.add(Camion.fromJson(data));
+      }
+
       showNadiSnackbar(
-        title: "Succès",
-        message: "Camion ajouté avec succès",
+        title: 'Succes',
+        message: 'Camion ajoute avec succes',
         type: NadiSnackbarType.success,
       );
       await NotificationService.instance.showNotification(
-        'Camion ajouté',
-        'Le camion a été ajouté avec succès.',
+        'Camion ajoute',
+        'Le camion a ete ajoute avec succes.',
       );
     } catch (e) {
       _handleError(e);
@@ -122,20 +129,22 @@ class CamionController extends GetxController {
   Future<void> updateCamion(Camion camion) async {
     try {
       final data = await _service.update(camion.id, camion.toJson());
-      int index = camions.indexWhere((c) => c.id == camion.id);
-      if (index != -1) {
+      final index = camions.indexWhere((c) => c.id == camion.id);
+      if (data == null) {
+        await fetchCamions();
+      } else if (index != -1) {
         camions[index] = Camion.fromJson(data);
-        // MODIFIÉ
-        showNadiSnackbar(
-          title: "Succès",
-          message: "Camion modifié avec succès",
-          type: NadiSnackbarType.success,
-        );
-        await NotificationService.instance.showNotification(
-          'Camion modifié',
-          'Le camion a été modifié avec succès.',
-        );
       }
+
+      showNadiSnackbar(
+        title: 'Succes',
+        message: 'Camion modifie avec succes',
+        type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Camion modifie',
+        'Le camion a ete modifie avec succes.',
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -145,15 +154,15 @@ class CamionController extends GetxController {
     try {
       await _service.delete(id);
       camions.removeWhere((c) => c.id == id);
-      
+
       showNadiSnackbar(
-        title: "Succès",
-        message: "Camion supprimé avec succès",
+        title: 'Succes',
+        message: 'Camion supprime avec succes',
         type: NadiSnackbarType.success,
       );
       await NotificationService.instance.showNotification(
-        'Camion supprimé',
-        'Le camion a été supprimé avec succès.',
+        'Camion supprime',
+        'Le camion a ete supprime avec succes.',
       );
     } catch (e) {
       _handleError(e);

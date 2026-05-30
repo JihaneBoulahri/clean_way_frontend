@@ -126,6 +126,24 @@ class CamionDetailPage extends StatelessWidget {
                     value: camion.status,
                     scheme: scheme,
                   ),
+                  const Divider(),
+                  if (camion.zone != null) ...[
+                    _DetailRow(
+                      icon: Icons.map_outlined,
+                      label: 'Zone',
+                      value: camion.zone!.nomZone.isNotEmpty
+                          ? camion.zone!.nomZone
+                          : '#${camion.zone!.id}',
+                      scheme: scheme,
+                    ),
+                    const Divider(),
+                  ],
+                  _DetailRow(
+                    icon: Icons.location_city,
+                    label: 'Ville',
+                    value: camion.villeNom ?? (camion.zone?.idVille != null ? '#${camion.zone!.idVille}' : 'Non renseignee'),
+                    scheme: scheme,
+                  ),
                 ],
               ),
             ),

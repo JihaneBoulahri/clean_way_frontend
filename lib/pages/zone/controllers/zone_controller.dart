@@ -21,7 +21,8 @@ class ZoneController extends GetxController {
           z.nomZone.toLowerCase().contains(q) ||
           z.typeZone.toLowerCase().contains(q) ||
           z.latitude.toLowerCase().contains(q) ||
-          z.longitude.toLowerCase().contains(q);
+          z.longitude.toLowerCase().contains(q) ||
+          (z.ville?.nomVille.toLowerCase().contains(q) ?? false);
       final matchesType = filterType.value == FilterDefaults.all ||
           z.typeZone.toLowerCase() == filterType.value.toLowerCase();
       return matchesSearch && matchesType;
@@ -62,12 +63,13 @@ class ZoneController extends GetxController {
 
   String _friendlyErrorMessage(String raw) {
     final lower = raw.toLowerCase();
-    if (lower.contains('zones.latitude') ||
+    if (lower.contains('id_ville') ||
+        lower.contains('zones.latitude') ||
         lower.contains('constraint failed')) {
-      return "Échec d'ajout de zone: latitude/longitude rejetées par le serveur. Vérifiez la configuration API des champs de zone.";
+      return 'Echec d\'ajout de zone: verifiez la ville et les coordonnees envoyees au serveur.';
     }
     if (lower.contains('server error (500)')) {
-      return "Le serveur a renvoyé une erreur lors de l'enregistrement de la zone.";
+      return 'Le serveur a renvoye une erreur lors de l\'enregistrement de la zone.';
     }
     return raw;
   }
@@ -81,7 +83,7 @@ class ZoneController extends GetxController {
         final friendly = _friendlyErrorMessage(errorMsg);
 
         showNadiSnackbar(
-          title: "Erreur",
+          title: 'Erreur',
           message: friendly,
           type: NadiSnackbarType.error,
         );
@@ -106,11 +108,15 @@ class ZoneController extends GetxController {
   Future<void> addZone(Zone zone) async {
     try {
       final data = await _service.create(zone.toJson());
-      zones.add(Zone.fromJson(data));
+      if (data == null) {
+        await fetchZones();
+      } else {
+        zones.add(Zone.fromJson(data));
+      }
 
       showNadiSnackbar(
-        title: "Succès",
-        message: "Zone ajoutée avec succès",
+        title: 'Succès',
+        message: 'Zone ajoutée avec succès',
         type: NadiSnackbarType.success,
       );
       await NotificationService.instance.showNotification(
@@ -125,22 +131,24 @@ class ZoneController extends GetxController {
   Future<void> updateZone(Zone zone) async {
     try {
       final data = await _service.update(zone.id, zone.toJson());
-      int index = zones.indexWhere((z) => z.id == zone.id);
-      if (index != -1) {
+      final index = zones.indexWhere((z) => z.id == zone.id);
+      if (data == null) {
+        await fetchZones();
+      } else if (index != -1) {
         final updatedZone = Zone.fromJson(data);
         zones[index] = updatedZone;
         zones.refresh();
-
-        showNadiSnackbar(
-          title: "Succès",
-          message: "Zone modifiée avec succès",
-          type: NadiSnackbarType.success,
-        );
-        await NotificationService.instance.showNotification(
-          'Zone modifiée',
-          'La zone a été modifiée avec succès.',
-        );
       }
+
+      showNadiSnackbar(
+        title: 'Succès',
+        message: 'Zone modifiée avec succès',
+        type: NadiSnackbarType.success,
+      );
+      await NotificationService.instance.showNotification(
+        'Zone modifiée',
+        'La zone a été modifiée avec succès.',
+      );
     } catch (e) {
       _handleError(e);
     }
@@ -152,8 +160,8 @@ class ZoneController extends GetxController {
       zones.removeWhere((z) => z.id == id);
 
       showNadiSnackbar(
-        title: "Succès",
-        message: "Zone supprimée avec succès",
+        title: 'Succès',
+        message: 'Zone supprimée avec succès',
         type: NadiSnackbarType.success,
       );
       await NotificationService.instance.showNotification(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../constants/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get_storage/get_storage.dart';
 
 class AuthService {
   static bool _isGenericValidationMessage(String value) {
@@ -231,19 +232,24 @@ class AuthService {
   //logout
   static Future<Map<String, dynamic>> logout() async {
     try {
+      final box = GetStorage();
       final storage = const FlutterSecureStorage();
-      final token = await storage.read(key: "token");
+      final storedToken = box.read('token')?.toString().trim();
+      final token = (storedToken != null && storedToken.isNotEmpty)
+          ? storedToken
+          : await storage.read(key: "token");
 
       final res = await http.post(
         Uri.parse(AuthEndpoints.logout),
         headers: {
-          "Authorization": "Bearer $token",
+          if (token != null && token.isNotEmpty) "Authorization": "Bearer $token",
           "Accept": "application/json",
         },
       );
 
       if (res.statusCode == 200) {
         // supprimer le token du téléphone
+        await box.remove('token');
         await storage.delete(key: "token");
 
         return {"success": true, "message": "Logout successful"};

@@ -9,18 +9,35 @@ class BenneService {
 
   /// Base headers with token
   Map<String, String> get _headers {
-    final token = _box.read('token');
+    final token = _box.read('token')?.toString().trim();
     return {
-      'Authorization': 'Bearer $token',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       'Accept': 'application/json',
       'Content-Type': 'application/json',
     };
   }
 
+  Future<http.Response> _putOrPatch(Uri uri, Map<String, dynamic> data) async {
+    final putRes = await http.put(
+      uri,
+      headers: _headers,
+      body: jsonEncode(data),
+    );
+    if (putRes.statusCode != 404 && putRes.statusCode != 405) {
+      return putRes;
+    }
+
+    return http.patch(
+      uri,
+      headers: _headers,
+      body: jsonEncode(data),
+    );
+  }
+
   /// Handle common response logic
   dynamic _handleResponse(http.Response res) {
-    
-    if (res.statusCode == 200 || res.statusCode == 201) {
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      if (res.body.trim().isEmpty) return null;
       final decoded = jsonDecode(res.body);
       if (decoded is List) return decoded;
       if (decoded is Map) {
@@ -45,7 +62,7 @@ class BenneService {
   }
 
   //create benne
-  Future createBenne(Map data) async {
+  Future createBenne(Map<String, dynamic> data) async {
     final response = await http.post(
       Uri.parse(BenneEndpoints.base),
       headers: _headers,
@@ -56,11 +73,10 @@ class BenneService {
   }
 
   //update benne
-  Future updateBenne(int id, Map data) async {
-    final response = await http.put(
+  Future updateBenne(int id, Map<String, dynamic> data) async {
+    final response = await _putOrPatch(
       Uri.parse(BenneEndpoints.detail(id)),
-      headers: _headers,
-      body: jsonEncode(data),
+      data,
     );
 
     return _handleResponse(response);

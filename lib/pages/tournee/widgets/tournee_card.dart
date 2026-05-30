@@ -15,6 +15,7 @@ class TourneeCard extends StatelessWidget {
     final dateText = tournee.dateTournee.toString().split(' ').first;
     final zoneLabel = (tournee.zone?.nomZone ?? '').trim();
     final camionLabel = (tournee.camion?.immatriculation ?? '').trim();
+    final cityLabel = (tournee.villeNom ?? '').trim();
     final zoneText = zoneLabel.isNotEmpty
         ? 'Zone: $zoneLabel'
         : (tournee.idZone != null
@@ -130,6 +131,17 @@ class TourneeCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       camionText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.8),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      cityLabel.isEmpty ? 'Ville: Non renseignee' : 'Ville: $cityLabel',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

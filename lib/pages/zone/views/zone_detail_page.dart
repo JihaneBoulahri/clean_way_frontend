@@ -106,11 +106,11 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
               ),
             ),
             const SizedBox(height: AppSpacing.md),
-            ModernCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _DetailRow(
+                ModernCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _DetailRow(
                     icon: Icons.confirmation_number,
                     label: 'ID Zone',
                     value: '${zone.id}',
@@ -124,15 +124,22 @@ class _ZoneDetailPageState extends State<ZoneDetailPage> {
                     scheme: scheme,
                   ),
                   const Divider(),
-                  _DetailRow(
-                    icon: Icons.category,
-                    label: 'Type Zone',
-                    value: zone.typeZone,
-                    scheme: scheme,
+                      _DetailRow(
+                        icon: Icons.category,
+                        label: 'Type Zone',
+                        value: zone.typeZone,
+                        scheme: scheme,
+                      ),
+                      const Divider(),
+                      _DetailRow(
+                        icon: Icons.location_city,
+                        label: 'Ville',
+                        value: zone.villeNom ?? (zone.idVille != null ? '#${zone.idVille}' : 'Non renseignee'),
+                        scheme: scheme,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
             const SizedBox(height: AppSpacing.xl),
 
             // Coordonnées géographiques

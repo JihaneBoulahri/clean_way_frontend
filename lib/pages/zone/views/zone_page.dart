@@ -35,7 +35,7 @@ class ZonePage extends GetView<ZoneController> {
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Obx(
               () => SearchBarField(
-                hint: 'Rechercher par nom, type...',
+                hint: 'Rechercher par nom, type, ville...',
                 onChanged: (v) => controller.searchQuery.value = v,
                 onFilterTap: () => _openFilters(context),
                 filterActive: controller.hasActiveFilters,
