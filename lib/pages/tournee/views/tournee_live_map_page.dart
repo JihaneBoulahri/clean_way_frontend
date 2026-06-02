@@ -249,7 +249,7 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
   @override
   Widget build(BuildContext context) {
     return AppLayout(
-      pageName: 'Live Map',
+      pageName: 'Carte en direct',
       child: FutureBuilder<Tournee?>(
         future: _futureTournee,
         builder: (context, snapshot) {

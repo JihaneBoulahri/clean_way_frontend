@@ -158,7 +158,7 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Courriel'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) {
                   final value = v?.trim() ?? '';

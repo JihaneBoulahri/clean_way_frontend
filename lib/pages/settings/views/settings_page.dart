@@ -197,7 +197,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         const SizedBox(height: AppSpacing.lg),
                         _ProfileInfoRow(
                           icon: Icons.email_outlined,
-                          label: 'Email',
+                          label: 'Courriel',
                           value: userMap['email']?.toString() ?? 'Non renseigné',
                         ),
                         const SizedBox(height: AppSpacing.md),
@@ -624,7 +624,7 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
-                  labelText: 'Email',
+                  labelText: 'Courriel',
                   prefixIcon: const Icon(Icons.email),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.sm),

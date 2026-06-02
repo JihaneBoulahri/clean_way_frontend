@@ -124,14 +124,14 @@ class Navbar extends StatelessWidget {
             const SizedBox(height: 16),
             Divider(color: scheme.onSurface.withValues(alpha: 0.12)),
             const SizedBox(height: 8),
-            _infoRow(context, Icons.email_outlined, 'Email', user.email),
+            _infoRow(context, Icons.email_outlined, 'Courriel', user.email),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
                 onPressed: _logout,
                 icon: const Icon(Icons.logout_rounded),
-                label: const Text('Logout'),
+                label: const Text('Déconnexion'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: scheme.error,
                   side: BorderSide(color: scheme.error.withValues(alpha: 0.35)),

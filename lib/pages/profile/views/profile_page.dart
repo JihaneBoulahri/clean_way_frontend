@@ -222,7 +222,7 @@ class _ProfileForm extends StatelessWidget {
                     TextFormField(
                       initialValue: controller.email.value,
                       decoration: const InputDecoration(
-                        labelText: 'Email',
+                        labelText: 'Courriel',
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.emailAddress,
@@ -279,7 +279,7 @@ class _ProfileForm extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _ProfileField(
-                      label: 'Email',
+                      label: 'Courriel',
                       value: controller.email.value,
                     ),
                     const SizedBox(height: 12),

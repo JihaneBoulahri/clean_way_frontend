@@ -12,7 +12,7 @@ class DashboardPage extends GetView<DashboardController> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return AppLayout(
-      pageName: 'Dashboard',
+      pageName: 'Tableau de bord',
       child: SafeArea(
         child: Obx(() {
           if (controller.stats_loading.value) {

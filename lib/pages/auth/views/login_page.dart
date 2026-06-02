@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        "Welcome Back!",
+                        "Bienvenue",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: width < 400 ? 22 : 26,
@@ -160,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: height * 0.01),
                       Text(
-                        "Please login to your account",
+                        "Connectez-vous à votre compte",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: width < 400 ? 14 : 16,
@@ -186,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                           onChanged: (_) => _validateIfNeeded(),
                           validator: _validatePassword,
                           decoration: _decoration(
-                            "Password",
+                            "Mot de passe",
                             Icons.lock_outline,
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -215,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   onPressed: _submit,
                                   child: const Text(
-                                    "Login",
+                                    "Se connecter",
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: Colors.white,
@@ -231,11 +231,11 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         child: RichText(
                           text: TextSpan(
-                            text: "Don't have an account? ",
+                            text: "Vous n'avez pas de compte ? ",
                             style: TextStyle(color: Colors.grey[700]),
                             children: const [
                               TextSpan(
-                                text: "Sign Up",
+                                text: "Inscription",
                                 style: TextStyle(
                                   color: primaryGreen,
                                   fontWeight: FontWeight.bold,

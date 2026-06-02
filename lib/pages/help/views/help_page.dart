@@ -87,7 +87,7 @@ class HelpPage extends GetView<HelpController> {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          'Need Help?',
+                          'Besoin d\'aide ?',
                           style: TextStyle(
                             color: scheme.onPrimary,
                             fontSize: 24,
@@ -96,7 +96,7 @@ class HelpPage extends GetView<HelpController> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Find FAQs, contact support, or send your feedback here.',
+                          'Trouvez des FAQ, contactez le support ou envoyez votre avis ici.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: scheme.onPrimary.withOpacity(0.7),
@@ -109,41 +109,41 @@ class HelpPage extends GetView<HelpController> {
                   const SizedBox(height: 24),
 
                   // FAQs section
-                  _buildSectionTitle('FAQs', primaryColor),
+                  _buildSectionTitle('FAQ', primaryColor),
                   _faqCard(
                     context,
-                    'How do I add a new tour?',
-                    'Go to the Tours page, click Add, fill in required fields, then save.',
+                    'Comment ajouter une nouvelle tournée ?',
+                    'Allez sur la page Tournées, cliquez sur Ajouter, remplissez les champs requis, puis enregistrez.',
                     primaryColor,
                   ),
                   _faqCard(
                     context,
-                    'What if I forget a required field?',
-                    'Make sure required fields like Date, Start Time, and Status are filled.',
+                    'Que faire si j\'oublie un champ obligatoire ?',
+                    'Assurez-vous que les champs obligatoires comme la date, l\'heure de début et le statut sont remplis.',
                     primaryColor,
                   ),
                   const SizedBox(height: 24),
 
                   // Contact Support
-                  _buildSectionTitle('Contact Support', primaryColor),
+                  _buildSectionTitle('Contacter le support', primaryColor),
                   _contactCard(
                     context,
                     Icons.email,
-                    'Email Us',
+                    'Envoyez-nous un email',
                     'cleanwaycontact77@gmail.com',
                     primaryColor,
                   ),
                   _contactCard(
                     context,
                     Icons.phone,
-                    'Call Support',
+                    'Appeler le support',
                     '+212 600 123 456',
                     primaryColor,
                   ),
                   const SizedBox(height: 24),
 
                   // Contact Us
-                  _buildSectionTitle('Contact Us', primaryColor),
+                  _buildSectionTitle('Contactez-nous', primaryColor),
                   _feedbackCard(context, primaryColor),
                 ],
               ),
@@ -278,7 +278,7 @@ class HelpPage extends GetView<HelpController> {
             maxLines: 4,
             decoration: InputDecoration(
               border: const OutlineInputBorder(),
-              hintText: 'Write your message here...',
+              hintText: 'Écrivez votre message ici...',
               hintStyle: TextStyle(color: onCard.withOpacity(0.6)),
             ),
             style: TextStyle(color: onCard),

@@ -140,7 +140,7 @@ class ChauffeurDetailPage extends StatelessWidget {
                         const Divider(),
                         _DetailRow(
                           icon: Icons.email,
-                          label: 'Email',
+                          label: 'Courriel',
                           value: chauffeur.user!.email,
                           scheme: scheme,
                         ),

@@ -242,7 +242,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     final emailField = buildField(
       controller: emailController,
-      label: 'Email',
+      label: 'Courriel',
       icon: Icons.email_outlined,
       validator: validateEmail,
       keyboardType: TextInputType.emailAddress,
@@ -250,7 +250,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     final passwordField = buildField(
       controller: passwordController,
-      label: 'Password',
+      label: 'Mot de passe',
       icon: Icons.lock_outline,
       validator: validatePassword,
       obscureText: !showPassword,
@@ -267,7 +267,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     final confirmPasswordField = buildField(
       controller: confirmPasswordController,
-      label: 'Confirm Password',
+      label: 'Confirmation du mot de passe',
       icon: Icons.lock_outline,
       validator: validateConfirmPassword,
       obscureText: !showConfirm,
@@ -366,7 +366,7 @@ class _RegisterPageState extends State<RegisterPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                "Create Account",
+                "Créer un compte",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: titleSize,
@@ -376,7 +376,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               SizedBox(height: screenHeight * 0.01),
               Text(
-                "Register to start using the app",
+                "Inscrivez-vous pour commencer à utiliser l'application",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: subtitleSize,
@@ -401,7 +401,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           onPressed: submitRegister,
                           child: const Text(
-                            "Sign Up",
+                            "S'inscrire",
                             style: TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),
@@ -414,11 +414,11 @@ class _RegisterPageState extends State<RegisterPage> {
                 },
                 child: RichText(
                   text: TextSpan(
-                    text: "Already have an account? ",
+                    text: "Vous avez déjà un compte ? ",
                     style: TextStyle(color: Colors.grey[700]),
                     children: const [
                       TextSpan(
-                        text: "Login",
+                        text: "Connexion",
                         style: TextStyle(
                           color: primaryGreen,
                           fontWeight: FontWeight.bold,
@@ -506,7 +506,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      "A cleaner workspace for your fleet, routes and monitoring.",
+                      "Un espace de travail plus propre pour votre flotte, vos itinéraires et votre surveillance.",
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.90),
                         fontSize: 13,
@@ -538,9 +538,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _TagChip(text: "Dashboard"),
-                    _TagChip(text: "Tournees"),
-                    _TagChip(text: "Monitoring"),
+                    _TagChip(text: "Tableau de bord"),
+                    _TagChip(text: "Tournées"),
+                    _TagChip(text: "Surveillance"),
                   ],
                 ),
               ],

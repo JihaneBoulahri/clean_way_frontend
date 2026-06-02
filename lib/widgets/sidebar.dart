@@ -108,7 +108,7 @@ class Sidebar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   if (_isChauffeur) ...[
-                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, active: currentRoute == AppRoutes.dashboard, onTap: () => onItemSelected(AppRoutes.dashboard)),
+                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Tableau de bord', primaryColor: primaryColor, active: currentRoute == AppRoutes.dashboard, onTap: () => onItemSelected(AppRoutes.dashboard)),
                     _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, active: currentRoute == AppRoutes.zones, onTap: () => onItemSelected(AppRoutes.zones)),
                     _SidebarItem(
                       icon: Icons.today_outlined,
@@ -119,7 +119,7 @@ class Sidebar extends StatelessWidget {
                     ),
                     _SidebarItem(
                       icon: Icons.my_location,
-                      label: 'Live Map',
+                      label: 'Carte en direct',
                       primaryColor: primaryColor,
                       active: currentRoute == AppRoutes.liveMap,
                       onTap: () => onItemSelected(AppRoutes.liveMap),
@@ -134,10 +134,10 @@ class Sidebar extends StatelessWidget {
                     ),
                     _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, active: currentRoute == AppRoutes.notifications, onTap: () => onItemSelected(AppRoutes.notifications)),
                     _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, active: currentRoute == AppRoutes.settings, onTap: () => onItemSelected(AppRoutes.settings)),                    
-                    _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, active: currentRoute == AppRoutes.help, onTap: () => onItemSelected(AppRoutes.help)),
+                    _SidebarItem(icon: Icons.help_outline, label: 'Aide et support', primaryColor: primaryColor, active: currentRoute == AppRoutes.help, onTap: () => onItemSelected(AppRoutes.help)),
 
                   ] else ...[
-                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, active: currentRoute == AppRoutes.dashboard, onTap: () => onItemSelected(AppRoutes.dashboard)),
+                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Tableau de bord', primaryColor: primaryColor, active: currentRoute == AppRoutes.dashboard, onTap: () => onItemSelected(AppRoutes.dashboard)),
                     _SidebarItem(icon: Icons.person_outline, label: 'Chauffeurs', primaryColor: primaryColor, active: currentRoute == AppRoutes.chauffeurs, onTap: () => onItemSelected(AppRoutes.chauffeurs)),
                     _SidebarItem(icon: Icons.local_shipping_outlined, label: 'Camions', primaryColor: primaryColor, active: currentRoute == AppRoutes.camions, onTap: () => onItemSelected(AppRoutes.camions)),
                     _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, active: currentRoute == AppRoutes.bennes, onTap: () => onItemSelected(AppRoutes.bennes)),
@@ -146,7 +146,7 @@ class Sidebar extends StatelessWidget {
                     _SidebarItem(icon: Icons.location_city_outlined, label: 'Villes', primaryColor: primaryColor, active: currentRoute == AppRoutes.villes, onTap: () => onItemSelected(AppRoutes.villes)),
                     _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, active: currentRoute == AppRoutes.notifications, onTap: () => onItemSelected(AppRoutes.notifications)),
                     _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, active: currentRoute == AppRoutes.settings, onTap: () => onItemSelected(AppRoutes.settings)),
-                    _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, active: currentRoute == AppRoutes.help, onTap: () => onItemSelected(AppRoutes.help)),
+                    _SidebarItem(icon: Icons.help_outline, label: 'Aide et support', primaryColor: primaryColor, active: currentRoute == AppRoutes.help, onTap: () => onItemSelected(AppRoutes.help)),
                   ],
                 ],
               ),
@@ -168,7 +168,7 @@ class Sidebar extends StatelessWidget {
                     children: [
                       Icon(Icons.logout, size: 18, color: Colors.red.shade700),
                       const SizedBox(width: 8),
-                      Text('Logout', style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600, fontSize: 14)),
+                      Text('Déconnexion', style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600, fontSize: 14)),
                     ],
                   ),
                 ),
