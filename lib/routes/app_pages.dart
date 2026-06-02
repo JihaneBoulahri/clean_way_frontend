@@ -33,10 +33,6 @@ import '../pages/help/controllers/help_controller.dart';
 
 import '../pages/notifications/views/notification_page.dart';
 import '../pages/notifications/controllers/notification_controller.dart';
-import '../pages/profile/views/profile_page.dart';
-import '../pages/profile/controllers/profile_controller.dart';
-import '../pages/online_users/views/online_users_page.dart';
-import '../pages/online_users/controllers/online_users_controller.dart';
 
 class AppPages {
   static final routes = [
@@ -172,19 +168,5 @@ class AppPages {
       }),
     ),
 
-    GetPage(
-      name: AppRoutes.profile,
-      page: () => const ProfilePage(),
-      binding: BindingsBuilder(() {
-        Get.lazyPut(() => ProfileController());
-      }),
-    ),
-    GetPage(
-      name: AppRoutes.onlineUsers,
-      page: () => const OnlineUsersPage(),
-      binding: BindingsBuilder(() {
-        Get.lazyPut(() => OnlineUsersController());
-      }),
-    ),
   ];
 }

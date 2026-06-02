@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import '../pages/auth/models/user_model.dart';
 import '../routes/app_routes.dart';
@@ -36,6 +37,7 @@ class Sidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final currentRoute = Get.currentRoute;
     return Container(
       color: scheme.surface,
       child: SafeArea(
@@ -106,45 +108,45 @@ class Sidebar extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 children: [
                   if (_isChauffeur) ...[
-                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.dashboard)),
-                    _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.zones)),
+                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, active: currentRoute == AppRoutes.dashboard, onTap: () => onItemSelected(AppRoutes.dashboard)),
+                    _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, active: currentRoute == AppRoutes.zones, onTap: () => onItemSelected(AppRoutes.zones)),
                     _SidebarItem(
                       icon: Icons.today_outlined,
                       label: 'Ma tournée',
                       primaryColor: primaryColor,
+                      active: currentRoute == AppRoutes.tourneeChauffeur,
                       onTap: () => onItemSelected(AppRoutes.tourneeChauffeur),
                     ),
                     _SidebarItem(
                       icon: Icons.my_location,
                       label: 'Live Map',
                       primaryColor: primaryColor,
+                      active: currentRoute == AppRoutes.liveMap,
                       onTap: () => onItemSelected(AppRoutes.liveMap),
                     ),
                     _SidebarItem(
                       icon: Icons.history,
                       label: 'Historique',
                       primaryColor: primaryColor,
+                      active: currentRoute == AppRoutes.tourneeChauffeurHistory,
                       onTap: () =>
                           onItemSelected(AppRoutes.tourneeChauffeurHistory),
                     ),
-                    _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.settings)),
-                    _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.notifications)),
-                    _SidebarItem(icon: Icons.person_outlined, label: 'Profil', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.profile)),
-                    _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
+                    _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, active: currentRoute == AppRoutes.notifications, onTap: () => onItemSelected(AppRoutes.notifications)),
+                    _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, active: currentRoute == AppRoutes.settings, onTap: () => onItemSelected(AppRoutes.settings)),                    
+                    _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, active: currentRoute == AppRoutes.help, onTap: () => onItemSelected(AppRoutes.help)),
+
                   ] else ...[
-                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.dashboard)),
-                    _SidebarItem(icon: Icons.location_city_outlined, label: 'Villes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.villes)),
-                    _SidebarItem(icon: Icons.local_shipping_outlined, label: 'Camions', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.camions)),
-                    _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.zones)),
-                    _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.bennes)),
-          
-                    _SidebarItem(icon: Icons.person_outline, label: 'Chauffeurs', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.chauffeurs)),
-                    _SidebarItem(icon: Icons.people_outlined, label: 'Utilisateurs actifs', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.onlineUsers)),
-                    _SidebarItem(icon: Icons.today_outlined, label: 'Tournées', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.tournees)),
-                    _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.settings)),
-                    _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.notifications)),
-                    _SidebarItem(icon: Icons.person_outlined, label: 'Profil', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.profile)),
-                    _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, onTap: () => onItemSelected(AppRoutes.help)),
+                    _SidebarItem(icon: Icons.dashboard_outlined, label: 'Dashboard', primaryColor: primaryColor, active: currentRoute == AppRoutes.dashboard, onTap: () => onItemSelected(AppRoutes.dashboard)),
+                    _SidebarItem(icon: Icons.person_outline, label: 'Chauffeurs', primaryColor: primaryColor, active: currentRoute == AppRoutes.chauffeurs, onTap: () => onItemSelected(AppRoutes.chauffeurs)),
+                    _SidebarItem(icon: Icons.local_shipping_outlined, label: 'Camions', primaryColor: primaryColor, active: currentRoute == AppRoutes.camions, onTap: () => onItemSelected(AppRoutes.camions)),
+                    _SidebarItem(icon: Icons.delete_outline, label: 'Bennes', primaryColor: primaryColor, active: currentRoute == AppRoutes.bennes, onTap: () => onItemSelected(AppRoutes.bennes)),
+                    _SidebarItem(icon: Icons.today_outlined, label: 'Tournées', primaryColor: primaryColor, active: currentRoute == AppRoutes.tournees, onTap: () => onItemSelected(AppRoutes.tournees)),
+                    _SidebarItem(icon: Icons.map_outlined, label: 'Zones', primaryColor: primaryColor, active: currentRoute == AppRoutes.zones, onTap: () => onItemSelected(AppRoutes.zones)),
+                    _SidebarItem(icon: Icons.location_city_outlined, label: 'Villes', primaryColor: primaryColor, active: currentRoute == AppRoutes.villes, onTap: () => onItemSelected(AppRoutes.villes)),
+                    _SidebarItem(icon: Icons.notifications_outlined, label: 'Notifications', primaryColor: primaryColor, active: currentRoute == AppRoutes.notifications, onTap: () => onItemSelected(AppRoutes.notifications)),
+                    _SidebarItem(icon: Icons.settings_outlined, label: 'Paramètres', primaryColor: primaryColor, active: currentRoute == AppRoutes.settings, onTap: () => onItemSelected(AppRoutes.settings)),
+                    _SidebarItem(icon: Icons.help_outline, label: 'Help & Support', primaryColor: primaryColor, active: currentRoute == AppRoutes.help, onTap: () => onItemSelected(AppRoutes.help)),
                   ],
                 ],
               ),
@@ -183,26 +185,33 @@ class _SidebarItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color primaryColor;
+  final bool active;
   final VoidCallback onTap;
 
   const _SidebarItem({
     required this.icon,
     required this.label,
     required this.primaryColor,
+    this.active = false,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final itemColor = active ? primaryColor : scheme.onSurface.withValues(alpha: 0.82);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
-      child: Padding(
+      child: Container(
+        decoration: BoxDecoration(
+          color: active ? primaryColor.withValues(alpha: 0.12) : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: scheme.onSurface.withValues(alpha: 0.82)),
+            Icon(icon, size: 20, color: itemColor),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -210,7 +219,7 @@ class _SidebarItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: scheme.onSurface,
+                  color: active ? primaryColor : scheme.onSurface,
                 ),
               ),
             ),

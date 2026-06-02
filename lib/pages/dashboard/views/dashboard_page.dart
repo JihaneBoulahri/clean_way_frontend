@@ -142,10 +142,20 @@ class _HeroBanner extends StatelessWidget {
             ),
           ),
           if (canOptimise) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Optimiser les tournées',
+              style: TextStyle(
+                color: scheme.onPrimary.withValues(alpha: 0.95),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
+                
                 onPressed: isOptimising ? null : onOptimiser,
                 child: isOptimising
                     ? SizedBox(
@@ -154,6 +164,8 @@ class _HeroBanner extends StatelessWidget {
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: scheme.primary,
+                          
+                          
                         ),
                       )
                     : const Icon(Icons.auto_graph_rounded, size: 18),

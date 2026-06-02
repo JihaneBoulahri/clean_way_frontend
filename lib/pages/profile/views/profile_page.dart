@@ -133,6 +133,15 @@ class _ProfileHeader extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
+            if (user.telephone.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                user.telephone,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+            ],
             const SizedBox(height: 8),
             Chip(
               label: Text(
@@ -219,6 +228,41 @@ class _ProfileForm extends StatelessWidget {
                       keyboardType: TextInputType.emailAddress,
                       onChanged: (value) => controller.email.value = value,
                     ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: controller.telephone.value,
+                            decoration: const InputDecoration(
+                              labelText: 'Téléphone',
+                              border: OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.phone,
+                            onChanged: (value) => controller.telephone.value = value,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Obx(() => ElevatedButton.icon(
+                          onPressed: controller.isFetchingPhones.value
+                              ? null
+                              : () => _showPhoneNumbersDialog(context),
+                          icon: controller.isFetchingPhones.value
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.phone),
+                          label: const Text('Récupérer'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                          ),
+                        )),
+                      ],
+                    ),
                   ],
                 );
               } else {
@@ -237,6 +281,11 @@ class _ProfileForm extends StatelessWidget {
                     _ProfileField(
                       label: 'Email',
                       value: controller.email.value,
+                    ),
+                    const SizedBox(height: 12),
+                    _ProfileField(
+                      label: 'Téléphone',
+                      value: controller.telephone.value.isNotEmpty ? controller.telephone.value : 'Non renseigné',
                     ),
                     const SizedBox(height: 12),
                     _ProfileField(
@@ -264,6 +313,51 @@ class _ProfileForm extends StatelessWidget {
       default:
         return role;
     }
+  }
+
+  /// Show dialog with fetched phone numbers
+  void _showPhoneNumbersDialog(BuildContext context) {
+    controller.fetchPhoneNumbersFromDatabase();
+    
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Sélectionner un numéro'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Obx(() {
+            if (controller.isFetchingPhones.value) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            if (controller.phoneNumbers.isEmpty) {
+              return const Center(
+                child: Text('Aucun numéro disponible'),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: controller.phoneNumbers.length,
+              itemBuilder: (context, index) {
+                final phone = controller.phoneNumbers[index];
+                return ListTile(
+                  title: Text(phone),
+                  leading: const Icon(Icons.phone),
+                  onTap: () => controller.setPhoneNumber(phone),
+                );
+              },
+            );
+          }),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Fermer'),
+          ),
+        ],
+      ),
+    );
   }
 }
 

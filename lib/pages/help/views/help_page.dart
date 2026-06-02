@@ -130,7 +130,7 @@ class HelpPage extends GetView<HelpController> {
                     context,
                     Icons.email,
                     'Email Us',
-                    'support@example.com',
+                    'cleanwaycontact77@gmail.com',
                     primaryColor,
                   ),
                   _contactCard(

@@ -5,6 +5,7 @@ class User {
   final String prenom;
   final String email;
   final String role;
+  final String telephone;
   final DateTime? emailVerifiedAt; // optional, rarely used in frontend
 
   User({
@@ -13,6 +14,7 @@ class User {
     required this.prenom,
     required this.email,
     required this.role,
+    this.telephone = '',
     this.emailVerifiedAt,
   });
 
@@ -23,6 +25,7 @@ class User {
       prenom: json['prenom'] as String,
       email: json['email'] as String,
       role: json['role'] as String,
+      telephone: (json['telephone'] ?? json['num_telephone'] ?? json['phone'] ?? json['tel'] ?? '') as String,
       emailVerifiedAt: json['email_verified_at'] != null
           ? DateTime.parse(json['email_verified_at'] as String)
           : null,
@@ -48,6 +51,7 @@ class User {
       'prenom': prenom,
       'email': email,
       'role': role,
+      'telephone': telephone,
       'email_verified_at': emailVerifiedAt?.toIso8601String(),
     };
   }
