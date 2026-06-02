@@ -486,7 +486,6 @@ class _OperationsInsights extends StatelessWidget {
     final camionsCollecte = _toInt(stats['camions_en_collecte']);
     final camionsHs = _toInt(stats['camions_hors_service']);
     
-    // Tournées aujourd'hui
     final tourneesEnCoursAujourdhui = _toInt(stats['tournees_en_cours_aujourdhui']);
     final tourneesTermineesAujourdhui = _toInt(stats['tournees_terminees_aujourdhui']);
     final tourneesPlanifieesAujourdhui = _toInt(stats['tournees_planifiees_aujourdhui']);
