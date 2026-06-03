@@ -342,6 +342,11 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _TargetCard(
+                  current: _currentStopLabel,
+                  next: _nextStopLabel,
+                ),
+                const SizedBox(height: AppSpacing.sm),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -350,24 +355,6 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                     child: const Icon(Icons.skip_next, size: 16),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                _InfoRow(label: 'Etape courante', value: _currentStopLabel),
-                _InfoRow(label: 'Suivant', value: _nextStopLabel),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Infos tournee',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                _InfoRow(label: 'ID', value: '${tournee.id}'),
-                _InfoRow(label: 'Zone', value: tournee.zone?.nomZone ?? '-'),
-                _InfoRow(
-                  label: 'Date',
-                  value: tournee.dateTournee.toString().split(' ').first,
-                ),
-                _InfoRow(label: 'Statut', value: tournee.status),
               ],
             ),
           );
@@ -515,6 +502,41 @@ class _RouteSelectButton extends StatelessWidget {
             const Icon(Icons.expand_more, size: 18),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TargetCard extends StatelessWidget {
+  final String current;
+  final String next;
+
+  const _TargetCard({required this.current, required this.next});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: scheme.primary.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.primary.withOpacity(0.24)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Cible',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          _InfoRow(label: 'Etape courante', value: current),
+          _InfoRow(label: 'Suivant', value: next),
+        ],
       ),
     );
   }
