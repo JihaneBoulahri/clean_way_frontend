@@ -30,6 +30,7 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
   final MapController _mapController = MapController();
   final List<LatLng> _routeStops = [];
   final List<String> _routeStopLabels = [];
+  final List<LatLng> _routeGeometry = [];
   int _currentSegment = 0;
   late Future<Tournee?> _futureTournee;
   String _routeMode = 'all';
@@ -67,6 +68,7 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
   Future<void> _prepareRouteStops(Tournee tournee) async {
     _routeStops.clear();
     _routeStopLabels.clear();
+    _routeGeometry.clear();
     _currentSegment = 0;
 
     final startPoint = _parseCoordinates(
@@ -90,45 +92,182 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
           }
         }
       } catch (e) {
-        // If fetching bennes fails, fall back to simulated stops
-        if (startPoint != null) {
-          const offsets = [
-            LatLng(0.0012, -0.0010),
-            LatLng(0.0008, 0.0014),
-            LatLng(-0.0010, 0.0010),
-          ];
-          for (var i = 0; i < offsets.length; i++) {
-            final offset = offsets[i];
-            _routeStops.add(
-              LatLng(
-                startPoint.latitude + offset.latitude,
-                startPoint.longitude + offset.longitude,
-              ),
-            );
-            _routeStopLabels.add('Benne ${i + 1}');
-          }
-        }
+        _addFallbackStops(startPoint);
       }
     } else {
-      // No benne IDs, fall back to simulated stops
-      if (startPoint != null) {
-        const offsets = [
-          LatLng(0.0012, -0.0010),
-          LatLng(0.0008, 0.0014),
-          LatLng(-0.0010, 0.0010),
-        ];
-        for (var i = 0; i < offsets.length; i++) {
-          final offset = offsets[i];
-          _routeStops.add(
-            LatLng(
-              startPoint.latitude + offset.latitude,
-              startPoint.longitude + offset.longitude,
-            ),
-          );
-          _routeStopLabels.add('Benne ${i + 1}');
+      _addFallbackStops(startPoint);
+    }
+
+    if (_routeStops.length >= 2) {
+      try {
+        final geometryPayload = await _tourneeService.getGeometry(tournee.id);
+        final extracted = _extractRouteGeometry(geometryPayload);
+        if (extracted.length >= 2) {
+          _routeGeometry.addAll(extracted);
+        } else {
+          _routeGeometry.addAll(_routeStops);
+        }
+      } catch (_) {
+        _routeGeometry.addAll(_routeStops);
+      }
+    }
+  }
+
+  void _addFallbackStops(LatLng? startPoint) {
+    if (startPoint == null) return;
+    const offsets = [
+      LatLng(0.0012, -0.0010),
+      LatLng(0.0008, 0.0014),
+      LatLng(-0.0010, 0.0010),
+    ];
+    for (var i = 0; i < offsets.length; i++) {
+      final offset = offsets[i];
+      _routeStops.add(
+        LatLng(
+          startPoint.latitude + offset.latitude,
+          startPoint.longitude + offset.longitude,
+        ),
+      );
+      _routeStopLabels.add('Benne ${i + 1}');
+    }
+  }
+
+  List<LatLng> _extractRouteGeometry(dynamic payload) {
+    final points = _extractGeometryPoints(payload);
+    if (points.length >= 2) return points;
+    if (_routeStops.length >= 2) {
+      return List<LatLng>.from(_routeStops);
+    }
+    return const [];
+  }
+
+  List<LatLng> _extractGeometryPoints(dynamic payload) {
+    if (payload is Map) {
+      final direct = payload['geometry'] ?? payload['geometrie'] ?? payload['coordinates'];
+      final parsedDirect = _parseRouteGeometry(direct);
+      if (parsedDirect.length >= 2) return parsedDirect;
+
+      const nestedKeys = [
+        'data',
+        'route',
+        'trajet',
+        'result',
+        'results',
+        'current',
+        'tournee',
+      ];
+      for (final key in nestedKeys) {
+        final nested = payload[key];
+        final points = _extractGeometryPoints(nested);
+        if (points.length >= 2) return points;
+      }
+
+      if (payload['features'] is List) {
+        for (final item in payload['features']) {
+          final points = _extractGeometryPoints(item);
+          if (points.length >= 2) return points;
+        }
+      }
+      return const [];
+    }
+
+    if (payload is List) {
+      for (final item in payload) {
+        final points = _extractGeometryPoints(item);
+        if (points.length >= 2) return points;
+      }
+      return const [];
+    }
+
+    return const [];
+  }
+
+  List<LatLng> _parseRouteGeometry(dynamic raw) {
+    if (raw == null) return const [];
+    if (raw is String) return _decodePolyline(raw);
+    if (raw is List) return _parseCoordinateCollection(raw);
+    if (raw is Map) {
+      final coordinates = raw['coordinates'];
+      final parsedCoordinates = _parseRouteGeometry(coordinates);
+      if (parsedCoordinates.length >= 2) return parsedCoordinates;
+      final geometry = raw['geometry'];
+      return _parseRouteGeometry(geometry);
+    }
+    return const [];
+  }
+
+  List<LatLng> _parseCoordinateCollection(List raw) {
+    final points = <LatLng>[];
+    for (final item in raw) {
+      if (item is List && item.length >= 2) {
+        final lng = _toDouble(item[0]);
+        final lat = _toDouble(item[1]);
+        if (lat != null && lng != null) {
+          points.add(LatLng(lat, lng));
+        }
+        continue;
+      }
+      if (item is Map) {
+        final map = Map<String, dynamic>.from(item);
+        final lat = _toDouble(map['lat'] ?? map['latitude'] ?? map['y']);
+        final lng = _toDouble(map['lng'] ?? map['lon'] ?? map['longitude'] ?? map['x']);
+        if (lat != null && lng != null) {
+          points.add(LatLng(lat, lng));
         }
       }
     }
+    return points;
+  }
+
+  double? _toDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString());
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    if (encoded.trim().isEmpty) return const [];
+    final precision5 = _decodePolylineWithScale(encoded, 1e5);
+    final precision6 = _decodePolylineWithScale(encoded, 1e6);
+    return precision6.length > precision5.length ? precision6 : precision5;
+  }
+
+  List<LatLng> _decodePolylineWithScale(String encoded, double scale) {
+    final points = <LatLng>[];
+    var index = 0;
+    var lat = 0;
+    var lng = 0;
+    try {
+      while (index < encoded.length) {
+        var shift = 0;
+        var result = 0;
+        int byte;
+        do {
+          byte = encoded.codeUnitAt(index++) - 63;
+          result |= (byte & 0x1f) << shift;
+          shift += 5;
+        } while (byte >= 0x20);
+        final deltaLat = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+        lat += deltaLat;
+
+        shift = 0;
+        result = 0;
+        do {
+          byte = encoded.codeUnitAt(index++) - 63;
+          result |= (byte & 0x1f) << shift;
+          shift += 5;
+        } while (byte >= 0x20);
+        final deltaLng = (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+        lng += deltaLng;
+
+        points.add(LatLng(lat / scale, lng / scale));
+      }
+    } catch (_) {
+      return const [];
+    }
+    return points;
   }
 
   void _passToNextBenne() {
@@ -404,12 +543,15 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                   routeMode: _routeMode,
                   routeStops: _routeStops,
                   routeStopLabels: _routeStopLabels,
+                  routeGeometry: _routeGeometry,
                   currentSegment: _currentSegment,
-                  onRecenter: point == null
-                      ? null
-                      : () => _recenterMap(
-                          _hasRouteStops ? _routeStops[_currentSegment] : point,
-                        ),
+                  onRecenter: (_routeGeometry.isNotEmpty || point != null)
+                      ? () => _recenterMap(
+                          _routeGeometry.isNotEmpty
+                              ? _routeGeometry.first
+                              : (_hasRouteStops ? _routeStops[_currentSegment] : point!),
+                        )
+                      : null,
                   fullBleed: true,
                 ),
               ),
@@ -499,9 +641,9 @@ class _TargetCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
-        color: scheme.primary.withOpacity(0.08),
+        color: scheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: scheme.primary.withOpacity(0.24)),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.24)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,6 +727,7 @@ class _LiveMapPanel extends StatelessWidget {
   final String routeMode;
   final List<LatLng> routeStops;
   final List<String> routeStopLabels;
+  final List<LatLng> routeGeometry;
   final int currentSegment;
   final VoidCallback? onRecenter;
   final bool fullBleed;
@@ -595,6 +738,7 @@ class _LiveMapPanel extends StatelessWidget {
     required this.routeMode,
     required this.routeStops,
     required this.routeStopLabels,
+    required this.routeGeometry,
     required this.currentSegment,
     required this.onRecenter,
     this.fullBleed = false,
@@ -608,6 +752,9 @@ class _LiveMapPanel extends StatelessWidget {
         : BorderRadius.circular(AppRadius.md);
     final routePoints = _routePoints();
     final markers = _routeMarkers(scheme);
+    final centerPoint = routeGeometry.isNotEmpty
+        ? routeGeometry[routeGeometry.length ~/ 2]
+        : point;
 
     return Container(
       decoration: BoxDecoration(
@@ -619,13 +766,13 @@ class _LiveMapPanel extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: radius,
-        child: point == null
+        child: centerPoint == null
             ? const Center(child: Text('Coordonnees non disponibles.'))
             : Stack(
                 children: [
                   FlutterMap(
                     mapController: mapController,
-                    options: MapOptions(initialCenter: point!, initialZoom: 14),
+                    options: MapOptions(initialCenter: centerPoint, initialZoom: 14),
                     children: [
                       TileLayer(
                         urlTemplate:
@@ -667,6 +814,9 @@ class _LiveMapPanel extends StatelessWidget {
   }
 
   List<LatLng> _routePoints() {
+    if (routeGeometry.length >= 2) {
+      return routeGeometry;
+    }
     if (routeStops.length < 2) {
       return point == null ? [] : [point!];
     }
