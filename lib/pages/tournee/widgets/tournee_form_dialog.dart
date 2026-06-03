@@ -348,7 +348,7 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
   }
 
   int? _selectedVilleValue() {
-    if (_selectedVilleId == null) return null;
+    if (_selectedVilleId == null || _villes.isEmpty) return null;
     if (_villes.any((ville) => ville.id == _selectedVilleId)) {
       return _selectedVilleId;
     }
@@ -356,13 +356,13 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
   }
 
   int? _selectedZoneValue(List<Zone> zones) {
-    if (_selectedZoneId == null) return null;
+    if (_selectedZoneId == null || zones.isEmpty) return null;
     if (zones.any((zone) => zone.id == _selectedZoneId)) return _selectedZoneId;
     return widget.tournee?.zone?.id == _selectedZoneId ? _selectedZoneId : null;
   }
 
   int? _selectedCamionValue(List<Camion> camions) {
-    if (_selectedCamionId == null) return null;
+    if (_selectedCamionId == null || camions.isEmpty) return null;
     if (camions.any((camion) => camion.id == _selectedCamionId)) {
       return _selectedCamionId;
     }

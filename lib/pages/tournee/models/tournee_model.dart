@@ -120,9 +120,12 @@ class Tournee {
   Map<String, dynamic> toJson() {
     final payload = <String, dynamic>{
       'date_tournee': dateTournee.toIso8601String().split('T').first,
-      'heure_debut': heureDebut,
       'status': status,
     };
+
+    if (heureDebut.trim().isNotEmpty) {
+      payload['heure_debut'] = heureDebut;
+    }
 
     if (id > 0) {
       payload['id_tournee'] = id;

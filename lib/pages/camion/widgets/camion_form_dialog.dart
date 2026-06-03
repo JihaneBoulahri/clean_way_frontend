@@ -85,9 +85,10 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
       if (mounted) {
         setState(() {
           _zones = zones;
+          // S'assurer que la zone sélectionnée existe dans la liste
           if (_selectedZoneId != null &&
               _zones.every((zone) => zone.id != _selectedZoneId)) {
-            _selectedZoneId = currentZone?.id;
+            _selectedZoneId = null;
           }
           _loadingZones = false;
           _zonesError = null;
@@ -219,11 +220,8 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
   }
 
   int? _selectedZoneValue() {
-    if (_selectedZoneId == null) return null;
-    if (_zones.any((zone) => zone.id == _selectedZoneId)) {
-      return _selectedZoneId;
-    }
-    return widget.camion?.zone?.id == _selectedZoneId ? _selectedZoneId : null;
+    // La zone sélectionnée est garantie d'exister dans _zones ou est null
+    return _selectedZoneId;
   }
 
   @override

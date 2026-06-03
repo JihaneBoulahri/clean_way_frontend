@@ -250,7 +250,7 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
   }
 
   int? _selectedVilleValue() {
-    if (_selectedVilleId == null) return null;
+    if (_selectedVilleId == null || _villes.isEmpty) return null;
     if (_villes.any((ville) => ville.id == _selectedVilleId)) {
       return _selectedVilleId;
     }
