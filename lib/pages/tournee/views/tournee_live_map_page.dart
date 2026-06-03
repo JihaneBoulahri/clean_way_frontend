@@ -339,7 +339,7 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
             visualDensity: VisualDensity.compact,
           );
 
-          final leftPanel = _OverlayPanel(
+          final controlPanel = _OverlayPanel(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -348,44 +348,41 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                   next: _nextStopLabel,
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    style: compactFilled,
-                    onPressed: _hasRouteStops ? _passToNextBenne : null,
-                    child: const Icon(Icons.skip_next, size: 16),
-                  ),
-                ),
-              ],
-            ),
-          );
-          final rightPanel = _OverlayPanel(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Select',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                _RouteSelectButton(
-                  value: _routeMode,
-                  onSelected: _selectRouteMode,
-                  textStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    style: compactOutlined,
-                    onPressed: point == null ? null : () => _recenterMap(point),
-                    child: const Icon(Icons.center_focus_strong, size: 16),
-                  ),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  alignment: WrapAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 52,
+                      height: 52,
+                      child: FilledButton(
+                        style: compactFilled,
+                        onPressed: _hasRouteStops ? _passToNextBenne : null,
+                        child: const Icon(Icons.skip_next, size: 18),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 170,
+                      child: _RouteSelectButton(
+                        value: _routeMode,
+                        onSelected: _selectRouteMode,
+                        textStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 52,
+                      height: 52,
+                      child: OutlinedButton(
+                        style: compactOutlined,
+                        onPressed: point == null ? null : () => _recenterMap(point),
+                        child: const Icon(Icons.center_focus_strong, size: 18),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
@@ -397,8 +394,6 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
               ],
             ),
           );
-          final rightPanelWide = SizedBox(width: 190, child: rightPanel);
-          final isNarrow = MediaQuery.of(context).size.width < 720;
 
           return Stack(
             children: [
@@ -424,24 +419,7 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (isNarrow)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            leftPanel,
-                            const SizedBox(height: AppSpacing.sm),
-                            rightPanel,
-                          ],
-                        )
-                      else
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: leftPanel),
-                            const SizedBox(width: AppSpacing.sm),
-                            rightPanelWide,
-                          ],
-                        ),
+                      controlPanel,
                       const Spacer(),
                       _OverlayPanel(
                         child: _BottomActions(
@@ -659,8 +637,8 @@ class _LiveMapPanel extends StatelessWidget {
                           polylines: [
                             Polyline(
                               points: routePoints,
-                              strokeWidth: 4,
-                              color: scheme.primary.withValues(alpha: 0.6),
+                              strokeWidth: 5,
+                              color: scheme.primary,
                             ),
                           ],
                         ),
@@ -720,10 +698,20 @@ class _LiveMapPanel extends StatelessWidget {
         }
       }
       for (final entry in visibleEntries) {
+        final isStart = entry.key == 0;
+        final isEnd = entry.key == routeStops.length - 1;
         final label = entry.key < routeStopLabels.length
             ? routeStopLabels[entry.key]
             : 'Stop ${entry.key + 1}';
-        markers.add(_buildMarker(entry.value, label, scheme));
+        markers.add(
+          _buildMarker(
+            entry.value,
+            label,
+            scheme,
+            isStart: isStart,
+            isEnd: isEnd,
+          ),
+        );
       }
     } else if (point != null) {
       markers.add(_buildMarker(point!, 'Zone', scheme));
@@ -731,33 +719,31 @@ class _LiveMapPanel extends StatelessWidget {
     return markers;
   }
 
-  Marker _buildMarker(LatLng position, String label, ColorScheme scheme) {
+  Marker _buildMarker(
+    LatLng position,
+    String label,
+    ColorScheme scheme, {
+    bool isStart = false,
+    bool isEnd = false,
+  }) {
+    final icon = isStart
+        ? Icons.play_circle
+        : isEnd
+            ? Icons.flag_circle
+            : Icons.location_pin;
+    final color = isStart
+        ? const Color(0xFF16A34A)
+        : isEnd
+            ? const Color(0xFFDC2626)
+            : scheme.primary;
+
     return Marker(
-      width: 80,
-      height: 80,
+      width: 36,
+      height: 36,
       point: position,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.location_pin, size: 36, color: scheme.primary),
-          const SizedBox(height: 2),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: scheme.surface.withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: scheme.outline.withValues(alpha: 0.3)),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                height: 1.1,
-                color: scheme.onSurface,
-              ),
-            ),
-          ),
-        ],
+      child: Tooltip(
+        message: label,
+        child: Icon(icon, color: color, size: 34),
       ),
     );
   }
