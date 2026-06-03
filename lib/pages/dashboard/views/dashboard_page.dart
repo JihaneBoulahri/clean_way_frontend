@@ -64,6 +64,7 @@ class DashboardPage extends GetView<DashboardController> {
                   const SizedBox(height: 14),
                   _StatsWrap(stats: stats),
                   const SizedBox(height: 14),
+                  
                   _OperationsInsights(stats: stats),
                 ],
               ],
