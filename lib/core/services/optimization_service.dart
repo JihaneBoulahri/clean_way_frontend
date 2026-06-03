@@ -19,6 +19,7 @@ class OptimizationService {
   /// Handle common response logic
   dynamic _handleResponse(http.Response res) {
     if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res.body.trim().isEmpty) return null;
       final decoded = jsonDecode(res.body);
       if (decoded is List) return decoded;
       if (decoded is Map) {
@@ -29,21 +30,44 @@ class OptimizationService {
       return decoded;
     }
 
-    // Show error but don't auto-redirect; let controller handle it
-    final body = res.body;
-    final preview = body.isEmpty
-        ? 'No response'
-        : body.substring(0, body.length > 200 ? 200 : body.length);
-    throw Exception("Server error (${res.statusCode}): $preview");
+    final preview = _extractErrorMessage(res.body);
+    throw Exception('Server error (${res.statusCode}): $preview');
+  }
+
+  String _extractErrorMessage(String body) {
+    if (body.trim().isEmpty) return 'No response';
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map) {
+        if (decoded['message'] != null) return decoded['message'].toString();
+        if (decoded['error'] != null) return decoded['error'].toString();
+        if (decoded['data'] is Map && decoded['data']['message'] != null) {
+          return decoded['data']['message'].toString();
+        }
+      }
+      return body.length > 300 ? '${body.substring(0, 300)}...' : body;
+    } catch (_) {
+      return body.length > 300 ? '${body.substring(0, 300)}...' : body;
+    }
   }
 
   /// Fetch optimized routes
-  Future<dynamic> optimiser() async {
-    final res = await http.get(
-      Uri.parse(OptimisationEndpoints.base),
-      headers: _headers,
-    );
+  Future<dynamic> optimiser({
+    int? villeId,
+    int? zoneId,
+    bool persist = true,
+  }) async {
+    final params = <String, String>{
+      if (villeId != null) 'ville_id': villeId.toString(),
+      if (zoneId != null) 'zone_id': zoneId.toString(),
+      if (!persist) 'persist': 'false',
+    };
 
+    final uri = Uri.parse(
+      OptimisationEndpoints.base,
+    ).replace(queryParameters: params.isEmpty ? null : params);
+
+    final res = await http.get(uri, headers: _headers);
     return _handleResponse(res);
   }
 }

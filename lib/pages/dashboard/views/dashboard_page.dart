@@ -155,7 +155,6 @@ class _HeroBanner extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
-                
                 onPressed: isOptimising ? null : onOptimiser,
                 child: isOptimising
                     ? SizedBox(
@@ -164,11 +163,22 @@ class _HeroBanner extends StatelessWidget {
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           color: scheme.primary,
-                          
-                          
                         ),
                       )
-                    : const Icon(Icons.auto_graph_rounded, size: 18),
+                    : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.auto_graph_rounded, size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Optimiser tournée',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: scheme.onPrimary,
                   foregroundColor: scheme.primary,
@@ -427,7 +437,9 @@ class _MiniStatCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: scheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: scheme.outlineVariant.withValues(alpha: 0.5),
+          ),
         ),
         child: Row(
           children: [
@@ -485,11 +497,19 @@ class _OperationsInsights extends StatelessWidget {
     final camionsDisponibles = _toInt(stats['camions_disponibles']);
     final camionsCollecte = _toInt(stats['camions_en_collecte']);
     final camionsHs = _toInt(stats['camions_hors_service']);
-    
-    final tourneesEnCoursAujourdhui = _toInt(stats['tournees_en_cours_aujourdhui']);
-    final tourneesTermineesAujourdhui = _toInt(stats['tournees_terminees_aujourdhui']);
-    final tourneesPlanifieesAujourdhui = _toInt(stats['tournees_planifiees_aujourdhui']);
-    final tourneesRatteeAujourdhui = _toInt(stats['tournees_rattées_aujourdhui']);
+
+    final tourneesEnCoursAujourdhui = _toInt(
+      stats['tournees_en_cours_aujourdhui'],
+    );
+    final tourneesTermineesAujourdhui = _toInt(
+      stats['tournees_terminees_aujourdhui'],
+    );
+    final tourneesPlanifieesAujourdhui = _toInt(
+      stats['tournees_planifiees_aujourdhui'],
+    );
+    final tourneesRatteeAujourdhui = _toInt(
+      stats['tournees_rattées_aujourdhui'],
+    );
 
     final rawWeek = stats['tournees_7_derniers_jours'];
     final weekly = (rawWeek is List ? rawWeek : const [])
