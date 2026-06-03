@@ -42,6 +42,7 @@ class DashboardPage extends GetView<DashboardController> {
             );
           }
 
+          final isChauffeur = _isChauffeur();
           final canOptimise = _isAdmin();
 
           return RefreshIndicator(
@@ -56,11 +57,15 @@ class DashboardPage extends GetView<DashboardController> {
                   onOptimiser: controller.optimiser,
                 ),
                 const SizedBox(height: 14),
-                _PerformancePanel(stats: stats),
-                const SizedBox(height: 14),
-                _StatsWrap(stats: stats),
-                const SizedBox(height: 14),
-                _OperationsInsights(stats: stats),
+                if (isChauffeur) ...[
+                  _ChauffeurStatsView(stats: stats),
+                ] else ...[
+                  _PerformancePanel(stats: stats),
+                  const SizedBox(height: 14),
+                  _StatsWrap(stats: stats),
+                  const SizedBox(height: 14),
+                  _OperationsInsights(stats: stats),
+                ],
               ],
             ),
           );
@@ -791,6 +796,85 @@ class _WeeklyToursBars extends StatelessWidget {
   }
 }
 
+class _ChauffeurStatsView extends StatelessWidget {
+  final Map<String, dynamic> stats;
+
+  const _ChauffeurStatsView({required this.stats});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final camion = stats['camion'];
+    final items = <_Kpi>[
+      _Kpi(Icons.route_outlined, 'Total tournées', _toInt(stats['total_tournees']), const Color(0xFF2563EB)),
+      _Kpi(Icons.today_outlined, 'Aujourd’hui', _toInt(stats['tournees_aujourdhui']), const Color(0xFF0EA5E9)),
+      _Kpi(Icons.timelapse_outlined, 'En cours', _toInt(stats['tournees_en_cours_aujourdhui']), const Color(0xFFF59E0B)),
+      _Kpi(Icons.check_circle_outline, 'Terminées', _toInt(stats['tournees_terminees_aujourdhui']), const Color(0xFF16A34A)),
+      _Kpi(Icons.location_on_outlined, 'Bennes assignées', _toInt(stats['total_bennes_assignees']), const Color(0xFF7C3AED)),
+      _Kpi(Icons.battery_charging_full_outlined, 'Bennes pleines', _toInt(stats['bennes_pleines']), const Color(0xFFDC2626)),
+      _Kpi(Icons.sensors_outlined, 'Remplissage moyen', _toInt(stats['niveau_remplissage_moyen']), const Color(0xFF2563EB)),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: scheme.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.55)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Statistiques chauffeur',
+                style: TextStyle(
+                  color: scheme.onSurface,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (camion is Map) ...[
+                Text(
+                  'Camion: ${camion['immatriculation'] ?? '-'}',
+                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Statut: ${camion['status'] ?? '-'}',
+                  style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = (constraints.maxWidth - 8) / 2;
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: items
+                  .map(
+                    (item) => SizedBox(
+                      width: width,
+                      child: _MiniStatCard(item: item),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
 class _DayTours {
   final String date;
   final int total;
@@ -814,6 +898,20 @@ String _readUserName() {
     if (full.isNotEmpty) return full;
   }
   return 'Utilisateur';
+}
+
+bool _isChauffeur() {
+  final raw = GetStorage().read('user');
+  if (raw is Map) {
+    final role = raw['role'] ?? raw['roles'];
+    if (role is String) {
+      return role.toLowerCase() == 'chauffeur';
+    }
+    if (role is List) {
+      return role.any((e) => e.toString().toLowerCase() == 'chauffeur');
+    }
+  }
+  return false;
 }
 
 bool _isAdmin() {

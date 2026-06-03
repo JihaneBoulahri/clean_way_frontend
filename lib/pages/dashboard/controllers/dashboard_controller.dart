@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../core/services/optimization_service.dart';
 import '../../../core/services/stats_service.dart';
 import '../../../widgets/snackbar_helper.dart';
@@ -6,6 +7,7 @@ import '../../../widgets/snackbar_helper.dart';
 class DashboardController extends GetxController {
   final StatsService _statsService = StatsService();
   final OptimizationService _optimizationService = OptimizationService();
+  final GetStorage _box = GetStorage();
 
   var stats = Rxn<Map<String, dynamic>>();
   var routes = RxList<dynamic>();
@@ -22,12 +24,27 @@ class DashboardController extends GetxController {
     super.onInit();
   }
 
+  String _userRole() {
+    final raw = _box.read('user');
+    if (raw is Map) {
+      final role = raw['role'] ?? raw['roles'];
+      if (role is String) return role.toLowerCase();
+      if (role is List && role.isNotEmpty) {
+        return role.first.toString().toLowerCase();
+      }
+    }
+    return '';
+  }
+
   Future<void> fetchStats() async {
     try {
       stats_loading.value = true;
       stats_error.value = null;
 
-      final data = await _statsService.fetchStats();
+      final isChauffeur = _userRole() == 'chauffeur';
+      final data = isChauffeur
+          ? await _statsService.fetchChauffeurStats()
+          : await _statsService.fetchStats();
       stats.value = data;
     } catch (e) {
       stats_error.value = e.toString();

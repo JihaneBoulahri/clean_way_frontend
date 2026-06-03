@@ -13,6 +13,7 @@ class EmailEndpoints {
 /* =============================== */
 class StatsEndpoint {
   static const String statistiques = "${ApiConstants.baseUrl}/stats";
+  static const String chauffeur = "${ApiConstants.baseUrl}/chauffeurs/me/stats";
 }
 
 /* =========================== */
