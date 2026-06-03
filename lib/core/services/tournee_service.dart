@@ -31,9 +31,32 @@ class TourneeService {
     }
 
     // Show error but don't auto-redirect; let controller handle it
-    throw Exception(
-      "Server error (${res.statusCode}):\n${res.body.isNotEmpty ? (res.body.length > 200 ? '${res.body.substring(0, 200)}...' : res.body) : 'No response'}",
-    );
+    // Try to surface a concise server message when available
+    try {
+      final decodedBody = res.body.trim().isEmpty ? null : jsonDecode(res.body);
+      String serverMessage;
+      if (decodedBody is Map) {
+        if (decodedBody['message'] != null) {
+          serverMessage = decodedBody['message'].toString();
+        } else if (decodedBody['error'] != null) {
+          serverMessage = decodedBody['error'].toString();
+        } else if (decodedBody['data'] != null && decodedBody['data'] is Map && decodedBody['data']['message'] != null) {
+          serverMessage = decodedBody['data']['message'].toString();
+        } else {
+          serverMessage = res.body.length > 300 ? '${res.body.substring(0, 300)}...' : res.body;
+        }
+      } else if (decodedBody is List) {
+        serverMessage = decodedBody.toString();
+      } else {
+        serverMessage = res.body.isNotEmpty ? res.body : 'No response';
+      }
+
+      throw Exception('Server error (${res.statusCode}): $serverMessage');
+    } catch (_) {
+      throw Exception(
+        "Server error (${res.statusCode}):\n${res.body.isNotEmpty ? (res.body.length > 200 ? '${res.body.substring(0, 200)}...' : res.body) : 'No response'}",
+      );
+    }
   }
 
   Future<http.Response> _putOrPatch(Uri uri, Map<String, dynamic> data) async {
