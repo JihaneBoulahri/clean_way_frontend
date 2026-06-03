@@ -1,4 +1,5 @@
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
+import 'package:clean_way_frontend/routes/app_routes.dart';
 import 'package:clean_way_frontend/widgets/app_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -202,9 +203,9 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
         'Tournée terminée',
         'La tournée ${tournee.id} est maintenant terminée.',
       );
-      setState(() {
-        _futureTournee = _loadCurrentTournee();
-      });
+      if (mounted) {
+        Get.offNamed(AppRoutes.tourneeChauffeurHistory);
+      }
     } catch (e) {
       showNadiSnackbar(
         title: 'Erreur',
