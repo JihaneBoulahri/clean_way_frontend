@@ -328,10 +328,10 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                                     context,
                                     capteur,
                                   ),
-                                  child: const Icon(Icons.delete),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.red.shade700,
                                   ),
+                                  child: const Icon(Icons.delete),
                                 ),
                               ],
                             ),
@@ -693,6 +693,7 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
       );
 
       if (created == true) {
+        Get.find<BennesController>().fetchBennes();
         showNadiSnackbar(
           title: 'Succès',
           message: isEdit
