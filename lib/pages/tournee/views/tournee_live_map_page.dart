@@ -187,11 +187,10 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
     if (raw is String) return _decodePolyline(raw);
     if (raw is List) return _parseCoordinateCollection(raw);
     if (raw is Map) {
-      final coordinates = raw['coordinates'];
+      final coordinates = raw['coordinates'] ?? raw['geometrie'] ?? raw['geometry'];
       final parsedCoordinates = _parseRouteGeometry(coordinates);
       if (parsedCoordinates.length >= 2) return parsedCoordinates;
-      final geometry = raw['geometry'];
-      return _parseRouteGeometry(geometry);
+      return const [];
     }
     return const [];
   }
@@ -200,11 +199,13 @@ class _TourneeLiveMapPageState extends State<TourneeLiveMapPage> {
     final points = <LatLng>[];
     for (final item in raw) {
       if (item is List && item.length >= 2) {
-        final lng = _toDouble(item[0]);
         final lat = _toDouble(item[1]);
+        final lng = _toDouble(item[0]);
         if (lat != null && lng != null) {
           points.add(LatLng(lat, lng));
+          continue;
         }
+        points.addAll(_parseCoordinateCollection(item));
         continue;
       }
       if (item is Map) {
