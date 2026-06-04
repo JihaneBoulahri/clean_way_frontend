@@ -35,14 +35,23 @@ class Capteur {
       return DateTime.tryParse(value.toString());
     }
 
-    final niveauRaw = json['niveau_remplissage'] ??
+    dynamic niveauRaw = json['niveau_remplissage'] ??
         json['niveau remplissage'] ??
         json['niveauRemplissage'];
+
+    if (niveauRaw is String) {
+      niveauRaw = niveauRaw.replaceAll('%', '').replaceAll(',', '.').trim();
+    }
+
+    final parsedNiveau = toDouble(niveauRaw);
+    final safeNiveau = parsedNiveau.isNaN
+        ? 0.0
+        : parsedNiveau.clamp(0.0, 100.0);
 
     return Capteur(
       id: toInt(json['id_capteur'] ?? json['id']),
       typeCapteur: (json['type_capteur'] ?? json['typeCapteur'] ?? '').toString(),
-      niveauRemplissage: toDouble(niveauRaw),
+      niveauRemplissage: safeNiveau,
       dateInstallation: toDate(json['date_installation'] ?? json['dateInstallation']),
       status: (json['status'] ?? '').toString(),
       idBenne: (json['id_benne'] ?? json['idBenne']) == null

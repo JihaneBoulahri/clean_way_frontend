@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../widgets/responsive_form_dialog.dart';
 import '../../../widgets/snackbar_helper.dart';
 import '../controllers/ville_controller.dart';
 import '../models/ville_model.dart';
@@ -76,8 +77,8 @@ class _VilleFormDialogState extends State<VilleFormDialog> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.ville != null;
-    return AlertDialog(
-      title: Text(isEdit ? 'Modifier la ville' : 'Ajouter une ville'),
+    return ResponsiveFormDialog(
+      title: isEdit ? 'Modifier la ville' : 'Ajouter une ville',
       content: Form(
         key: _formKey,
         child: TextFormField(
@@ -87,19 +88,21 @@ class _VilleFormDialogState extends State<VilleFormDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        TextButton.icon(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          icon: const Icon(Icons.close),
+          label: const Text('Annuler'),
         ),
-        FilledButton(
+        FilledButton.icon(
           onPressed: _saving ? null : _save,
-          child: _saving
+          icon: _saving
               ? const SizedBox(
                   width: 16,
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : Text(isEdit ? 'Modifier' : 'Ajouter'),
+              : const Icon(Icons.check),
+          label: Text(isEdit ? 'Modifier' : 'Ajouter'),
         ),
       ],
     );

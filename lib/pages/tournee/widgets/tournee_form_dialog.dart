@@ -5,6 +5,7 @@ import '../../../core/services/camion_service.dart';
 import '../../../core/services/ville_service.dart';
 import '../../../core/services/zone_service.dart';
 import '../../../widgets/snackbar_helper.dart';
+import '../../../widgets/responsive_form_dialog.dart';
 import '../../camion/models/camion_model.dart';
 import '../../ville/models/ville_model.dart';
 import '../../zone/models/zone_model.dart';
@@ -380,165 +381,168 @@ class _TourneeFormDialogState extends State<TourneeFormDialog> {
     final selectedZoneId = _selectedZoneValue(availableZones);
     final selectedCamionId = _selectedCamionValue(availableCamions);
 
-    return AlertDialog(
-      title: Text(isEdit ? 'Modifier la tournee' : 'Ajouter une tournee'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_loadingRefs)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: LinearProgressIndicator(),
-                ),
-              if (_loadError != null && _villes.isEmpty && _zones.isEmpty && _camions.isEmpty)
-                Text(
-                  'Impossible de charger les donnees de reference',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                    fontSize: 12,
-                  ),
-                ),
-              TextFormField(
-                controller: _dateController,
-                decoration: const InputDecoration(
-                  labelText: 'Date (AAAA-MM-JJ)',
-                ),
-                readOnly: true,
-                onTap: _selectDate,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Requis';
-                  final regex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
-                  if (!regex.hasMatch(v.trim())) return 'Format invalide';
-                  return null;
-                },
+    return ResponsiveFormDialog(
+      title: isEdit ? 'Modifier la tournee' : 'Ajouter une tournee',
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_loadingRefs)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: LinearProgressIndicator(),
               ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedStatus,
-                decoration: const InputDecoration(labelText: 'Statut'),
-                items: _statusOptions
-                    .map(
-                      (status) => DropdownMenuItem<String>(
-                        value: status,
-                        child: Text(status),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedStatus = value),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            if (_loadError != null && _villes.isEmpty && _zones.isEmpty && _camions.isEmpty)
+              Text(
+                'Impossible de charger les donnees de reference',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 12,
+                ),
               ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<int?>(
-                initialValue: selectedVilleId,
-                decoration: const InputDecoration(labelText: 'Ville'),
-                items: [
-                  const DropdownMenuItem<int?>(
-                    value: null,
-                    child: Text('Choisir une ville'),
-                  ),
-                  ..._villes.map(
-                    (ville) => DropdownMenuItem<int?>(
-                      value: ville.id,
-                      child: Text(
-                        ville.createdAt != null
-                            ? '${ville.nomVille} - ${ville.createdAt}'
-                            : ville.nomVille,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+            TextFormField(
+              controller: _dateController,
+              decoration: const InputDecoration(
+                labelText: 'Date (AAAA-MM-JJ)',
+              ),
+              readOnly: true,
+              onTap: _selectDate,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return 'Requis';
+                final regex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+                if (!regex.hasMatch(v.trim())) return 'Format invalide';
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedStatus,
+              decoration: const InputDecoration(labelText: 'Statut'),
+              items: _statusOptions
+                  .map(
+                    (status) => DropdownMenuItem<String>(
+                      value: status,
+                      child: Text(status),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) => setState(() => _selectedStatus = value),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int?>(
+              initialValue: selectedVilleId,
+              decoration: const InputDecoration(labelText: 'Ville'),
+              items: [
+                const DropdownMenuItem<int?>(
+                  value: null,
+                  child: Text('Choisir une ville'),
+                ),
+                ..._villes.map(
+                  (ville) => DropdownMenuItem<int?>(
+                    value: ville.id,
+                    child: Text(
+                      ville.createdAt != null
+                          ? '${ville.nomVille} - ${ville.createdAt}'
+                          : ville.nomVille,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ],
-                onChanged: _onCityChanged,
-                validator: (v) {
-                  if (v == null && (_selectedZoneId != null || _selectedCamionId != null || _isCreate)) {
-                    return 'Requis';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<int?>(
-                initialValue: selectedZoneId,
-                decoration: InputDecoration(
-                  labelText: _isCreate ? 'Zone' : 'Zone (optionnelle)',
-                ),
-                items: [
-                  DropdownMenuItem<int?>(
-                    value: null,
-                    child: Text(_isCreate ? 'Choisir une zone' : 'Aucune zone'),
-                  ),
-                  ...availableZones.map(
-                    (zone) => DropdownMenuItem<int?>(
-                      value: zone.id,
-                      child: Text(
-                        '#${zone.id} - ${zone.nomZone}${zone.villeNom != null ? ' (${zone.villeNom})' : ''}',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
-                onChanged: _onZoneChanged,
-                validator: (v) {
-                  if (_isCreate && v == null) return 'Requis';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<int?>(
-                initialValue: selectedCamionId,
-                decoration: InputDecoration(
-                  labelText: _isCreate ? 'Camion' : 'Camion (optionnel)',
-                ),
-                items: [
-                  DropdownMenuItem<int?>(
-                    value: null,
-                    child: Text(_isCreate ? 'Choisir un camion' : 'Aucun camion'),
-                  ),
-                  ...availableCamions.map(
-                    (camion) => DropdownMenuItem<int?>(
-                      value: camion.id,
-                      child: Text(
-                        '${camion.immatriculation}${camion.villeNom != null ? ' (${camion.villeNom})' : ''}',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
-                onChanged: _onCamionChanged,
-                validator: (v) {
-                  if (_isCreate && v == null) return 'Requis';
-                  return null;
-                },
-              ),
-              if (selectedVilleId == null && !_loadingRefs) ...[
-                const SizedBox(height: 10),
-                Text(
-                  'La ville est deduite de la zone ou du camion si possible.',
-                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
+              onChanged: _onCityChanged,
+              validator: (v) {
+                if (v == null && (_selectedZoneId != null || _selectedCamionId != null || _isCreate)) {
+                  return 'Requis';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int?>(
+              initialValue: selectedZoneId,
+              decoration: InputDecoration(
+                labelText: _isCreate ? 'Zone' : 'Zone (optionnelle)',
+              ),
+              items: [
+                DropdownMenuItem<int?>(
+                  value: null,
+                  child: Text(_isCreate ? 'Choisir une zone' : 'Aucune zone'),
+                ),
+                ...availableZones.map(
+                  (zone) => DropdownMenuItem<int?>(
+                    value: zone.id,
+                    child: Text(
+                      '#${zone.id} - ${zone.nomZone}${zone.villeNom != null ? ' (${zone.villeNom})' : ''}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+              onChanged: _onZoneChanged,
+              validator: (v) {
+                if (_isCreate && v == null) return 'Requis';
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int?>(
+              initialValue: selectedCamionId,
+              decoration: InputDecoration(
+                labelText: _isCreate ? 'Camion' : 'Camion (optionnel)',
+              ),
+              items: [
+                DropdownMenuItem<int?>(
+                  value: null,
+                  child: Text(_isCreate ? 'Choisir un camion' : 'Aucun camion'),
+                ),
+                ...availableCamions.map(
+                  (camion) => DropdownMenuItem<int?>(
+                    value: camion.id,
+                    child: Text(
+                      '${camion.immatriculation}${camion.villeNom != null ? ' (${camion.villeNom})' : ''}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+              onChanged: _onCamionChanged,
+              validator: (v) {
+                if (_isCreate && v == null) return 'Requis';
+                return null;
+              },
+            ),
+            if (selectedVilleId == null && !_loadingRefs) ...[
+              const SizedBox(height: 10),
+              Text(
+                'La ville est deduite de la zone ou du camion si possible.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             ],
-          ),
+            ],
         ),
       ),
       actions: [
-        TextButton(
+        TextButton.icon(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(Icons.close),
+          icon: const Icon(Icons.close),
+          label: const Text('Annuler'),
         ),
-        FilledButton(
+        FilledButton.icon(
           onPressed: _saving ? null : _save,
-          child: _saving
+          icon: _saving
               ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
                 )
               : Icon(isEdit ? Icons.check : Icons.add),
+          label: Text(isEdit ? 'Modifier' : 'Ajouter'),
         ),
       ],
     );

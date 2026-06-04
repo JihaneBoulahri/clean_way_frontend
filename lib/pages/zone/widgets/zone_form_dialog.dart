@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/services/ville_service.dart';
 import '../../../pages/ville/models/ville_model.dart';
 import '../../../widgets/snackbar_helper.dart';
+import '../../../widgets/responsive_form_dialog.dart';
 import '../controllers/zone_controller.dart';
 import '../models/zone_model.dart';
 
@@ -262,13 +263,12 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
     final isEdit = widget.zone != null;
     final selectedVilleId = _selectedVilleValue();
 
-    return AlertDialog(
-      title: Text(isEdit ? 'Modifier la zone' : 'Ajouter une zone'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+    return ResponsiveFormDialog(
+      title: isEdit ? 'Modifier la zone' : 'Ajouter une zone',
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
             children: [
               if (_loadingVilles)
                 const Padding(
@@ -368,23 +368,27 @@ class _ZoneFormDialogState extends State<ZoneFormDialog> {
                 ),
               ),
             ],
-          ),
         ),
       ),
       actions: [
-        TextButton(
+        TextButton.icon(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(Icons.close),
+          icon: const Icon(Icons.close),
+          label: const Text('Annuler'),
         ),
-        FilledButton(
+        FilledButton.icon(
           onPressed: _saving ? null : _save,
-          child: _saving
+          icon: _saving
               ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
                 )
               : Icon(isEdit ? Icons.check : Icons.add),
+          label: Text(isEdit ? 'Modifier' : 'Ajouter'),
         ),
       ],
     );

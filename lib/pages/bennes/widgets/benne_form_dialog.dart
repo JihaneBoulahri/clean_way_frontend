@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../models/benne_model.dart';
 import '../controllers/benne_controller.dart';
 import '../../../widgets/snackbar_helper.dart';
+import '../../../widgets/responsive_form_dialog.dart';
 
 class BenneFormDialog extends StatefulWidget {
   final Benne? benne;
@@ -201,113 +202,116 @@ class _BenneFormDialogState extends State<BenneFormDialog> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.benne != null;
-    return AlertDialog(
-      title: Text(isEdit ? 'Modifier la benne' : 'Ajouter une benne'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                initialValue: _selectedType,
-                decoration: const InputDecoration(labelText: 'Type benne'),
-                items: _typeOptions
-                    .map(
-                      (type) => DropdownMenuItem<String>(
-                        value: type,
-                        child: Text(type),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedType = value),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+    return ResponsiveFormDialog(
+      title: isEdit ? 'Modifier la benne' : 'Ajouter une benne',
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DropdownButtonFormField<String>(
+              initialValue: _selectedType,
+              decoration: const InputDecoration(labelText: 'Type benne'),
+              items: _typeOptions
+                  .map(
+                    (type) => DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) => setState(() => _selectedType = value),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedStatus,
+              decoration: const InputDecoration(labelText: 'Statut'),
+              items: _statusOptions
+                  .map(
+                    (status) => DropdownMenuItem<String>(
+                      value: status,
+                      child: Text(status),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) => setState(() => _selectedStatus = value),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _capaciteController,
+              decoration: const InputDecoration(labelText: 'Capacité (m³)'),
+              keyboardType: TextInputType.number,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _latController,
+              decoration: const InputDecoration(labelText: 'Latitude'),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedStatus,
-                decoration: const InputDecoration(labelText: 'Statut'),
-                items: _statusOptions
-                    .map(
-                      (status) => DropdownMenuItem<String>(
-                        value: status,
-                        child: Text(status),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedStatus = value),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) {
+                  return 'Requis';
+                }
+                if (double.tryParse(_normalizeCoordinateInput(v)) == null) {
+                  return 'Doit être un nombre';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _longController,
+              decoration: const InputDecoration(labelText: 'Longitude'),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _capaciteController,
-                decoration: const InputDecoration(labelText: 'Capacité (m³)'),
-                keyboardType: TextInputType.number,
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) {
+                  return 'Requis';
+                }
+                if (double.tryParse(_normalizeCoordinateInput(v)) == null) {
+                  return 'Doit être un nombre';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _openMapPicker,
+                child: const Icon(Icons.map_outlined),
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _latController,
-                decoration: const InputDecoration(labelText: 'Latitude'),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'Requis';
-                  }
-                  if (double.tryParse(_normalizeCoordinateInput(v)) == null) {
-                    return 'Doit être un nombre';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _longController,
-                decoration: const InputDecoration(labelText: 'Longitude'),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'Requis';
-                  }
-                  if (double.tryParse(_normalizeCoordinateInput(v)) == null) {
-                    return 'Doit être un nombre';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: _openMapPicker,
-                  child: const Icon(Icons.map_outlined),
-                ),
-              ),
+            ),
             ],
-          ),
         ),
       ),
       actions: [
-        TextButton(
+        TextButton.icon(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(Icons.close),
+          icon: const Icon(Icons.close),
+          label: const Text('Annuler'),
         ),
-        FilledButton(
+        FilledButton.icon(
           onPressed: _saving ? null : _save,
-          child: _saving
+          icon: _saving
               ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
                 )
               : Icon(isEdit ? Icons.check : Icons.add),
+          label: Text(isEdit ? 'Modifier' : 'Ajouter'),
         ),
       ],
     );

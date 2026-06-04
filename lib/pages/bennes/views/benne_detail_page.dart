@@ -60,11 +60,13 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                     Expanded(
                       child: Text(
                         'Benne ${benne.id}',
-                        style: Theme.of(context).textTheme.headlineMedium
+                        style: Theme.of(context).textTheme.titleLarge
                             ?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: scheme.primary,
                             ),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (!isChauffeur)
@@ -151,12 +153,14 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
                           Icon(Icons.sensors, color: scheme.primary),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
-                            'Coordonnées geographiques',
-                            style: Theme.of(context).textTheme.titleLarge
+                            'Coordonnées géographiques',
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: scheme.primary,
                                 ),
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -253,10 +257,12 @@ class _BenneDetailPageState extends State<BenneDetailPage> {
               Expanded(
                 child: Text(
                   'Capteurs liés à la benne',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: scheme.primary,
                   ),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

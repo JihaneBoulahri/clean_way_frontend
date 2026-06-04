@@ -36,7 +36,13 @@ class Benne {
       return double.tryParse(value.toString()) ?? fallback;
     }
 
+    dynamic normalizeRaw(dynamic raw) {
+      if (raw is Map && raw.containsKey('data')) return raw['data'];
+      return raw;
+    }
+
     Capteur? parseCapteur(dynamic raw) {
+      raw = normalizeRaw(raw);
       if (raw == null) return null;
       if (raw is List && raw.isNotEmpty) {
         final first = raw.first;
@@ -52,6 +58,7 @@ class Benne {
     }
 
     List<Capteur> parseCapteurs(dynamic raw) {
+      raw = normalizeRaw(raw);
       if (raw == null) return const [];
       if (raw is List) {
         return raw
