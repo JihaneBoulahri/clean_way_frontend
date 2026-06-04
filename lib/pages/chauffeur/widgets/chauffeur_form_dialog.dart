@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../models/chauffeur_model.dart';
 import '../controllers/chauffeur_controller.dart';
 import '../../../widgets/snackbar_helper.dart';
+import '../../../widgets/responsive_form_dialog.dart';
 
 class ChauffeurFormDialog extends StatefulWidget {
   final Chauffeur? chauffeur;
@@ -134,120 +135,123 @@ class _ChauffeurFormDialogState extends State<ChauffeurFormDialog> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.chauffeur != null;
-    return AlertDialog(
-      title: Text(isEdit ? 'Modifier le chauffeur' : 'Ajouter un chauffeur'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _nomController,
-                decoration: const InputDecoration(labelText: 'Nom'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _prenomController,
-                decoration: const InputDecoration(labelText: 'Prénom'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Courriel'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) {
-                  final value = v?.trim() ?? '';
-                  if (value.isEmpty) return 'Requis';
-                  if (!value.contains('@')) return 'Email invalide';
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _hidePassword,
-                decoration: InputDecoration(
-                  labelText: isEdit
-                      ? 'Mot de passe (laisser vide pour ne pas changer)'
-                      : 'Mot de passe',
-                  suffixIcon: IconButton(
-                    onPressed: () =>
-                        setState(() => _hidePassword = !_hidePassword),
-                    icon: Icon(
-                      _hidePassword ? Icons.visibility : Icons.visibility_off,
-                    ),
+    return ResponsiveFormDialog(
+      title: isEdit ? 'Modifier le chauffeur' : 'Ajouter un chauffeur',
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _nomController,
+              decoration: const InputDecoration(labelText: 'Nom'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _prenomController,
+              decoration: const InputDecoration(labelText: 'Prénom'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Courriel'),
+              keyboardType: TextInputType.emailAddress,
+              validator: (v) {
+                final value = v?.trim() ?? '';
+                if (value.isEmpty) return 'Requis';
+                if (!value.contains('@')) return 'Email invalide';
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _passwordController,
+              obscureText: _hidePassword,
+              decoration: InputDecoration(
+                labelText: isEdit
+                    ? 'Mot de passe (laisser vide pour ne pas changer)'
+                    : 'Mot de passe',
+                suffixIcon: IconButton(
+                  onPressed: () =>
+                      setState(() => _hidePassword = !_hidePassword),
+                  icon: Icon(
+                    _hidePassword ? Icons.visibility : Icons.visibility_off,
                   ),
                 ),
-                validator: (v) {
-                  final value = v?.trim() ?? '';
-                  if (!isEdit && value.isEmpty) return 'Requis';
-                  if (value.isNotEmpty && value.length < 6) {
-                    return 'Min 6 caractères';
-                  }
-                  return null;
-                },
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: 'Numéro de téléphone',
-                ),
-                keyboardType: TextInputType.phone,
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
+              validator: (v) {
+                final value = v?.trim() ?? '';
+                if (!isEdit && value.isEmpty) return 'Requis';
+                if (value.isNotEmpty && value.length < 6) {
+                  return 'Min 6 caractères';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _phoneController,
+              decoration: const InputDecoration(
+                labelText: 'Numéro de téléphone',
               ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _cniController,
-                decoration: const InputDecoration(labelText: 'CNI'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _permisController,
-                decoration: const InputDecoration(labelText: 'Permis'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _camionIdController,
-                decoration: const InputDecoration(labelText: 'ID camion'),
-                keyboardType: TextInputType.number,
-                validator: (v) {
-                  final value = v?.trim() ?? '';
-                  if (value.isEmpty && !isEdit) return 'Requis';
-                  if (value.isNotEmpty && int.tryParse(value) == null) {
-                    return 'Doit être un entier';
-                  }
-                  return null;
-                },
-              ),
+              keyboardType: TextInputType.phone,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _cniController,
+              decoration: const InputDecoration(labelText: 'CNI'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _permisController,
+              decoration: const InputDecoration(labelText: 'Permis'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _camionIdController,
+              decoration: const InputDecoration(labelText: 'ID camion'),
+              keyboardType: TextInputType.number,
+              validator: (v) {
+                final value = v?.trim() ?? '';
+                if (value.isEmpty && !isEdit) return 'Requis';
+                if (value.isNotEmpty && int.tryParse(value) == null) {
+                  return 'Doit être un entier';
+                }
+                return null;
+              },
+            ),
             ],
-          ),
         ),
       ),
       actions: [
-        TextButton(
+        TextButton.icon(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(Icons.close),
+          icon: const Icon(Icons.close),
+          label: const Text('Annuler'),
         ),
-        FilledButton(
+        FilledButton.icon(
           onPressed: _saving ? null : _save,
-          child: _saving
+          icon: _saving
               ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
                 )
               : Icon(isEdit ? Icons.check : Icons.add),
+          label: Text(isEdit ? 'Modifier' : 'Ajouter'),
         ),
       ],
     );

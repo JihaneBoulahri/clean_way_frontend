@@ -97,7 +97,12 @@ class BennesController extends GetxController {
   void fetchBennes() async {
     try {
       isLoading(true);
-      final data = await _service.getAllBennes();
+      List<dynamic> data;
+      try {
+        data = await _service.getBennesWithSensors();
+      } catch (_) {
+        data = await _service.getAllBennes();
+      }
       bennes.value = data.map((json) => Benne.fromJson(json)).toList();
     } catch (e) {
       _handleError(e);

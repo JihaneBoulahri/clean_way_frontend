@@ -135,7 +135,7 @@ class Chauffeur {
 
   Map<String, dynamic> toJson() {
     return {
-      'id_chauffeur': id,
+      'id_chauffeur': chauffeurId ?? id,
       'id': id,
       'user_id': userId ?? user?.id,
       'num_telephone': numTelephone,

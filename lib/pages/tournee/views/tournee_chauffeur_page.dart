@@ -72,10 +72,19 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
     return tournee.id > 0 ? tournee : null;
   }
 
+  static final _assignedActiveStatusPattern = RegExp(
+    r'planif|en[\s_]?cours',
+    caseSensitive: false,
+  );
+
+  bool _isAssignedActiveStatus(String status) {
+    return _assignedActiveStatusPattern.hasMatch(status.trim().toLowerCase());
+  }
+
   Tournee? _extractCurrentTournee(dynamic payload) {
     if (payload is Map) {
       final root = _mapToTournee(Map<String, dynamic>.from(payload));
-      if (root != null) return root;
+      if (root != null && _isAssignedActiveStatus(root.status)) return root;
 
       const candidates = [
         'tournee',
@@ -88,7 +97,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
         final value = payload[key];
         if (value is Map) {
           final parsed = _mapToTournee(Map<String, dynamic>.from(value));
-          if (parsed != null) return parsed;
+          if (parsed != null && _isAssignedActiveStatus(parsed.status)) {
+            return parsed;
+          }
         }
       }
       return null;
@@ -98,7 +109,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
       for (final item in payload) {
         if (item is Map) {
           final parsed = _mapToTournee(Map<String, dynamic>.from(item));
-          if (parsed != null) return parsed;
+          if (parsed != null && _isAssignedActiveStatus(parsed.status)) {
+            return parsed;
+          }
         }
       }
     }
@@ -171,8 +184,15 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
       final tournees = await _chauffeurController.fetchMyTournees(
         showSnackbar: false,
       );
-      if (tournees.isNotEmpty) {
-        return _AssignedTournee(tournee: tournees.first);
+      Tournee? activeTournee;
+      for (final tournee in tournees) {
+        if (_isAssignedActiveStatus(tournee.status)) {
+          activeTournee = tournee;
+          break;
+        }
+      }
+      if (activeTournee != null) {
+        return _AssignedTournee(tournee: activeTournee);
       }
     } catch (e) {
       if (!_isNotFoundError(e)) {
@@ -422,9 +442,9 @@ class _TourneeChauffeurPageState extends State<TourneeChauffeurPage> {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: EmptyState(
                   icon: Icons.directions_bus_outlined,
-                  title: 'Aucune tournée assignée',
+                  title: 'Aucune tournée active',
                   subtitle:
-                      'Commencez une nouvelle tournée ou contactez l\'administration.',
+                      'Vous n\'avez pas de tournée planifiée ou en cours actuellement. Les tournées terminées ou annulées s\'affichent dans l\'historique.',
                   action: ElevatedButton(
                     onPressed: _startNewTournee,
                     child: const Icon(Icons.play_arrow),

@@ -5,8 +5,13 @@ import '../../../routes/app_routes.dart';
 
 class TourneeCard extends StatelessWidget {
   final Tournee tournee;
+  final bool enableNavigation;
 
-  const TourneeCard({super.key, required this.tournee});
+  const TourneeCard({
+    super.key,
+    required this.tournee,
+    this.enableNavigation = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,9 @@ class TourneeCard extends StatelessWidget {
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: InkWell(
-        onTap: () => Get.toNamed(AppRoutes.tourneeDetail, arguments: tournee),
+        onTap: enableNavigation
+            ? () => Get.toNamed(AppRoutes.tourneeDetail, arguments: tournee)
+            : null,
         borderRadius: BorderRadius.circular(18),
         child: Padding(
           padding: const EdgeInsets.all(14),
@@ -96,7 +103,9 @@ class TourneeCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      cityLabel.isEmpty ? 'Ville: Non renseignee' : 'Ville: $cityLabel',
+                      cityLabel.isEmpty
+                          ? 'Ville: Non renseignee'
+                          : 'Ville: $cityLabel',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

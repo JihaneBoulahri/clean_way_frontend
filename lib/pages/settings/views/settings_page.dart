@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:clean_way_frontend/core/theme/app_theme.dart';
 import 'package:clean_way_frontend/widgets/modern_widgets.dart';
+import 'package:clean_way_frontend/core/services/chauffeur_service.dart';
 import 'package:clean_way_frontend/core/services/notification_service.dart';
 import 'package:clean_way_frontend/core/services/user_service.dart';
 import '../../../widgets/app_layout.dart';
@@ -12,6 +13,28 @@ Map<String, dynamic> _readUserMap(GetStorage box) {
   final raw = box.read('user');
   if (raw == null || raw is! Map) return <String, dynamic>{};
   return Map<String, dynamic>.from(raw);
+}
+
+Map<String, dynamic> _readChauffeurMap(GetStorage box) {
+  final raw = box.read('chauffeur');
+  if (raw == null || raw is! Map) return <String, dynamic>{};
+  return Map<String, dynamic>.from(raw);
+}
+
+bool _isChauffeurRole(String role) => role.toLowerCase() == 'chauffeur';
+
+String _chauffeurPhone(GetStorage box, Map<String, dynamic> userMap) {
+  final chauffeurMap = _readChauffeurMap(box);
+  final phone =
+      (chauffeurMap['num_telephone'] ??
+              userMap['num_telephone'] ??
+              userMap['telephone'] ??
+              userMap['phone'] ??
+              userMap['tel'] ??
+              '')
+          .toString()
+          .trim();
+  return phone.isEmpty ? 'Non renseigné' : phone;
 }
 
 class SettingsPage extends StatefulWidget {
@@ -92,13 +115,18 @@ class _SettingsPageState extends State<SettingsPage> {
     final nom = userMap['nom']?.toString().trim() ?? '';
     final prenom = userMap['prenom']?.toString().trim() ?? '';
     final role = userMap['role']?.toString().trim() ?? 'Utilisateur';
-    final telephone = userMap['telephone']?.toString().trim() ?? 'Non renseigné';
+    final isChauffeur = _isChauffeurRole(role);
+    final chauffeurTelephone = _chauffeurPhone(box, userMap);
+    final telephone =
+        userMap['telephone']?.toString().trim() ?? 'Non renseigné';
     final userId = userMap['id']?.toString() ?? '—';
     final userName = prenom.isNotEmpty || nom.isNotEmpty
         ? '$prenom $nom'.trim()
         : 'Utilisateur';
     final emailVerifiedAt = userMap['email_verified_at']?.toString();
-    final emailVerified = emailVerifiedAt != null && emailVerifiedAt.isNotEmpty ? 'Vérifié' : 'Non vérifié';
+    final emailVerified = emailVerifiedAt != null && emailVerifiedAt.isNotEmpty
+        ? 'Vérifié'
+        : 'Non vérifié';
 
     // Afficher 1 lettre du prénom + 1 lettre du nom
     String initials = '';
@@ -198,15 +226,20 @@ class _SettingsPageState extends State<SettingsPage> {
                         _ProfileInfoRow(
                           icon: Icons.email_outlined,
                           label: 'Courriel',
-                          value: userMap['email']?.toString() ?? 'Non renseigné',
+                          value:
+                              userMap['email']?.toString() ?? 'Non renseigné',
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        _ProfileInfoRow(
-                          icon: Icons.phone_outlined,
-                          label: 'Téléphone',
-                          value: telephone,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
+                        if (isChauffeur) ...[
+                          _ProfileInfoRow(
+                            icon: Icons.phone_outlined,
+                            label: 'Téléphone',
+                            value: chauffeurTelephone.isNotEmpty
+                                ? chauffeurTelephone
+                                : telephone,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
                         _ProfileInfoRow(
                           icon: Icons.badge_outlined,
                           label: 'ID utilisateur',
@@ -223,7 +256,9 @@ class _SettingsPageState extends State<SettingsPage> {
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             onPressed: () async {
-                              final res = await Get.dialog<bool>(_EditProfileDialog(box: box));
+                              final res = await Get.dialog<bool>(
+                                _EditProfileDialog(box: box),
+                              );
                               if (res == true) setState(() {});
                             },
                             icon: const Icon(Icons.edit),
@@ -410,15 +445,15 @@ class _ProfileInfoRow extends StatelessWidget {
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurface.withOpacity(0.72),
-                    ),
+                  color: scheme.onSurface.withOpacity(0.72),
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -510,6 +545,10 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
   void initState() {
     super.initState();
     final userMap = _readUserMap(widget.box);
+    final chauffeurMap = _readChauffeurMap(widget.box);
+    final isChauffeur = _isChauffeurRole(
+      userMap['role']?.toString().trim() ?? '',
+    );
     _nameController = TextEditingController(
       text: userMap['nom']?.toString() ?? '',
     );
@@ -520,7 +559,13 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
       text: userMap['email']?.toString() ?? '',
     );
     _phoneController = TextEditingController(
-      text: userMap['telephone']?.toString() ?? '',
+      text: isChauffeur
+          ? (chauffeurMap['num_telephone'] ??
+                    userMap['num_telephone'] ??
+                    userMap['telephone'] ??
+                    '')
+                .toString()
+          : '',
     );
     _passwordController = TextEditingController();
   }
@@ -537,22 +582,30 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
 
   Future<void> _save() async {
     final userMap = _readUserMap(widget.box);
+    final chauffeurMap = _readChauffeurMap(widget.box);
+    final isChauffeur = _isChauffeurRole(
+      userMap['role']?.toString().trim() ?? '',
+    );
     final idRaw = userMap['id'];
     final id = idRaw is int ? idRaw : int.tryParse(idRaw?.toString() ?? '');
+    final chauffeurIdRaw =
+        chauffeurMap['id_chauffeur'] ?? chauffeurMap['chauffeur_id'];
+    final chauffeurId = chauffeurIdRaw is int
+        ? chauffeurIdRaw
+        : int.tryParse(chauffeurIdRaw?.toString() ?? '');
 
     final updated = <String, dynamic>{
       ...userMap,
       'nom': _nameController.text.trim(),
       'prenom': _prenomController.text.trim(),
       'email': _emailController.text.trim(),
-      'telephone': _phoneController.text.trim(),
     };
+    updated.remove('telephone');
 
     final payload = <String, dynamic>{
       'nom': updated['nom'],
       'prenom': updated['prenom'],
       'email': updated['email'],
-      'telephone': updated['telephone'],
     };
     final password = _passwordController.text.trim();
     if (password.isNotEmpty) {
@@ -564,7 +617,20 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
       if (id != null) {
         await UserService.update(id, payload);
       }
+      if (isChauffeur) {
+        final phone = _phoneController.text.trim();
+        if (chauffeurId != null) {
+          await ChauffeurService().update(chauffeurId, {
+            'num_telephone': phone,
+          });
+        }
+        widget.box.write('chauffeur', {
+          ...chauffeurMap,
+          'num_telephone': phone,
+        });
+      }
       widget.box.write('user', updated);
+      if (!mounted) return;
 
       showNadiSnackbar(
         title: "Succès",
@@ -585,6 +651,11 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final userMap = _readUserMap(widget.box);
+    final isChauffeur = _isChauffeurRole(
+      userMap['role']?.toString().trim() ?? '',
+    );
+
     return AlertDialog(
       title: Row(
         children: [
@@ -632,18 +703,20 @@ class _EditProfileDialogState extends State<_EditProfileDialog> {
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
-              const SizedBox(height: AppSpacing.lg),
-              TextField(
-                controller: _phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Téléphone',
-                  prefixIcon: const Icon(Icons.phone),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
+              if (isChauffeur) ...[
+                const SizedBox(height: AppSpacing.lg),
+                TextField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    labelText: 'Téléphone',
+                    prefixIcon: const Icon(Icons.phone),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
                   ),
+                  keyboardType: TextInputType.phone,
                 ),
-                keyboardType: TextInputType.phone,
-              ),
+              ],
               const SizedBox(height: AppSpacing.lg),
               TextField(
                 controller: _passwordController,

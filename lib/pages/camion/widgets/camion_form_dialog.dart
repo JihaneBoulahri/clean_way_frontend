@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../core/services/zone_service.dart';
 import '../../../widgets/snackbar_helper.dart';
+import '../../../widgets/responsive_form_dialog.dart';
 import '../../zone/models/zone_model.dart';
 import '../controllers/camion_controller.dart';
 import '../models/camion_model.dart';
@@ -229,136 +230,167 @@ class _CamionFormDialogState extends State<CamionFormDialog> {
     final isEdit = widget.camion != null;
     final selectedZoneId = _selectedZoneValue();
 
-    return AlertDialog(
-      title: Text(isEdit ? 'Modifier le camion' : 'Ajouter un camion'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_loadingZones)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: LinearProgressIndicator(),
-                ),
-              if (_zonesError != null && _zones.isEmpty) ...[
-                Text(
-                  'Impossible de charger les zones',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-              TextFormField(
-                controller: _immatController,
-                decoration: const InputDecoration(labelText: 'Immatriculation'),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedType,
-                decoration: const InputDecoration(labelText: 'Type camion'),
-                items: _typeOptions
-                    .map(
-                      (type) => DropdownMenuItem<String>(
-                        value: type,
-                        child: Text(type),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedType = value),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: _capaciteController,
-                decoration: const InputDecoration(labelText: 'Capacite (m3)'),
-                keyboardType: TextInputType.number,
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _dateController,
-                      decoration: const InputDecoration(
-                        labelText: 'Date mise en service',
-                        hintText: 'AAAA-MM-JJ',
-                      ),
-                      readOnly: true,
-                      onTap: _selectDate,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'Requis' : null,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: _selectDate,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedStatus,
-                decoration: const InputDecoration(labelText: 'Statut'),
-                items: _statusOptions
-                    .map(
-                      (status) => DropdownMenuItem<String>(
-                        value: status,
-                        child: Text(status),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) => setState(() => _selectedStatus = value),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Requis' : null,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<int?>(
-                initialValue: selectedZoneId,
-                decoration: const InputDecoration(labelText: 'Zone (optionnel)'),
-                items: [
-                  const DropdownMenuItem<int?>(
-                    value: null,
-                    child: Text('Aucune zone'),
-                  ),
-                  ..._zones.map(
-                    (zone) => DropdownMenuItem<int?>(
-                      value: zone.id,
-                      child: Text(
-                        '#${zone.id} - ${zone.nomZone}${zone.villeNom != null ? ' (${zone.villeNom})' : ''}',
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _selectedZoneId = value),
-              ),
-            ],
+    final statusValues = List<String>.from(_statusOptions);
+    if (_selectedStatus != null && !statusValues.contains(_selectedStatus)) {
+      statusValues.insert(0, _selectedStatus!);
+    }
+
+    final typeValues = List<String>.from(_typeOptions);
+    if (_selectedType != null && !typeValues.contains(_selectedType)) {
+      typeValues.insert(0, _selectedType!);
+    }
+
+    final selectedZone = _selectedZone();
+    final zoneItems = <DropdownMenuItem<int?>>[
+      const DropdownMenuItem<int?>(
+        value: null,
+        child: Text('Aucune zone'),
+      ),
+      ..._zones.map(
+        (zone) => DropdownMenuItem<int?>(
+          value: zone.id,
+          child: Text(
+            '#${zone.id} - ${zone.nomZone}${zone.villeNom != null ? ' (${zone.villeNom})' : ''}',
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Icon(Icons.close),
+    ];
+    if (selectedZoneId != null &&
+        zoneItems.where((item) => item.value == selectedZoneId).length != 1) {
+      zoneItems.insert(
+        1,
+        DropdownMenuItem<int?>(
+          value: selectedZoneId,
+          child: Text(
+            selectedZone != null
+                ? '#${selectedZone.id} - ${selectedZone.nomZone}'
+                : 'Zone #$selectedZoneId',
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        FilledButton(
+      );
+    }
+
+    return ResponsiveFormDialog(
+      title: isEdit ? 'Modifier le camion' : 'Ajouter un camion',
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_loadingZones)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: LinearProgressIndicator(),
+              ),
+            if (_zonesError != null && _zones.isEmpty) ...[
+              Text(
+                'Impossible de charger les zones',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+            TextFormField(
+              controller: _immatController,
+              decoration: const InputDecoration(labelText: 'Immatriculation'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedType,
+              decoration: const InputDecoration(labelText: 'Type camion'),
+              items: typeValues
+                  .map(
+                    (type) => DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) => setState(() => _selectedType = value),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _capaciteController,
+              decoration: const InputDecoration(labelText: 'Capacite (m3)'),
+              keyboardType: TextInputType.number,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _dateController,
+                    decoration: const InputDecoration(
+                      labelText: 'Date mise en service',
+                      hintText: 'AAAA-MM-JJ',
+                    ),
+                    readOnly: true,
+                    onTap: _selectDate,
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: _selectDate,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedStatus,
+              decoration: const InputDecoration(labelText: 'Statut'),
+              items: statusValues
+                  .map(
+                    (status) => DropdownMenuItem<String>(
+                      value: status,
+                      child: Text(status),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) => setState(() => _selectedStatus = value),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Requis' : null,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int?>(
+              initialValue: selectedZoneId,
+              decoration: const InputDecoration(labelText: 'Zone (optionnel)'),
+              items: zoneItems,
+              onChanged: (value) => setState(() => _selectedZoneId = value),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton.icon(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.close),
+          label: const Text('Annuler'),
+        ),
+        FilledButton.icon(
           onPressed: _saving ? null : _save,
-          child: _saving
+          icon: _saving
               ? const SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
                 )
               : Icon(isEdit ? Icons.check : Icons.add),
+          label: Text(isEdit ? 'Modifier' : 'Ajouter'),
         ),
       ],
     );

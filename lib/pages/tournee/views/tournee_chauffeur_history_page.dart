@@ -101,7 +101,7 @@ class _TourneeChauffeurHistoryPageState
               final tournee = history[index];
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                child: TourneeCard(tournee: tournee),
+                child: TourneeCard(tournee: tournee, enableNavigation: false),
               );
             },
           );
