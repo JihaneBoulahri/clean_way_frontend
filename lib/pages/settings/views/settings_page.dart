@@ -310,7 +310,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           builder: (context, constraints) {
                             final colors = <int>[
                               0xFFFFFFFF,
-                              0xFF0F172A,
                               0xFFDC2626,
                               0xFF065F46,
                               0xFF1E3A8A,
