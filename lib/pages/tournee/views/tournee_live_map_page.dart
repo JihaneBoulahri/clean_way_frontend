@@ -814,15 +814,20 @@ class _LiveMapPanel extends StatelessWidget {
   }
 
   List<LatLng> _routePoints() {
-    if (routeGeometry.length >= 2) {
-      return routeGeometry;
+    if (routeMode == 'all') {
+      if (routeGeometry.length >= 2) {
+        return routeGeometry;
+      }
+      if (routeStops.length >= 2) {
+        return routeStops;
+      }
+      return point == null ? [] : [point!];
     }
+
     if (routeStops.length < 2) {
       return point == null ? [] : [point!];
     }
-    if (routeMode == 'all') {
-      return routeStops;
-    }
+
     final nextIndex = currentSegment + 1;
     if (nextIndex < routeStops.length) {
       return [routeStops[currentSegment], routeStops[nextIndex]];
